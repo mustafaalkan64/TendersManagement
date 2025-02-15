@@ -1,0 +1,34 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Companies";
+}
+
+<h1>Companies</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Companies[0].Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Companies[0].CreatedDate)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Companies)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> 
