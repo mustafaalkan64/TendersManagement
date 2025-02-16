@@ -1,0 +1,38 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Offers";
+}
+
+<h1>Offers</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New Offer</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Offers[0].OfferName)</th>
+            <th>@Html.DisplayNameFor(m => m.Offers[0].TotalPrice)</th>
+            <th>@Html.DisplayNameFor(m => m.Offers[0].CreatedDate)</th>
+            <th>Items Count</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Offers)
+        {
+            <tr>
+                <td>@item.OfferName</td>
+                <td>@item.TotalPrice.ToString("C")</td>
+                <td>@item.CreatedDate.ToShortDateString()</td>
+                <td>@item.OfferItems.Count</td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> 
