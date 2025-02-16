@@ -1,0 +1,58 @@
+@page
+@using global::Pages.Offers
+@model DeleteModel
+@{
+    ViewData["Title"] = "Delete Offer";
+}
+
+<h1>Delete Offer</h1>
+
+<div class="alert alert-danger">
+    <h3>Are you sure you want to delete this offer?</h3>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Offer.OfferName)</dt>
+            <dd class="col-sm-10">@Model.Offer.OfferName</dd>
+
+            <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Offer.TotalPrice)</dt>
+            <dd class="col-sm-10">@Model.Offer.TotalPrice.ToString("C")</dd>
+
+            <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Offer.CreatedDate)</dt>
+            <dd class="col-sm-10">@Model.Offer.CreatedDate.ToShortDateString()</dd>
+        </dl>
+
+        <h4 class="mt-4">Offer Items</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Equipment</th>
+                    <th>Company</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Offer.OfferItems)
+                {
+                    <tr>
+                        <td>@item.Equipment.Name</td>
+                        <td>@item.Company.Name</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price.ToString("C")</td>
+                        <td>@((item.Price * item.Quantity).ToString("C"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <form method="post">
+            <input type="hidden" asp-for="Offer.Id" />
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
+        </form>
+    </div>
+</div> 

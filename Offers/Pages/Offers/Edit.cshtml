@@ -1,8 +1,8 @@
 @page
 @using global::Pages.Offers
-@model EditModel;
+@model EditModel
 @{
-    ViewData["Title"] = Model.Offer?.Id > 0 ? "Edit Offer" : "Create Offer";
+    ViewData["Title"] = "Edit Offer";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -10,11 +10,8 @@
 <div class="row">
     <div class="col-md-12">
         <form method="post">
-            @if (Model.Offer?.Id > 0)
-            {
-                <input type="hidden" asp-for="Offer.Id" />
-                <input type="hidden" asp-for="Offer.CreatedDate" />
-            }
+            <input type="hidden" asp-for="Offer.Id" />
+            <input type="hidden" asp-for="Offer.CreatedDate" />
 
             <div class="row">
                 <div class="col-md-6">
@@ -26,35 +23,37 @@
                 </div>
             </div>
 
-            @if (Model.Offer?.Id > 0)
-            {
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Offer Items</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <select asp-for="NewItem.EquipmentId" asp-items="Model.EquipmentList" class="form-select">
-                                    <option value="">Select Equipment</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <select asp-for="NewItem.CompanyId" asp-items="Model.CompanyList" class="form-select">
-                                    <option value="">Select Company</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <input asp-for="NewItem.Quantity" class="form-control" placeholder="Quantity" />
-                            </div>
-                            <div class="col-md-2">
-                                <input asp-for="NewItem.Price" class="form-control" placeholder="Price" />
-                            </div>
-                            <div class="col-md-2">
-                                <button type="submit" asp-page-handler="AddItem" class="btn btn-primary">Add Item</button>
-                            </div>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Offer Items</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <select asp-for="NewItem.EquipmentId" asp-items="Model.EquipmentList" class="form-select">
+                            </select>
+                            <span asp-validation-for="NewItem.EquipmentId" class="text-danger"></span>
                         </div>
+                        <div class="col-md-3">
+                            <select asp-for="NewItem.CompanyId" asp-items="Model.CompanyList" class="form-select">
+                            </select>
+                            <span asp-validation-for="NewItem.CompanyId" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <input asp-for="NewItem.Quantity" class="form-control" value="1" placeholder="Quantity" />
+                            <span asp-validation-for="NewItem.Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <input asp-for="NewItem.Price" class="form-control" value="100" placeholder="Price" />
+                            <span asp-validation-for="NewItem.Price" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" asp-page-handler="AddItem" class="btn btn-primary">Add Item</button>
+                        </div>
+                    </div>
 
+                    @if (Model.OfferItems.Any())
+                    {
                         <table class="table">
                             <thead>
                                 <tr>
@@ -76,14 +75,13 @@
                                         <td>@item.Price.ToString("C")</td>
                                         <td>@((item.Price * item.Quantity).ToString("C"))</td>
                                         <td>
-                                            <form method="post" style="display: inline;">
-                                                <input type="hidden" name="itemId" value="@item.Id" />
-                                                <button type="submit" asp-page-handler="DeleteItem" 
-                                                        class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Are you sure you want to delete this item?')">
-                                                    Delete
-                                                </button>
-                                            </form>
+                                            <button type="submit"
+                                                    asp-page-handler="DeleteItem"
+                                                    asp-route-itemId="@item.Id"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Are you sure you want to delete this item?')">
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 }
@@ -96,12 +94,12 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
+                    }
                 </div>
-            }
+            </div>
 
             <div class="form-group mt-3">
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" asp-page-handler="Save" class="btn btn-primary">Save Changes</button>
                 <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
             </div>
         </form>
@@ -110,4 +108,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-} 
+}

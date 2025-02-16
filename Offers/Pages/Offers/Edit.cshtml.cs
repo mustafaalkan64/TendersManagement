@@ -23,7 +23,7 @@ namespace Pages.Offers
         public Offer Offer { get; set; }
 
         [BindProperty]
-        public OfferItem NewItem { get; set; }
+        public OfferItem NewItem { get; set; } = new OfferItem();
 
         public List<OfferItem> OfferItems { get; set; }
         public SelectList EquipmentList { get; set; }
@@ -31,19 +31,35 @@ namespace Pages.Offers
 
         private async Task LoadRelatedData()
         {
-            EquipmentList = new SelectList(await _context.Equipment.ToListAsync(), "Id", "Name");
-            CompanyList = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+            var equipments = await _context.Equipment.ToListAsync();
+            var companies = await _context.Companies.ToListAsync();
+
+            EquipmentList = new SelectList(
+                new List<SelectListItem>
+                {
+            new SelectListItem { Value = "0", Text = "Please Select Equipment" }
+                }.Concat(equipments.Select(e => new SelectListItem
+                {
+                    Value = e.Id.ToString(),
+                    Text = e.Name
+                })), "Value", "Text");
+
+            CompanyList = new SelectList(
+                new List<SelectListItem>
+                {
+            new SelectListItem { Value = "0", Text = "Please Select Company" }
+                }.Concat(companies.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })), "Value", "Text");
         }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            await LoadRelatedData();
-
             if (id == null)
             {
-                Offer = new Offer();
-                OfferItems = new List<OfferItem>();
-                return Page();
+                return NotFound();
             }
 
             Offer = await _context.Offers
@@ -58,36 +74,61 @@ namespace Pages.Offers
                 return NotFound();
             }
 
+            await LoadRelatedData();
             OfferItems = Offer.OfferItems.ToList();
+            NewItem.EquipmentId = 0;
+            NewItem.CompanyId = 0;
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostSaveAsync()
         {
-            if (!ModelState.IsValid)
+            if(string.IsNullOrEmpty(Offer.OfferName))
             {
                 await LoadRelatedData();
                 return Page();
             }
 
-            if (Offer.Id == 0)
+            var offer = await _context.Offers
+                .FirstOrDefaultAsync(o => o.Id == Offer.Id);
+
+            offer.OfferName = Offer.OfferName;
+
+            _context.Attach(offer).State = EntityState.Modified;
+
+            try
             {
-                _context.Offers.Add(Offer);
+                await _context.SaveChangesAsync();
             }
-            else
+            catch (DbUpdateConcurrencyException)
             {
-                _context.Attach(Offer).State = EntityState.Modified;
+                if (!OfferExists(Offer.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToPage("./Edit", new { id = Offer.Id });
+            return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostAddItemAsync()
         {
-            if (!ModelState.IsValid)
+
+            if (NewItem == null || NewItem.EquipmentId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
+
                 await LoadRelatedData();
+                var offer = await _context.Offers
+                   .Include(o => o.OfferItems)
+                       .ThenInclude(oi => oi.Equipment)
+                   .Include(o => o.OfferItems)
+                       .ThenInclude(oi => oi.Company)
+               .FirstOrDefaultAsync(o => o.Id == Offer.Id);
+                OfferItems = offer.OfferItems.ToList();
                 return Page();
             }
 
@@ -104,16 +145,19 @@ namespace Pages.Offers
         public async Task<IActionResult> OnPostDeleteItemAsync(int itemId)
         {
             var offerItem = await _context.OfferItems.FindAsync(itemId);
-            if (offerItem != null)
+            if (offerItem == null)
             {
-                _context.OfferItems.Remove(offerItem);
-                await _context.SaveChangesAsync();
-
-                // Update total price
-                await UpdateOfferTotalPrice(offerItem.OfferId);
+                return NotFound();
             }
 
-            return RedirectToPage("./Edit", new { id = Offer.Id });
+            var offerId = offerItem.OfferId;
+            _context.OfferItems.Remove(offerItem);
+            await _context.SaveChangesAsync();
+
+            // Update total price
+            await UpdateOfferTotalPrice(offerId);
+
+            return RedirectToPage("./Edit", new { id = offerId });
         }
 
         private async Task UpdateOfferTotalPrice(int offerId)
@@ -127,6 +171,11 @@ namespace Pages.Offers
                 offer.TotalPrice = offer.OfferItems.Sum(item => item.Price * item.Quantity);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        private bool OfferExists(int id)
+        {
+            return _context.Offers.Any(e => e.Id == id);
         }
     }
 } 

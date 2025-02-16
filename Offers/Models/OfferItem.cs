@@ -23,6 +23,7 @@ public class OfferItem
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
+    [Range(0.0001, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
     public decimal Price { get; set; }
 
     // Navigation properties
