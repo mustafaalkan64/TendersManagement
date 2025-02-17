@@ -18,12 +18,18 @@ namespace Pages.Offers
 
         public List<Offer> Offers { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(CancellationToken cancellationToken)
         {
             Offers = await _context.Offers
+                .AsNoTracking()
                 .Include(o => o.OfferItems)
                 .OrderByDescending(o => o.CreatedDate)
-                .ToListAsync();
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            foreach (var Offer in Offers)
+            {
+                Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
+            }
         }
     }
 } 

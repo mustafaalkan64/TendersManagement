@@ -58,6 +58,21 @@ namespace Pages.Offers
             NewItem.Equipment = await _context.Equipment.FindAsync(NewItem.EquipmentId);
             NewItem.Company = await _context.Companies.FindAsync(NewItem.CompanyId);
 
+            if(OfferItems.Any())
+            {
+
+                var minOffer = OfferItems.Min(x => x.Price);
+
+                var twentyPercentMore = (double)minOffer * (1.2);
+
+                if ((double)NewItem.Price < twentyPercentMore)
+                {
+                    StatusMessage = "Price is less than 20% of the lowest offer price.";
+                    await LoadDropDownLists();
+                    return Page();
+                }
+            }
+
             OfferItems.Add(NewItem);
 
             // Save back to session

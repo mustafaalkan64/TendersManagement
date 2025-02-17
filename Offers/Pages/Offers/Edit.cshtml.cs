@@ -22,6 +22,9 @@ namespace Pages.Offers
         [BindProperty]
         public Offer Offer { get; set; }
 
+        [TempData]
+        public string StatusMessage { get; set; }
+
         [BindProperty]
         public OfferItem NewItem { get; set; } = new OfferItem();
 
@@ -62,12 +65,8 @@ namespace Pages.Offers
                 return NotFound();
             }
 
-            Offer = await _context.Offers
-                .Include(o => o.OfferItems)
-                    .ThenInclude(oi => oi.Equipment)
-                .Include(o => o.OfferItems)
-                    .ThenInclude(oi => oi.Company)
-                .FirstOrDefaultAsync(o => o.Id == id);
+            Offer =  await GetOfferById(id);
+            Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
 
             if (Offer == null)
             {
@@ -117,22 +116,52 @@ namespace Pages.Offers
 
         public async Task<IActionResult> OnPostAddItemAsync()
         {
+            var offer = await GetOfferById(Offer.Id);
+            
+            OfferItems = offer.OfferItems.ToList();
 
             if (NewItem == null || NewItem.EquipmentId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
-
                 await LoadRelatedData();
-                var offer = await _context.Offers
-                   .Include(o => o.OfferItems)
-                       .ThenInclude(oi => oi.Equipment)
-                   .Include(o => o.OfferItems)
-                       .ThenInclude(oi => oi.Company)
-               .FirstOrDefaultAsync(o => o.Id == Offer.Id);
-                OfferItems = offer.OfferItems.ToList();
+                await UpdateOfferTotalPrice(Offer.Id);
                 return Page();
             }
 
             NewItem.OfferId = Offer.Id;
+
+            if(OfferItems.Any(x => x.CompanyId == NewItem.CompanyId) && OfferItems.Any(x => x.EquipmentId == NewItem.EquipmentId))
+            {
+                await LoadRelatedData();
+
+                StatusMessage = "Zaten kurum bu ekipmana teklif vermiþ";
+                return Page();
+            }
+
+
+            if (OfferItems.Any())
+            {
+
+                var minOffer = OfferItems.Min(x => x.Price);
+
+                var twentyPercentMore = (double)minOffer * (1.2);
+
+                if (NewItem.Price < minOffer)
+                {
+                    await LoadRelatedData();
+
+                    StatusMessage = "Teklif tutarý en düþük teklif tutarýndan düþük olamaz";
+                    return Page();
+                }
+
+                if ((double)NewItem.Price >= twentyPercentMore)
+                {
+                    await LoadRelatedData();
+
+                    StatusMessage = "Teklif tutarý en düþük teklif tutarýnýn %20sinden fazla olamaz";
+                    return Page();
+                }
+            }
+
             _context.OfferItems.Add(NewItem);
             await _context.SaveChangesAsync();
 
@@ -162,20 +191,31 @@ namespace Pages.Offers
 
         private async Task UpdateOfferTotalPrice(int offerId)
         {
-            var offer = await _context.Offers
+            var offer = await _context.Offers.AsNoTracking()
                 .Include(o => o.OfferItems)
-                .FirstOrDefaultAsync(o => o.Id == offerId);
+                .FirstOrDefaultAsync(o => o.Id == offerId).ConfigureAwait(false);
 
             if (offer != null)
             {
+                _context.Entry(offer).State = EntityState.Modified;
                 offer.TotalPrice = offer.OfferItems.Sum(item => item.Price * item.Quantity);
-                await _context.SaveChangesAsync();
+                Offer.TotalPrice = offer.TotalPrice;
             }
         }
 
         private bool OfferExists(int id)
         {
             return _context.Offers.Any(e => e.Id == id);
+        }
+
+        private async Task<Offer> GetOfferById(int? id)
+        {
+            return await _context.Offers
+               .Include(o => o.OfferItems)
+                   .ThenInclude(oi => oi.Equipment)
+               .Include(o => o.OfferItems)
+                   .ThenInclude(oi => oi.Company)
+               .FirstOrDefaultAsync(o => o.Id == id);
         }
     }
 } 
