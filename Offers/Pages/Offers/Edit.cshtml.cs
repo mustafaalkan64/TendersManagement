@@ -134,6 +134,7 @@ namespace Pages.Offers
                 await LoadRelatedData();
 
                 StatusMessage = "Zaten kurum bu ekipmana teklif vermiþ";
+                await UpdateOfferTotalPrice(Offer.Id);
                 return Page();
             }
 
@@ -150,14 +151,16 @@ namespace Pages.Offers
                     await LoadRelatedData();
 
                     StatusMessage = "Teklif tutarý en düþük teklif tutarýndan düþük olamaz";
+                    await UpdateOfferTotalPrice(Offer.Id);
                     return Page();
                 }
 
-                if ((double)NewItem.Price >= twentyPercentMore)
+                if ((double)NewItem.Price > twentyPercentMore)
                 {
                     await LoadRelatedData();
 
                     StatusMessage = "Teklif tutarý en düþük teklif tutarýnýn %20sinden fazla olamaz";
+                    await UpdateOfferTotalPrice(Offer.Id);
                     return Page();
                 }
             }

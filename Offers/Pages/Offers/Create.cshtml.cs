@@ -58,17 +58,32 @@ namespace Pages.Offers
             NewItem.Equipment = await _context.Equipment.FindAsync(NewItem.EquipmentId);
             NewItem.Company = await _context.Companies.FindAsync(NewItem.CompanyId);
 
-            if(OfferItems.Any())
+            if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId) && OfferItems.Any(x => x.EquipmentId == NewItem.EquipmentId))
+            {
+                await LoadDropDownLists();
+                StatusMessage = "Zaten kurum bu ekipmana teklif vermiþ";
+                return Page();
+            }
+
+            if (OfferItems.Any())
             {
 
                 var minOffer = OfferItems.Min(x => x.Price);
 
                 var twentyPercentMore = (double)minOffer * (1.2);
 
-                if ((double)NewItem.Price < twentyPercentMore)
+                if (NewItem.Price < minOffer)
                 {
-                    StatusMessage = "Price is less than 20% of the lowest offer price.";
+                    StatusMessage = "Teklif tutarý en düþük teklif tutarýndan düþük olamaz";
                     await LoadDropDownLists();
+                    return Page();
+                }
+
+                if ((double)NewItem.Price > twentyPercentMore)
+                {
+                    StatusMessage = "Teklif tutarý en düþük teklif tutarýnýn %20sinden fazla olamaz";
+                    await LoadDropDownLists();
+
                     return Page();
                 }
             }
