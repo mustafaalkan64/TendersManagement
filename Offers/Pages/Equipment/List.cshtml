@@ -8,15 +8,15 @@
 <h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-page="Create" class="btn btn-primary">Yeni Oluþtur</a>
+    <a asp-page="Create" class="btn btn-primary">Yeni Olu&#351;tur</a>
 </p>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Adý</th>
-            <th>Açýklamasý</th>
-            <th>Markasý</th>
+            <th>Ad&#305;</th>
+            <th>A&ccedil;ýklamasý</th>
+            <th>Markas&#305;</th>
             <th>Aksiyonlar</th>
         </tr>
     </thead>
@@ -28,7 +28,7 @@
                 <td>@item.Description</td>
                 <td>@item.Brand</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Düzenle</a>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">D&uuml;zenle</a>
                     <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Sil</a>
                 </td>
             </tr>
