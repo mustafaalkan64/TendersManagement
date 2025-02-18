@@ -1,22 +1,22 @@
 @page
 @model EquipmentListModel
 @{
-    ViewData["Title"] = "Equipment List";
+    ViewData["Title"] = "Ekipman Listesi";
 }
 
-<h1>Equipment List</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-page="Create" class="btn btn-primary">Create New</a>
+    <a asp-page="Create" class="btn btn-primary">Yeni Oluþtur</a>
 </p>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Brand</th>
-            <th>Actions</th>
+            <th>Adý</th>
+            <th>Açýklamasý</th>
+            <th>Markasý</th>
+            <th>Aksiyonlar</th>
         </tr>
     </thead>
     <tbody>
@@ -27,8 +27,8 @@
                 <td>@item.Description</td>
                 <td>@item.Brand</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Düzenle</a>
+                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Sil</a>
                 </td>
             </tr>
         }

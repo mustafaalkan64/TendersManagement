@@ -1,10 +1,10 @@
 @page
 @model CreateModel
 @{
-    ViewData["Title"] = "Create Equipment";
+    ViewData["Title"] = "Ekipman Oluþtur";
 }
 
-<h1>Create Equipment</h1>
+<h1>@ViewData["Title"]</h1>
 
 <form method="post">
     <div class="form-group">
@@ -22,8 +22,9 @@
         <input asp-for="Equipment.Brand" class="form-control" />
         <span asp-validation-for="Equipment.Brand" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-page="Index" class="btn btn-secondary">Back to List</a>
+    <br />
+    <button type="submit" class="btn btn-primary">Oluþtur</button>
+    <a asp-page="Index" class="btn btn-secondary">Ekipman Listesi</a>
 </form> 
 
 @section Scripts {
