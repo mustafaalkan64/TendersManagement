@@ -1,8 +1,27 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Globalization;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Ensure JSON encoding supports Turkish characters properly
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+});
+
+// Set Turkish localization
+var supportedCultures = new[] { new CultureInfo("tr-TR") };
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("tr-TR");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -44,6 +63,16 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var app = builder.Build();
+
+// Apply localization settings
+app.UseRequestLocalization();
+
+// Force UTF-8 for responses
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+    await next();
+});
 
 // Apply migrations automatically
 using (var scope = app.Services.CreateScope())
