@@ -27,7 +27,7 @@
             <tr>
                 <td>@item.OfferName</td>
                 <td>@item.TotalPrice.ToString("C")</td>
-                <td>@item.CreatedDate.ToShortDateString()</td>
+                <td>@item.CreatedDate</td>
                 <td>@item.OfferItems.Count</td>
                 <td>
                     <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>

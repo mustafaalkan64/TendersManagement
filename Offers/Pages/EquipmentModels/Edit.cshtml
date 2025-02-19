@@ -50,7 +50,7 @@
                                     <input type="hidden" name="Features[@i].Id" value="@Model.Features[i].Id" />
                                 </div>
                                 <div class="col-md-6">
-                                    <textarea name="Features[@i].FeatureValue" class="form-control" rows="2" required>@Model.Features[i].FeatureValue</textarea>
+                                    <input name="Features[@i].FeatureValue" class="form-control" value="@Model.Features[i].FeatureValue" required />
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
@@ -83,7 +83,7 @@
                     <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Feature Key" required />
                 </div>
                 <div class="col-md-6">
-                    <textarea name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" rows="2" required></textarea>
+                    <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" required />
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
