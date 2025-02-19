@@ -11,11 +11,11 @@ namespace Models
         public int OfferId { get; set; }
 
         [Required]
-        [Display(Name = "Equipment Model")]
+        [Display(Name = "Ekipman Modeli")]
         public int EquipmentModelId { get; set; }
 
         [Required]
-        [Display(Name = "Company")]
+        [Display(Name = "Þirket")]
         public int CompanyId { get; set; }
 
         [Required]
@@ -25,6 +25,9 @@ namespace Models
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
+
+        [Display(Name = "Oluþturma Tarihi")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         // Navigation properties
         public Offer Offer { get; set; }

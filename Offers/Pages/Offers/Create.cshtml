@@ -67,6 +67,7 @@
                                     <th>Quantity</th>
                                     <th>Price</th>
                                     <th>Total</th>
+                                    <th>Created Date</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -79,6 +80,7 @@
                                         <td>@item.Quantity</td>
                                         <td>@item.Price.ToString("C")</td>
                                         <td>@((item.Price * item.Quantity).ToString("C"))</td>
+                                        <td>@item.CreatedDate</td>
                                         <td>
                                             <button type="submit"
                                                     asp-page-handler="RemoveItem"

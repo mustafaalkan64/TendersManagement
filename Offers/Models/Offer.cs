@@ -8,14 +8,14 @@ namespace Models
 
         [Required]
         [StringLength(200)]
-        [Display(Name = "Offer Name")]
+        [Display(Name = "Teklif Adý")]
         public string OfferName { get; set; }
 
-        [Display(Name = "Total Price")]
+        [Display(Name = "Toplam Tutar")]
         public decimal TotalPrice { get; set; }
 
-        [Display(Name = "Created Date")]
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        [Display(Name = "Oluþturma Tarihi")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         public List<OfferItem> OfferItems { get; set; } = new List<OfferItem>();
     }
