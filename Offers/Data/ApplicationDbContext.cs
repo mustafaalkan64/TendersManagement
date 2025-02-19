@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Company> Companies { get; set; }
     public DbSet<Offer> Offers { get; set; }
     public DbSet<OfferItem> OfferItems { get; set; }
+    public DbSet<EquipmentModelFeature> EquipmentModelFeatures { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

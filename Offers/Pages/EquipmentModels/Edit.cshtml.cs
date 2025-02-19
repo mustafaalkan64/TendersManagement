@@ -17,6 +17,10 @@ namespace Pages.EquipmentModelPage
 
         [BindProperty]
         public EquipmentModel EquipmentModel { get; set; }
+
+        [BindProperty]
+        public List<EquipmentModelFeature> Features { get; set; }
+
         public SelectList EquipmentList { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
@@ -28,6 +32,7 @@ namespace Pages.EquipmentModelPage
 
             EquipmentModel = await _context.EquipmentModels
                 .Include(e => e.Equipment)
+                .Include(e => e.Features)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (EquipmentModel == null)
@@ -35,6 +40,7 @@ namespace Pages.EquipmentModelPage
                 return NotFound();
             }
 
+            Features = EquipmentModel.Features.ToList();
             await LoadEquipmentList();
             return Page();
         }
@@ -45,6 +51,18 @@ namespace Pages.EquipmentModelPage
             {
                 await LoadEquipmentList();
                 return Page();
+            }
+
+            var existingFeatures = await _context.EquipmentModelFeatures
+            .Where(f => f.EquipmentModelId == EquipmentModel.Id)
+            .ToListAsync();
+
+            _context.EquipmentModelFeatures.RemoveRange(existingFeatures);
+
+            foreach (var feature in Features)
+            {
+                feature.EquipmentModelId = EquipmentModel.Id;
+                _context.EquipmentModelFeatures.Add(feature);
             }
 
             _context.Attach(EquipmentModel).State = EntityState.Modified;

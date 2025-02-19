@@ -17,6 +17,10 @@ namespace Pages.EquipmentModelPage
 
         [BindProperty]
         public EquipmentModel EquipmentModel { get; set; }
+
+        [BindProperty]
+        public List<EquipmentModelFeature> Features { get; set; } = new List<EquipmentModelFeature>();
+
         public SelectList EquipmentList { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
@@ -32,14 +36,22 @@ namespace Pages.EquipmentModelPage
                 await LoadEquipmentList();
                 return Page();
             }
+            //_context.EquipmentModels.Add(new EquipmentModel() {  
+            //    Brand = EquipmentModel.Brand,
+            //    Model = EquipmentModel.Model,
+            //    EquipmentId = EquipmentModel.EquipmentId
+            //});
 
-            var equipment = await _context.Equipment.FindAsync(EquipmentModel.EquipmentId);
+            _context.EquipmentModels.Add(EquipmentModel);
+            await _context.SaveChangesAsync();
 
-            _context.EquipmentModels.Add(new EquipmentModel() {  
-                Brand = EquipmentModel.Brand,
-                Model = EquipmentModel.Model,
-                EquipmentId = EquipmentModel.EquipmentId
-            });
+            // Add features
+            foreach (var feature in Features)
+            {
+                feature.EquipmentModelId = EquipmentModel.Id;
+                _context.EquipmentModelFeatures.Add(feature);
+            }
+
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

@@ -22,5 +22,7 @@ namespace Models
         [JsonIgnore]
         // Navigation property
         public Equipment Equipment { get; set; }
+
+        public List<EquipmentModelFeature> Features { get; set; } = new List<EquipmentModelFeature>();
     }
 }
