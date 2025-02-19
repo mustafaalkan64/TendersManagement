@@ -11,6 +11,7 @@ public class ApplicationDbContext : IdentityDbContext
     }
 
     public DbSet<Equipment> Equipment { get; set; }
+    public DbSet<EquipmentModel> EquipmentModels { get; set; }
     public DbSet<Company> Companies { get; set; }
     public DbSet<Offer> Offers { get; set; }
     public DbSet<OfferItem> OfferItems { get; set; }
@@ -24,5 +25,10 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany(o => o.OfferItems)
             .HasForeignKey(oi => oi.OfferId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EquipmentModel>()
+            .HasOne(em => em.Equipment)
+            .WithMany(e => e.Models)
+            .HasForeignKey(em => em.EquipmentId);
     }
 } 

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
 using System.Text.Encodings.Web;
+using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
 {
     options.SerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    //options.SerializerOptions.ReferenceHandler = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 });
 
 // Set Turkish localization

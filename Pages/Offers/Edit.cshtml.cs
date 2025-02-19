@@ -26,29 +26,50 @@ namespace Pages.Offers
         public OfferItem NewItem { get; set; }
 
         public List<OfferItem> OfferItems { get; set; }
-        public SelectList EquipmentList { get; set; }
+        public SelectList EquipmentModelList { get; set; }
         public SelectList CompanyList { get; set; }
 
         private async Task LoadRelatedData()
         {
-            EquipmentList = new SelectList(await _context.Equipment.ToListAsync(), "Id", "Name");
-            CompanyList = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+            var equipmentModels = await _context.EquipmentModels
+                .Include(em => em.Equipment)
+                .OrderBy(em => em.Equipment.Name)
+                .ThenBy(em => em.Brand)
+                .ThenBy(em => em.Model)
+                .ToListAsync();
+
+            EquipmentModelList = new SelectList(
+                new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "0", Text = "Please Select Equipment Model" }
+                }.Concat(equipmentModels.Select(em => new SelectListItem
+                {
+                    Value = em.Id.ToString(),
+                    Text = $"{em.Equipment.Name} - {em.Brand} {em.Model}"
+                })), "Value", "Text");
+
+            CompanyList = new SelectList(
+                new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "0", Text = "Please Select Company" }
+                }.Concat(await _context.Companies.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToListAsync()), "Value", "Text");
         }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            await LoadRelatedData();
-
             if (id == null)
             {
-                Offer = new Offer();
-                OfferItems = new List<OfferItem>();
-                return Page();
+                return NotFound();
             }
 
             Offer = await _context.Offers
                 .Include(o => o.OfferItems)
-                    .ThenInclude(oi => oi.Equipment)
+                    .ThenInclude(oi => oi.EquipmentModel)
+                        .ThenInclude(em => em.Equipment)
                 .Include(o => o.OfferItems)
                     .ThenInclude(oi => oi.Company)
                 .FirstOrDefaultAsync(o => o.Id == id);
@@ -59,6 +80,7 @@ namespace Pages.Offers
             }
 
             OfferItems = Offer.OfferItems.ToList();
+            await LoadRelatedData();
             return Page();
         }
 

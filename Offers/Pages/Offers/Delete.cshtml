@@ -39,7 +39,7 @@
                 @foreach (var item in Model.Offer.OfferItems)
                 {
                     <tr>
-                        <td>@item.Equipment.Name</td>
+                        <td>@item.EquipmentModel.Equipment.Name - @item.EquipmentModel.Brand @item.EquipmentModel.Model</td>
                         <td>@item.Company.Name</td>
                         <td>@item.Quantity</td>
                         <td>@item.Price.ToString("C")</td>

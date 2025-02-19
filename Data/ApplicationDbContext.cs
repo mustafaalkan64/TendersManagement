@@ -7,6 +7,7 @@ namespace Data
     {
         public DbSet<Offer> Offers { get; set; }
         public DbSet<OfferItem> OfferItems { get; set; }
+        public DbSet<EquipmentModel> EquipmentModels { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -17,6 +18,11 @@ namespace Data
                 .WithMany(o => o.OfferItems)
                 .HasForeignKey(oi => oi.OfferId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EquipmentModel>()
+                .HasOne(em => em.Equipment)
+                .WithMany(e => e.Models)
+                .HasForeignKey(em => em.EquipmentId);
         }
     }
 } 

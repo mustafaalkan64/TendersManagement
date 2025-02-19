@@ -35,14 +35,12 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <select asp-for="NewItem.EquipmentId" asp-items="Model.EquipmentList" class="form-select">
-                                <option value="">Select Equipment</option>
+                            <select asp-for="NewItem.EquipmentModelId" asp-items="Model.EquipmentModelList" class="form-select">
                             </select>
-                            <span asp-validation-for="NewItem.EquipmentId" class="text-danger"></span>
+                            <span asp-validation-for="NewItem.EquipmentModelId" class="text-danger"></span>
                         </div>
                         <div class="col-md-3">
                             <select asp-for="NewItem.CompanyId" asp-items="Model.CompanyList" class="form-select">
-                                <option value="">Select Company</option>
                             </select>
                             <span asp-validation-for="NewItem.CompanyId" class="text-danger"></span>
                         </div>
@@ -76,13 +74,15 @@
                                 @foreach (var item in Model.OfferItems)
                                 {
                                     <tr>
-                                        <td>@item.Equipment?.Name</td>
-                                        <td>@item.Company?.Name</td>
+                                        <td>@item.EquipmentModel.Equipment.Name - @item.EquipmentModel.Brand @item.EquipmentModel.Model</td>
+                                        <td>@item.Company.Name</td>
                                         <td>@item.Quantity</td>
                                         <td>@item.Price.ToString("C")</td>
                                         <td>@((item.Price * item.Quantity).ToString("C"))</td>
                                         <td>
-                                            <button type="submit" asp-page-handler="RemoveItem" asp-route-index="@Model.OfferItems.IndexOf(item)"
+                                            <button type="submit"
+                                                    asp-page-handler="RemoveItem"
+                                                    asp-route-index="@Model.OfferItems.IndexOf(item)"
                                                     class="btn btn-danger btn-sm">
                                                 Remove
                                             </button>

@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Models;
-namespace Offers.Pages.Companies
+
+namespace Pages.EquipmentModelPage
 {
-    [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -16,7 +16,8 @@ namespace Offers.Pages.Companies
         }
 
         [BindProperty]
-        public Company Company { get; set; }
+        public EquipmentModel EquipmentModel { get; set; }
+        public SelectList EquipmentList { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -25,23 +26,28 @@ namespace Offers.Pages.Companies
                 return NotFound();
             }
 
-            Company = await _context.Companies.FirstOrDefaultAsync(m => m.Id == id);
+            EquipmentModel = await _context.EquipmentModels
+                .Include(e => e.Equipment)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (Company == null)
+            if (EquipmentModel == null)
             {
                 return NotFound();
             }
+
+            await LoadEquipmentList();
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            if (EquipmentModel.EquipmentId == null || string.IsNullOrEmpty(EquipmentModel.Brand) || string.IsNullOrEmpty(EquipmentModel.Model))
             {
+                await LoadEquipmentList();
                 return Page();
             }
 
-            _context.Attach(Company).State = EntityState.Modified;
+            _context.Attach(EquipmentModel).State = EntityState.Modified;
 
             try
             {
@@ -49,7 +55,7 @@ namespace Offers.Pages.Companies
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CompanyExists(Company.Id))
+                if (!EquipmentModelExists(EquipmentModel.Id))
                 {
                     return NotFound();
                 }
@@ -62,9 +68,18 @@ namespace Offers.Pages.Companies
             return RedirectToPage("./Index");
         }
 
-        private bool CompanyExists(int id)
+        private async Task LoadEquipmentList()
         {
-            return _context.Companies.Any(e => e.Id == id);
+            EquipmentList = new SelectList(
+                await _context.Equipment.OrderBy(e => e.Name).ToListAsync(),
+                "Id",
+                "Name"
+            );
+        }
+
+        private bool EquipmentModelExists(int id)
+        {
+            return _context.EquipmentModels.Any(e => e.Id == id);
         }
     }
-}
+} 

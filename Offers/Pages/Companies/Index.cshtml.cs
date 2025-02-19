@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Models;
 namespace Offers.Pages.Companies
 {
     [Authorize(Roles = "Admin, User")]

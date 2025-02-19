@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Offers.Pages.Equipment
+namespace EquipmentModels.Pages
 {
-    [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -16,7 +17,8 @@ namespace Offers.Pages.Equipment
         }
 
         [BindProperty]
-        public Models.Equipment Equipment { get; set; }
+        public EquipmentModel EquipmentModel { get; set; }
+        public SelectList EquipmentList { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -25,12 +27,16 @@ namespace Offers.Pages.Equipment
                 return NotFound();
             }
 
-            Equipment = await _context.Equipment.FindAsync(id);
+            EquipmentModel = await _context.EquipmentModels
+                .Include(e => e.Equipment)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (Equipment == null)
+            if (EquipmentModel == null)
             {
                 return NotFound();
             }
+
+            await LoadEquipmentList();
             return Page();
         }
 
@@ -38,10 +44,11 @@ namespace Offers.Pages.Equipment
         {
             if (!ModelState.IsValid)
             {
+                await LoadEquipmentList();
                 return Page();
             }
 
-            _context.Attach(Equipment).State = EntityState.Modified;
+            _context.Attach(EquipmentModel).State = EntityState.Modified;
 
             try
             {
@@ -49,7 +56,7 @@ namespace Offers.Pages.Equipment
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EquipmentExists(Equipment.Id))
+                if (!EquipmentModelExists(EquipmentModel.Id))
                 {
                     return NotFound();
                 }
@@ -59,12 +66,21 @@ namespace Offers.Pages.Equipment
                 }
             }
 
-            return RedirectToPage("./List");
+            return RedirectToPage("./Index");
         }
 
-        private bool EquipmentExists(int id)
+        private async Task LoadEquipmentList()
         {
-            return _context.Equipment.Any(e => e.Id == id);
+            EquipmentList = new SelectList(
+                await _context.Equipment.OrderBy(e => e.Name).ToListAsync(),
+                "Id",
+                "Name"
+            );
+        }
+
+        private bool EquipmentModelExists(int id)
+        {
+            return _context.EquipmentModels.Any(e => e.Id == id);
         }
     }
-}
+} 

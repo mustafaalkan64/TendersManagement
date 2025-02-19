@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
-using Models;
 using Microsoft.AspNetCore.Authorization;
+using Models;
 
 [Authorize(Roles = "Admin")]
 public class DeleteModel : PageModel

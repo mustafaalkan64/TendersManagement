@@ -34,9 +34,10 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <select asp-for="NewItem.EquipmentId" asp-items="Model.EquipmentList" class="form-select">
-                                    <option value="">Select Equipment</option>
+                                <select asp-for="NewItem.EquipmentModelId" asp-items="Model.EquipmentModelList" class="form-select">
+                                    <option value="0">Please Select Equipment Model</option>
                                 </select>
+                                <span asp-validation-for="NewItem.EquipmentModelId" class="text-danger"></span>
                             </div>
                             <div class="col-md-3">
                                 <select asp-for="NewItem.CompanyId" asp-items="Model.CompanyList" class="form-select">

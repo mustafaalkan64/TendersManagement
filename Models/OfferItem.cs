@@ -9,8 +9,8 @@ public class OfferItem
     public int OfferId { get; set; }
     
     [Required]
-    [Display(Name = "Equipment")]
-    public int EquipmentId { get; set; }
+    [Display(Name = "Equipment Model")]
+    public int EquipmentModelId { get; set; }
 
     [Required]
     [Display(Name = "Company")]
@@ -26,6 +26,6 @@ public class OfferItem
 
     // Navigation properties
     public Offer Offer { get; set; }
-    public Equipment Equipment { get; set; }
+    public EquipmentModel EquipmentModel { get; set; }
     public Company Company { get; set; }
 } 

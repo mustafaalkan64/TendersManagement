@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Models;
 
 namespace Pages.Offers {
 
@@ -24,10 +25,6 @@ namespace Pages.Offers {
             }
 
             Offer = await _context.Offers
-                .Include(o => o.OfferItems)
-                    .ThenInclude(oi => oi.Equipment)
-                .Include(o => o.OfferItems)
-                    .ThenInclude(oi => oi.Company)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (Offer == null)
