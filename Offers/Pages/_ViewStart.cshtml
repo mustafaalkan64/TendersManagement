@@ -1,3 +1,6 @@
-﻿@{
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
     Layout = "_Layout";
+    HttpContextAccessor.HttpContext.Response.ContentType = "text/html; charset=utf-8";
+    HttpContextAccessor.HttpContext.Response.Headers["Content-Type"] = "text/html; charset=utf-8";
 }
