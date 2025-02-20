@@ -16,10 +16,14 @@ public class CreateModel : PageModel
     [BindProperty]
     public Equipment Equipment { get; set; }
 
+    [BindProperty]
+    public string StatusMessage { get; set; }
+
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
+        if(string.IsNullOrEmpty(Equipment.Name))
         {
+            StatusMessage = "Ekipman adý boþ olamaz";
             return Page();
         }
 
