@@ -23,10 +23,27 @@ namespace Pages.EquipmentModelPage
 
         public SelectList EquipmentList { get; set; }
 
+        [TempData]
+        public string StatusMessage { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
             await LoadEquipmentList();
             return Page();
+        }
+
+        public async Task<IActionResult> OnGetEquipmentFeaturesAsync(int equipmentId)
+        {
+            var features = await _context.EquipmentFeatures
+                .Where(ef => ef.EquipmentId == equipmentId)
+                .Select(ef => new
+                {
+                    featureKey = ef.FeatureKey,
+                    featureValue = ef.FeatureValue
+                })
+                .ToListAsync();
+
+            return new JsonResult(features);
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -53,6 +70,8 @@ namespace Pages.EquipmentModelPage
             }
 
             await _context.SaveChangesAsync();
+
+            StatusMessage = "Equipment model created successfully.";
 
             return RedirectToPage("./Index");
         }

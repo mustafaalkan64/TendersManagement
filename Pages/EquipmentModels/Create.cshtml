@@ -2,6 +2,7 @@
 @model CreateModel
 @{
     ViewData["Title"] = "Create Equipment Model";
+    var antiforgery = Context.RequestServices.GetRequiredService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>().GetAndStoreTokens(Context);
 }
 
 <h1>@ViewData["Title"]</h1>

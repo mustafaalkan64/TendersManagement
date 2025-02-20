@@ -17,6 +17,9 @@ public class CreateModel : PageModel
     public Equipment Equipment { get; set; }
 
     [BindProperty]
+    public List<EquipmentFeature> Features { get; set; } = new List<EquipmentFeature>();
+
+    [BindProperty]
     public string StatusMessage { get; set; }
 
     public async Task<IActionResult> OnPostAsync()
@@ -29,6 +32,16 @@ public class CreateModel : PageModel
 
         _context.Equipment.Add(Equipment);
         await _context.SaveChangesAsync();
+
+        // Add features
+        foreach (var feature in Features)
+        {
+            feature.EquipmentId = Equipment.Id;
+            _context.EquipmentFeatures.Add(feature);
+        }
+        await _context.SaveChangesAsync();
+
+        StatusMessage = "Equipment created successfully.";
 
         return RedirectToPage("./List");
     }

@@ -1,8 +1,11 @@
 @page
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @using global::Pages.EquipmentModelPage
 @model CreateModel
 @{
     ViewData["Title"] = "Create Equipment Model";
+    var context = HttpContextAccessor.HttpContext;
+    var antiforgery = context.RequestServices.GetRequiredService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>().GetAndStoreTokens(context);
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -14,7 +17,10 @@
 
             <div class="form-group mb-3">
                 <label asp-for="EquipmentModel.EquipmentId" class="control-label">Equipment</label>
-                <select asp-for="EquipmentModel.EquipmentId" asp-items="Model.EquipmentList" class="form-select">
+                <select asp-for="EquipmentModel.EquipmentId"
+                        asp-items="Model.EquipmentList"
+                        class="form-select"
+                        onchange="loadEquipmentFeatures(this.value)">
                     <option value="">Please select equipment</option>
                 </select>
                 <span asp-validation-for="EquipmentModel.EquipmentId" class="text-danger"></span>
@@ -57,6 +63,46 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+
+        async function loadEquipmentFeatures(equipmentId) {
+            if (!equipmentId) return;
+
+            try {
+                const response = await fetch(`?handler=EquipmentFeatures&equipmentId=${equipmentId}`, {
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                });
+                if (response.ok) {
+                    const features = await response.json();
+
+                    // Clear existing features
+                    const container = document.getElementById('featuresContainer');
+                    container.innerHTML = '';
+
+                    // Add features from equipment
+                    features.forEach((feature, index) => {
+                        const row = document.createElement('div');
+                        row.className = 'row mb-2 feature-row';
+                        row.innerHTML = `
+                            <div class="col-md-4">
+                                <input name="Features[${index}].FeatureKey" value="${feature.featureKey}" class="form-control" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input name="Features[${index}].FeatureValue" class="form-control" value="${feature.featureValue}" required />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                            </div>
+                        `;
+
+                        container.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading equipment features:', error);
+            }
+        }
         function addFeatureRow() {
             const container = document.getElementById('featuresContainer');
             const index = container.children.length;

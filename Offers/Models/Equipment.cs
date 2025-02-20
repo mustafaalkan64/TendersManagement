@@ -16,5 +16,6 @@ namespace Models
 
         // Navigation property
         public ICollection<EquipmentModel> Models { get; set; }
+        public List<EquipmentFeature> Features { get; set; } = new List<EquipmentFeature>();
     }
 }

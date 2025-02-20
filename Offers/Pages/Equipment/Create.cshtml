@@ -29,6 +29,21 @@
         <span asp-validation-for="Equipment.Description" class="text-danger"></span>
     </div>
     <br />
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Features</h5>
+                <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Add Feature</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="featuresContainer">
+                <!-- Feature rows will be added here -->
+            </div>
+        </div>
+    </div>
+    <br />
     <button type="submit" class="btn btn-primary">Olu&#351;tur</button>
     <a asp-page="Index" class="btn btn-secondary">Ekipman Listesi</a>
 </form> 
@@ -37,4 +52,47 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        function addFeatureRow() {
+            const container = document.getElementById('featuresContainer');
+            const index = container.children.length;
+
+            const row = document.createElement('div');
+            row.className = 'row mb-2 feature-row';
+            row.innerHTML = `
+                <div class="col-md-4">
+                    <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Feature Key" required />
+                </div>
+                <div class="col-md-6">
+                    <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" />
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                </div>
+            `;
+
+            container.appendChild(row);
+        }
+
+        function removeFeatureRow(button) {
+            const row = button.closest('.feature-row');
+            row.remove();
+            reindexFeatures();
+        }
+
+        function reindexFeatures() {
+            const container = document.getElementById('featuresContainer');
+            const rows = container.getElementsByClassName('feature-row');
+
+            for (let i = 0; i < rows.length; i++) {
+                const inputs = rows[i].querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    const nameParts = input.name.split('.');
+                    if (nameParts.length > 1) {
+                        input.name = `Features[${i}].${nameParts[1]}`;
+                    }
+                });
+            }
+        }
+    </script>
 }

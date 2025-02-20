@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Models;
 
 namespace Offers.Pages.Equipment
 {
@@ -16,7 +17,13 @@ namespace Offers.Pages.Equipment
         }
 
         [BindProperty]
+        public List<EquipmentFeature> Features { get; set; }
+
+        [BindProperty]
         public Models.Equipment Equipment { get; set; }
+
+        [TempData]
+        public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -25,26 +32,38 @@ namespace Offers.Pages.Equipment
                 return NotFound();
             }
 
-            Equipment = await _context.Equipment.FindAsync(id);
+            Equipment = await _context.Equipment
+                .Include(e => e.Features)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (Equipment == null)
             {
                 return NotFound();
             }
+
+            Features = Equipment.Features.ToList();
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            _context.Attach(Equipment).State = EntityState.Modified;
-
             try
             {
+                // Remove existing features
+                var existingFeatures = await _context.EquipmentFeatures
+                    .Where(f => f.EquipmentId == Equipment.Id)
+                    .ToListAsync();
+                _context.EquipmentFeatures.RemoveRange(existingFeatures);
+
+                // Add new features
+                foreach (var feature in Features)
+                {
+                    feature.EquipmentId = Equipment.Id;
+                    _context.EquipmentFeatures.Add(feature);
+                }
+                _context.Attach(Equipment).State = EntityState.Modified;
+
+                StatusMessage = "Equipment updated successfully.";
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
