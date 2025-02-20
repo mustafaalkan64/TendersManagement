@@ -52,7 +52,7 @@ namespace Models
         [StringLength(100)]
         public string Eposta { get; set; }
 
-        [Display(Name = "Created Date")]
+        [Display(Name = "Oluþturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
 }
