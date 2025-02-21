@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Firma Detayý";
 }
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <div class="container-fluid">
     <h1 class="mt-4">Firma Detayý</h1>
@@ -14,10 +16,10 @@
         </div>
         <div class="card-body">
             <div cite="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <dl class="row">
-                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Company.TicariUnvan)</dt>
-                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Company.TicariUnvan)</dd>
+                        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Company.TicariUnvan)</dt>
+                        <dd class="col-sm-10">@Html.DisplayFor(model => model.Company.TicariUnvan)</dd>
                     </dl>
                 </div>
             </div>
