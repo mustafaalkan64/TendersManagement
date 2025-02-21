@@ -6,9 +6,9 @@ namespace Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Firma Ad&#305; zorunludur")]
+        [Required(ErrorMessage = "Firma Adý zorunludur")]
         [StringLength(150, MinimumLength = 3)]
-        [Display(Name = "Firma Ad&#305;")]
+        [Display(Name = "Firma Adý")]
         public string Name { get; set; }
 
         [Required]
