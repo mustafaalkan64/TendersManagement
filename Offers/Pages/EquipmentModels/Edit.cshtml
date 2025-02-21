@@ -7,6 +7,15 @@
 
 <h1>@ViewData["Title"]</h1>
 
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    var statusClass = Model.StatusMessage.StartsWith("Error") ? "danger" : "success";
+    <div class="alert alert-@statusClass alert-dismissible fade show" role="alert">
+        @Model.StatusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-6">
         <form method="post">
@@ -49,11 +58,22 @@
                                     <input name="Features[@i].FeatureKey" value="@Model.Features[i].FeatureKey" class="form-control" required />
                                     <input type="hidden" name="Features[@i].Id" value="@Model.Features[i].Id" />
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <input name="Features[@i].FeatureValue" class="form-control" value="@Model.Features[i].FeatureValue" required />
                                 </div>
-                                <div class="col-md-2">
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                                <div class="col-md-3">
+                                    <select name="Features[@i].UnitId" class="form-select">
+                                        <option value="">Birim Seçiniz</option>
+                                        @foreach (var unit in Model.Units)
+                                        {
+                                            <option value="@unit.Id" selected="@(Model.Features[i].UnitId == unit.Id)">
+                                                @unit.Name (@unit.ShortCode)
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Sil</button>
                                 </div>
                             </div>
                         }
@@ -82,11 +102,20 @@
                 <div class="col-md-4">
                     <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Feature Key" required />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" required />
                 </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                <div class="col-md-3">
+                    <select name="Features[${index}].UnitId" class="form-select">
+                        <option value="">Birim Seçiniz</option>
+                            @foreach (var unit in Model.Units)
+                            {
+                               <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                            }
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Sil</button>
                 </div>
             `;
 

@@ -22,6 +22,8 @@ namespace Offers.Pages.Equipment
         [BindProperty]
         public Models.Equipment Equipment { get; set; }
 
+        public List<Unit> Units { get; set; }
+
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -42,6 +44,8 @@ namespace Offers.Pages.Equipment
             }
 
             Features = Equipment.Features.ToList();
+            Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+
             return Page();
         }
 

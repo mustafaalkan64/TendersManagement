@@ -10,8 +10,17 @@
 
 <h1>@ViewData["Title"]</h1>
 
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    var statusClass = Model.StatusMessage.StartsWith("Error") ? "danger" : "success";
+    <div class="alert alert-@statusClass alert-dismissible fade show" role="alert">
+        @Model.StatusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -80,23 +89,40 @@
                     const container = document.getElementById('featuresContainer');
                     container.innerHTML = '';
 
+
                     // Add features from equipment
                     features.forEach((feature, index) => {
                         const row = document.createElement('div');
                         row.className = 'row mb-2 feature-row';
+
                         row.innerHTML = `
                             <div class="col-md-4">
                                 <input name="Features[${index}].FeatureKey" value="${feature.featureKey}" class="form-control" required />
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <input name="Features[${index}].FeatureValue" class="form-control" value="${feature.featureValue}" required />
                             </div>
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                            <div class="col-md-3">
+                                <select name="Features[${index}].UnitId" value="${feature.unitId}" text="deeffe" class="form-select">
+                                    <option value="">Birim Seçiniz</option>
+                                        @foreach (var unit in Model.Units)
+                                        {
+                                            <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                                        }
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Sil</button>
                             </div>
                         `;
 
                         container.appendChild(row);
+
+                            // Set select value after adding to DOM
+                        const select = row.querySelector(`select[name="Features[${index}].UnitId"]`);
+                        if (select && feature.unitId) {
+                            select.value = feature.unitId;
+                        }
                     });
                 }
             } catch (error) {
@@ -113,11 +139,20 @@
                 <div class="col-md-4">
                     <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Feature Key" required />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" required />
                 </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                <div class="col-md-3">
+                    <select name="Features[${index}].UnitId" class="form-select">
+                        <option value="">Birim Seçiniz</option>
+                        @foreach (var unit in Model.Units)
+                        {
+                           <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Sil</button>
                 </div>
             `;
 

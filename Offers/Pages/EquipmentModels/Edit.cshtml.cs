@@ -21,7 +21,11 @@ namespace Pages.EquipmentModelPage
         [BindProperty]
         public List<EquipmentModelFeature> Features { get; set; }
 
+        public List<Unit> Units { get; set; }
         public SelectList EquipmentList { get; set; }
+
+        [TempData]
+        public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -42,6 +46,7 @@ namespace Pages.EquipmentModelPage
 
             Features = EquipmentModel.Features.ToList();
             await LoadEquipmentList();
+            Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
             return Page();
         }
 
@@ -50,6 +55,7 @@ namespace Pages.EquipmentModelPage
             if (EquipmentModel.EquipmentId == null || string.IsNullOrEmpty(EquipmentModel.Brand) || string.IsNullOrEmpty(EquipmentModel.Model))
             {
                 await LoadEquipmentList();
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
                 return Page();
             }
 
@@ -79,7 +85,10 @@ namespace Pages.EquipmentModelPage
                 }
                 else
                 {
-                    throw;
+                    StatusMessage = "Error: Güncelleme sýrasýnda bir hata oluþtu.";
+                    await LoadEquipmentList();
+                    Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+                    return Page();
                 }
             }
 

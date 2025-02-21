@@ -63,10 +63,19 @@
                 <div class="col-md-4">
                     <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Feature Key" required />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" />
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
+                    <select name="Features[${index}].UnitId" class="form-select">
+                        <option value="">Birim Seçiniz</option>
+                        @foreach (var unit in Model.Units)
+                        {
+                            <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-1">
                     <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
                 </div>
             `;

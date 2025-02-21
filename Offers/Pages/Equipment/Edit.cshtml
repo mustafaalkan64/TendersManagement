@@ -44,11 +44,22 @@
                             <input name="Features[@i].FeatureKey" value="@Model.Features[i].FeatureKey" class="form-control" required />
                             <input type="hidden" name="Features[@i].Id" value="@Model.Features[i].Id" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <input name="Features[@i].FeatureValue" class="form-control" value="@Model.Features[i].FeatureValue" required />
                         </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                        <div class="col-md-3">
+                            <select name="Features[@i].UnitId" class="form-select">
+                                <option value="">Birim Seçiniz</option>
+                                @foreach (var unit in Model.Units)
+                                {
+                                    <option value="@unit.Id" selected="@(Model.Features[i].UnitId == unit.Id)">
+                                        @unit.Name (@unit.ShortCode)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Sil</button>
                         </div>
                     </div>
                 }
@@ -57,7 +68,7 @@
     </div>
     <button type="submit" class="btn btn-primary">Kaydet</button>
     <a asp-page="Index" class="btn btn-secondary">Listeye Dön</a>
-</form> 
+</form>
 
 @section Scripts {
     @{
@@ -74,11 +85,20 @@
                 <div class="col-md-4">
                     <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Feature Key" required />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" required />
                 </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                <div class="col-md-3">
+                    <select name="Features[${index}].UnitId" class="form-select">
+                        <option value="">Birim Seçiniz</option>
+                            @foreach (var unit in Model.Units)
+                            {
+                               <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                            }
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Sil</button>
                 </div>
             `;
 

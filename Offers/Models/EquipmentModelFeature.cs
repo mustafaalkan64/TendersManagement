@@ -18,6 +18,11 @@ namespace Models
         [StringLength(500)]
         public string FeatureValue { get; set; }
 
+        [Display(Name = "Birim")]
+        public int? UnitId { get; set; }
+
         public EquipmentModel EquipmentModel { get; set; }
+
+        public Unit Unit { get; set; }
     }
 }

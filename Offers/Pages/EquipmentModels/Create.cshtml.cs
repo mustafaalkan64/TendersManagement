@@ -23,12 +23,15 @@ namespace Pages.EquipmentModelPage
 
         public SelectList EquipmentList { get; set; }
 
+        public List<Unit> Units { get; set; }
+
         [TempData]
         public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
             await LoadEquipmentList();
+            Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
             return Page();
         }
 
@@ -39,7 +42,8 @@ namespace Pages.EquipmentModelPage
                 .Select(ef => new
                 {
                     featureKey = ef.FeatureKey,
-                    featureValue = ef.FeatureValue
+                    featureValue = ef.FeatureValue,
+                    unitId = ef.UnitId
                 })
                 .ToListAsync();
 
@@ -51,13 +55,9 @@ namespace Pages.EquipmentModelPage
             if (EquipmentModel.EquipmentId == null || string.IsNullOrEmpty(EquipmentModel.Brand) || string.IsNullOrEmpty(EquipmentModel.Model))
             {
                 await LoadEquipmentList();
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
                 return Page();
             }
-            //_context.EquipmentModels.Add(new EquipmentModel() {  
-            //    Brand = EquipmentModel.Brand,
-            //    Model = EquipmentModel.Model,
-            //    EquipmentId = EquipmentModel.EquipmentId
-            //});
 
             _context.EquipmentModels.Add(EquipmentModel);
             await _context.SaveChangesAsync();
