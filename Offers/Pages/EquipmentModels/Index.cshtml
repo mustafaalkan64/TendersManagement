@@ -5,10 +5,10 @@
     ViewData["Title"] = "Equipment Models";
 }
 
-<h1>Equipment Models</h1>
+<h1>Ekipman Modelleri</h1>
 
 <p>
-    <a asp-page="Create" class="btn btn-primary">Create New Equipment Model</a>
+    <a asp-page="Create" class="btn btn-primary">Yeni Ekipman Modeli</a>
 </p>
 
 <table class="table">
@@ -28,8 +28,8 @@
                 <td>@item.Brand</td>
                 <td>@item.Model</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Duzenle</a>
+                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
                 </td>
             </tr>
         }

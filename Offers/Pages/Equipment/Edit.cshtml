@@ -53,7 +53,7 @@
                                 @foreach (var unit in Model.Units)
                                 {
                                     <option value="@unit.Id" selected="@(Model.Features[i].UnitId == unit.Id)">
-                                        @unit.Name (@unit.ShortCode)
+                                        @unit.Name
                                     </option>
                                 }
                             </select>
@@ -93,7 +93,7 @@
                         <option value="">Birim Seçiniz</option>
                             @foreach (var unit in Model.Units)
                             {
-                               <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                               <option value="@unit.Id">@unit.Name</option>
                             }
                     </select>
                 </div>

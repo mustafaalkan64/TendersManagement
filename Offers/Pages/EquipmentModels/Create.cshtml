@@ -3,7 +3,7 @@
 @using global::Pages.EquipmentModelPage
 @model CreateModel
 @{
-    ViewData["Title"] = "Create Equipment Model";
+    ViewData["Title"] = "Yeni Ekipman Modeli";
     var context = HttpContextAccessor.HttpContext;
     var antiforgery = context.RequestServices.GetRequiredService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>().GetAndStoreTokens(context);
 }
@@ -51,7 +51,7 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Features</h5>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Add Feature</button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Yeni Ekle</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -62,8 +62,8 @@
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Create</button>
-                <a asp-page="Index" class="btn btn-secondary">Back to List</a>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-page="Index" class="btn btn-secondary">Listeye dön</a>
             </div>
         </form>
     </div>
@@ -107,7 +107,7 @@
                                     <option value="">Birim Seçiniz</option>
                                         @foreach (var unit in Model.Units)
                                         {
-                                            <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                                            <option value="@unit.Id">@unit.Name</option>
                                         }
                                 </select>
                             </div>
@@ -147,7 +147,7 @@
                         <option value="">Birim Seçiniz</option>
                         @foreach (var unit in Model.Units)
                         {
-                           <option value="@unit.Id">@unit.Name (@unit.ShortCode)</option>
+                           <option value="@unit.Id">@unit.Name</option>
                         }
                     </select>
                 </div>
