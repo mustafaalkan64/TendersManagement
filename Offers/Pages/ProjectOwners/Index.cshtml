@@ -1,0 +1,42 @@
+@page
+@using global::Pages.ProjectOwner
+@model IndexModel
+@{
+    ViewData["Title"] = "Proje Sahipleri";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Yeni Proje Sahibi</a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(m => m.ProjectOwners[0].Name)</th>
+                <th>@Html.DisplayNameFor(m => m.ProjectOwners[0].IdentityNo)</th>
+                <th>@Html.DisplayNameFor(m => m.ProjectOwners[0].Telephone)</th>
+                <th>@Html.DisplayNameFor(m => m.ProjectOwners[0].Address)</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ProjectOwners)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.IdentityNo</td>
+                    <td>@item.Telephone</td>
+                    <td>@item.Address</td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
+                        <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
+                        <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div> 

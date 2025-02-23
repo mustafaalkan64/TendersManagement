@@ -1,0 +1,49 @@
+@page
+@using global::Pages.ProjectOwner
+@model CreateModel
+@{
+    ViewData["Title"] = "Yeni Proje Sahibi";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ProjectOwner.Name" class="control-label"></label>
+                <input asp-for="ProjectOwner.Name" class="form-control" />
+                <span asp-validation-for="ProjectOwner.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ProjectOwner.IdentityNo" class="control-label"></label>
+                <input asp-for="ProjectOwner.IdentityNo" class="form-control" />
+                <span asp-validation-for="ProjectOwner.IdentityNo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ProjectOwner.Telephone" class="control-label"></label>
+                <input asp-for="ProjectOwner.Telephone" class="form-control" />
+                <span asp-validation-for="ProjectOwner.Telephone" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ProjectOwner.Address" class="control-label"></label>
+                <textarea asp-for="ProjectOwner.Address" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="ProjectOwner.Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-page="Index" class="btn btn-secondary">Listeye Dön</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} 

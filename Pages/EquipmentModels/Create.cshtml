@@ -42,4 +42,45 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        async function loadEquipmentFeatures(equipmentId) {
+            if (!equipmentId) return;
+
+            try {
+                const response = await fetch(`?handler=EquipmentFeatures&equipmentId=${equipmentId}`, {
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                });
+                if (response.ok) {
+                    const features = await response.json();
+                    
+                    // Clear existing features
+                    const container = document.getElementById('featuresContainer');
+                    container.innerHTML = '';
+                    
+                    // Add features from equipment
+                    features.forEach((feature, index) => {
+                        const row = document.createElement('div');
+                        row.className = 'row mb-2 feature-row';
+                        row.innerHTML = `
+                            <div class="col-md-4">
+                                <input name="Features[${index}].FeatureKey" value="${feature.featureKey}" class="form-control" required />
+                            </div>
+                            <div class="col-md-6">
+                                <textarea name="Features[${index}].FeatureValue" class="form-control" rows="2" required>${feature.featureValue}</textarea>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
+                            </div>
+                        `;
+                        
+                        container.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading equipment features:', error);
+            }
+        }
+    </script>
 } 
