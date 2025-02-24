@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using System.Threading;
 
 namespace Pages.Offers
 {
@@ -44,7 +45,7 @@ namespace Pages.Offers
             EquipmentModelList = new SelectList(
                 new List<SelectListItem>
                 {
-                new SelectListItem { Value = "0", Text = "Please Select Equipment Model" }
+                new SelectListItem { Value = "0", Text = "Ekipman modeli seciniz" }
                 }.Concat(equipmentModels.Select(em => new SelectListItem
                 {
                     Value = em.Id.ToString(),
@@ -54,7 +55,7 @@ namespace Pages.Offers
             CompanyList = new SelectList(
                 new List<SelectListItem>
                 {
-                new SelectListItem { Value = "0", Text = "Please Select Company" }
+                new SelectListItem { Value = "0", Text = "Sirket seciniz" }
                 }.Concat(await _context.Companies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -78,7 +79,7 @@ namespace Pages.Offers
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAddItemAsync()
+        public async Task<IActionResult> OnPostAddItemAsync(CancellationToken cancellationToken)
         {
             if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
@@ -93,8 +94,8 @@ namespace Pages.Offers
             // Load related entities for display
             NewItem.EquipmentModel = await _context.EquipmentModels
                 .Include(em => em.Equipment)
-                .FirstOrDefaultAsync(em => em.Id == NewItem.EquipmentModelId);
-            NewItem.Company = await _context.Companies.FindAsync(NewItem.CompanyId);
+                .FirstOrDefaultAsync(em => em.Id == NewItem.EquipmentModelId, cancellationToken);
+            NewItem.Company = await _context.Companies.FindAsync(NewItem.CompanyId, cancellationToken);
 
             if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId) && OfferItems.Any(x => x.EquipmentModelId == NewItem.EquipmentModelId))
             {
@@ -153,7 +154,7 @@ namespace Pages.Offers
             return Page();
         }
 
-        public async Task<IActionResult> OnPostCreateAsync()
+        public async Task<IActionResult> OnPostCreateAsync(CancellationToken cancellationToken)
         {
             OfferItems = HttpContext.Session.Get<List<OfferItem>>("OfferItems") ?? new List<OfferItem>();
 
@@ -162,7 +163,7 @@ namespace Pages.Offers
             {
                 if (!OfferItems.Any())
                 {
-                    ModelState.AddModelError("", "At least one offer item is required.");
+                    StatusMessage = "En az bir teklif giriniz";
                 }
                 await LoadDropDownLists();
                 return Page();
@@ -174,15 +175,20 @@ namespace Pages.Offers
 
             // Add offer
             _context.Offers.Add(Offer);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             // Add offer items
             foreach (var item in OfferItems)
             {
                 item.OfferId = Offer.Id;
-                _context.OfferItems.Add(new OfferItem() { CompanyId = item.CompanyId, CreatedDate = DateTime.Now, EquipmentModelId = item.EquipmentModelId, OfferId = item.OfferId, Price = item.Price, Quantity = item.Quantity });
+                _context.OfferItems.Add(new OfferItem() { CompanyId = item.CompanyId, 
+                    CreatedDate = DateTime.Now, 
+                    EquipmentModelId = item.EquipmentModelId, 
+                    OfferId = item.OfferId, 
+                    Price = item.Price, 
+                    Quantity = item.Quantity });
             }
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             // Clear session
             HttpContext.Session.Remove("OfferItems");

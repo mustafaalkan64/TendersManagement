@@ -47,7 +47,7 @@ namespace Pages.Offers
             .OrderBy(em => em.Equipment.Name)
             .ThenBy(em => em.Brand)
             .ThenBy(em => em.Model)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken);  
 
             CompanySummaries = await _context.OfferItems
                 .Where(oi => oi.OfferId == Offer.Id)
@@ -107,8 +107,6 @@ namespace Pages.Offers
                 return NotFound();
             }
 
-            Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
-
             await LoadRelatedData();
             NewItem.EquipmentModelId = 0;
             NewItem.CompanyId = 0;
@@ -123,23 +121,17 @@ namespace Pages.Offers
                 return Page();
             }
 
-            if(!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme)) {
-
-                StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalýdýr";
-                Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
-
+            if (!(Offer.SonTeklifBildirme > Offer.TeklifGonderimTarihi))
+            {
+                StatusMessage = "Son teklif bildirme tarihi teklif gönderim tarihinden sonra olmalýdýr";
                 await LoadRelatedData();
                 return Page();
             }
 
-            if (!(Offer.SonTeklifBildirme > Offer.TeklifGonderimTarihi))
-            {
+            if (!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme)) {
 
-                StatusMessage = "Son teklif bildirme tarihi teklif gönderim tarihinden sonra olmalýdýr";
-                Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
-
+                StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalýdýr";
                 await LoadRelatedData();
-                OfferItems = Offer.OfferItems.ToList();
                 return Page();
             }
 
