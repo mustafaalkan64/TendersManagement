@@ -107,6 +107,10 @@
                                         <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@((item.Price * item.Quantity).ToString("C"))</td>
                                         <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@item.CreatedDate</td>
                                         <td>
+                                            <button type="button" class="btn btn-primary btn-sm me-2"
+                                                    onclick="openPriceModal('@item.Id', '@item.Price')">
+                                                Fiyat Duz.
+                                            </button>
                                             <button type="submit"
                                                     asp-page-handler="DeleteItem"
                                                     asp-route-itemId="@item.Id"
@@ -213,6 +217,41 @@
     </div>
 </div>
 
+<div class="modal fade" id="priceModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Fiyat Duzenleme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="UpdatePrice">
+                <div class="modal-body">
+                    <input type="hidden" id="itemId" name="itemId" />
+                    <div class="mb-3">
+                        <label class="form-label">Fiyat</label>
+                        <input type="text" id="price" name="newPrice" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function openPriceModal(itemId, price) {
+            debugger;
+            document.getElementById('itemId').value = itemId;
+            document.getElementById('price').value = price;
+            $("#price").val(price);
+
+            var modal = new bootstrap.Modal(document.getElementById('priceModal'));
+            modal.show();
+        }
+    </script>
 }

@@ -267,5 +267,19 @@ namespace Pages.Offers
                 .ThenInclude(oi => oi.Company)
             .FirstOrDefaultAsync(o => o.Id == id);
         }
+
+        public async Task<IActionResult> OnPostUpdatePriceAsync(int itemId, decimal newPrice)
+        {
+            var offerItem = await _context.OfferItems.FindAsync(itemId);
+
+            if (offerItem != null)
+            {
+                offerItem.Price = newPrice;
+                _context.Entry(offerItem).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToPage("./Edit", new { id = offerItem?.OfferId });
+        }
     }
 } 
