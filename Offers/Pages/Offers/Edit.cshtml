@@ -55,7 +55,7 @@
 
             <div class="card mt-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Offer Items</h5>
+                    <h5 class="mb-0">Teklifler</h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
@@ -78,7 +78,7 @@
                             <span asp-validation-for="NewItem.Price" class="text-danger"></span>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" asp-page-handler="AddItem" class="btn btn-primary">Add Item</button>
+                            <button type="submit" asp-page-handler="AddItem" class="btn btn-primary">Teklif Ekle</button>
                         </div>
                     </div>
 
@@ -100,12 +100,12 @@
                                 @foreach (var item in Model.OfferItems)
                                 {
                                     <tr>
-                                        <td>@item.EquipmentModel.Equipment.Name - @item.EquipmentModel.Brand @item.EquipmentModel.Model</td>
-                                        <td>@item.Company.Name</td>
-                                        <td>@item.Quantity</td>
-                                        <td>@item.Price.ToString("C")</td>
-                                        <td>@((item.Price * item.Quantity).ToString("C"))</td>
-                                        <td>@item.CreatedDate</td>
+                                        <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@item.EquipmentModel.Equipment.Name - @item.EquipmentModel.Brand @item.EquipmentModel.Model</td>
+                                        <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@item.Company.Name</td>
+                                        <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@item.Quantity</td>
+                                        <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@item.Price.ToString("C")</td>
+                                        <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@((item.Price * item.Quantity).ToString("C"))</td>
+                                        <td style="background: @(item.Company.Name == Model.MinOfferCompany ? "lightgreen" : "white")">@item.CreatedDate</td>
                                         <td>
                                             <button type="submit"
                                                     asp-page-handler="DeleteItem"
@@ -120,12 +120,39 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="4" class="text-end"><strong>Toplam:</strong></td>
-                                    <td><strong>@Model.Offer.TotalPrice.ToString("C")</strong></td>
+                                    <td colspan="4" class="text-end"><strong>Minimum Teklif:</strong></td>
+                                    <td><strong>@Model.MinOfferCompany : @Model.MinOfferAmount.ToString("C")</strong></td>
                                     <td></td>
                                 </tr>
                             </tfoot>
                         </table>
+                        @if (Model.CompanySummaries.Any())
+                        {
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Sirket Teklif Ozeti</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sirket</th>
+                                                <th>Toplam Teklif Miktari</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var summary in Model.CompanySummaries)
+                                            {
+                                                <tr>
+                                                    <td>@summary.CompanyName</td>
+                                                    <td>@summary.TotalPrice.ToString("C")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
                     }
                 </div>
             </div>

@@ -24,6 +24,11 @@ namespace Pages.Offers
 
         public SelectList ProjectOwnerList { get; set; }
 
+        public List<CompanySummaryViewModel> CompanySummaries { get; set; }
+
+        public Decimal MinOfferAmount { get; set; }
+        public string MinOfferCompany { get; set; }
+
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -35,14 +40,28 @@ namespace Pages.Offers
         public SelectList EquipmentList { get; set; }
         public SelectList CompanyList { get; set; }
 
-        private async Task LoadRelatedData()
+        private async Task LoadRelatedData(CancellationToken cancellationToken = default)
         {
             var equipmentModels = await _context.EquipmentModels
             .Include(em => em.Equipment)
             .OrderBy(em => em.Equipment.Name)
             .ThenBy(em => em.Brand)
             .ThenBy(em => em.Model)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
+
+            CompanySummaries = await _context.OfferItems
+                .Where(oi => oi.OfferId == Offer.Id)
+                .GroupBy(oi => oi.Company.Name)
+                .Select(g => new CompanySummaryViewModel
+                {
+                    CompanyName = g.Key,
+                    TotalPrice = g.Sum(oi => oi.Price * oi.Quantity)
+                })
+                .OrderBy(s => s.TotalPrice)
+                .ToListAsync(cancellationToken);
+
+            MinOfferAmount = CompanySummaries.Any() ? CompanySummaries.First().TotalPrice : 0;
+            MinOfferCompany = CompanySummaries.Any() ? CompanySummaries.First().CompanyName : "";
 
             EquipmentModelList = new SelectList(
                 new List<SelectListItem>
@@ -62,13 +81,16 @@ namespace Pages.Offers
                 {
                     Value = c.Id.ToString(),
                     Text = c.Name
-                }).ToListAsync()), "Value", "Text");
+                }).ToListAsync(cancellationToken)), "Value", "Text");
+
+            var offer = await GetOfferById(Offer.Id);
+            OfferItems = offer.OfferItems.ToList();
 
             ProjectOwnerList = new SelectList(
-           await _context.ProjectOwners.OrderBy(p => p.Name).ToListAsync(),
-           "Id",
-           "Name"
-       );
+               await _context.ProjectOwners.OrderBy(p => p.Name).ToListAsync(cancellationToken),
+               "Id",
+               "Name"
+           );
         }
 
         public async Task<IActionResult> OnGetAsync(int? id)
@@ -79,15 +101,15 @@ namespace Pages.Offers
             }
 
             Offer =  await GetOfferById(id);
-            Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
 
             if (Offer == null)
             {
                 return NotFound();
             }
 
+            Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
+
             await LoadRelatedData();
-            OfferItems = Offer.OfferItems.ToList();
             NewItem.EquipmentModelId = 0;
             NewItem.CompanyId = 0;
             return Page();
@@ -104,6 +126,16 @@ namespace Pages.Offers
             if(!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme)) {
 
                 StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalýdýr";
+                Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
+
+                await LoadRelatedData();
+                return Page();
+            }
+
+            if (!(Offer.SonTeklifBildirme > Offer.TeklifGonderimTarihi))
+            {
+
+                StatusMessage = "Son teklif bildirme tarihi teklif gönderim tarihinden sonra olmalýdýr";
                 Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
 
                 await LoadRelatedData();
