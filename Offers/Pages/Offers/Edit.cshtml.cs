@@ -101,12 +101,17 @@ namespace Pages.Offers
                 return Page();
             }
 
-            var offer = await _context.Offers
-                .FirstOrDefaultAsync(o => o.Id == Offer.Id);
+            if(!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme)) {
 
-            offer.OfferName = Offer.OfferName;
+                StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalýdýr";
+                Offer.TotalPrice = Offer.OfferItems.Sum(item => item.Price * item.Quantity);
 
-            _context.Attach(offer).State = EntityState.Modified;
+                await LoadRelatedData();
+                OfferItems = Offer.OfferItems.ToList();
+                return Page();
+            }
+
+            _context.Attach(Offer).State = EntityState.Modified;
 
             try
             {

@@ -8,7 +8,7 @@ namespace Models
 
         [Required]
         [StringLength(200)]
-        [Display(Name = "Proje Adý")]
+        [Display(Name = "Proje Adi")]
         public string OfferName { get; set; }
 
         [Required]
@@ -40,6 +40,8 @@ namespace Models
         public DateTime? DanismanlikSonTeklifSunum { get; set; }
 
         public DateTime? DanismanlikTeklifGecerlilikSuresi { get; set; }
+
+        public DateTime? TeklifSunumTarihi {  get; set; }
 
         public List<OfferItem> OfferItems { get; set; } = new List<OfferItem>();
     }
