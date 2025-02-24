@@ -47,7 +47,7 @@ namespace Pages.Offers
             EquipmentModelList = new SelectList(
                 new List<SelectListItem>
                 {
-                new SelectListItem { Value = "0", Text = "Please Select Equipment Model" }
+                new SelectListItem { Value = "0", Text = "Ekipman Modeli Seciniz" }
                 }.Concat(equipmentModels.Select(em => new SelectListItem
                 {
                     Value = em.Id.ToString(),
@@ -57,7 +57,7 @@ namespace Pages.Offers
             CompanyList = new SelectList(
                 new List<SelectListItem>
                 {
-                new SelectListItem { Value = "0", Text = "Please Select Company" }
+                new SelectListItem { Value = "0", Text = "Sirket Seciniz" }
                 }.Concat(await _context.Companies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),

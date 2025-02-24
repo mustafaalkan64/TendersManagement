@@ -170,7 +170,7 @@ namespace Pages.Offers
 
             // Calculate total price
             Offer.TotalPrice = CalculateTotalPrice();
-            Offer.CreatedDate = DateTime.UtcNow;
+            Offer.CreatedDate = DateTime.Now;
 
             // Add offer
             _context.Offers.Add(Offer);
@@ -180,7 +180,7 @@ namespace Pages.Offers
             foreach (var item in OfferItems)
             {
                 item.OfferId = Offer.Id;
-                _context.OfferItems.Add(new OfferItem() { CompanyId = item.CompanyId, EquipmentModelId = item.EquipmentModelId, OfferId = item.OfferId, Price = item.Price, Quantity = item.Quantity });
+                _context.OfferItems.Add(new OfferItem() { CompanyId = item.CompanyId, CreatedDate = DateTime.Now, EquipmentModelId = item.EquipmentModelId, OfferId = item.OfferId, Price = item.Price, Quantity = item.Quantity });
             }
             await _context.SaveChangesAsync();
 

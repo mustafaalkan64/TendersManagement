@@ -2,7 +2,7 @@
 @using global::Pages.Offers
 @model EditModel
 @{
-    ViewData["Title"] = "Edit Offer";
+    ViewData["Title"] = "Proje Duzenle";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -25,7 +25,7 @@
                     <div class="form-group mb-6">
                         <label asp-for="Offer.ProjectOwnerId">Proje Sahibi</label>
                         <select asp-for="Offer.ProjectOwnerId" asp-items="Model.ProjectOwnerList" class="form-select">
-                            <option value="">Select Project Owner</option>
+                            <option value="">Proje Sahibi Sec</option>
                         </select>
                         <span asp-validation-for="Offer.ProjectOwnerId" class="text-danger"></span>
                     </div>
@@ -39,6 +39,16 @@
                         <label asp-for="Offer.OfferName"></label>
                         <input asp-for="Offer.OfferName" class="form-control" />
                         <span asp-validation-for="Offer.OfferName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group mb-3">
+                        <label asp-for="Offer.ProjectAddress">Proje Adresi</label>
+                        <input asp-for="Offer.ProjectAddress" class="form-control" />
+                        <span asp-validation-for="Offer.ProjectAddress" class="text-danger"></span>
                     </div>
                 </div>
             </div>

@@ -5,10 +5,10 @@
     ViewData["Title"] = "Offers";
 }
 
-<h1>Offers</h1>
+<h1>Projeler</h1>
 
 <p>
-    <a asp-page="Create" class="btn btn-primary">Create New Offer</a>
+    <a asp-page="Create" class="btn btn-primary">Yeni</a>
 </p>
 
 <table class="table">
@@ -30,8 +30,8 @@
                 <td>@item.CreatedDate</td>
                 <td>@item.OfferItems.Count</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Duzenle</a>
+                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Sil</a>
                 </td>
             </tr>
         }
