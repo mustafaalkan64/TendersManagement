@@ -18,10 +18,23 @@
 <div class="row">
     <div class="col-md-12">
         <form method="post">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-6">
+                        <label asp-for="Offer.ProjectOwnerId">Proje Sahibi</label>
+                        <select asp-for="Offer.ProjectOwnerId" asp-items="Model.ProjectOwnerList" class="form-select">
+                            <option value="">Select Project Owner</option>
+                        </select>
+                        <span asp-validation-for="Offer.ProjectOwnerId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group mb-3">
-                        <label asp-for="Offer.OfferName"></label>
+                        <label asp-for="Offer.OfferName">Proje Adý</label>
                         <input asp-for="Offer.OfferName" class="form-control" />
                         <span asp-validation-for="Offer.OfferName" class="text-danger"></span>
                     </div>
@@ -111,7 +124,7 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Offer.TeklifGonderimTarihi" class="control-label">Teklif Gönderim Tarihi</label>
+                <label asp-for="Offer.TeklifGonderimTarihi" class="control-label">Teklif Gonderim Tarihi</label>
                 <input asp-for="Offer.TeklifGonderimTarihi" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Offer.TeklifGonderimTarihi" class="text-danger"></span>
             </div>
@@ -123,37 +136,37 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Offer.TeklifGecerlilikSuresi" class="control-label">Teklif Geçerlilik Süresi</label>
+                <label asp-for="Offer.TeklifGecerlilikSuresi" class="control-label">Teklif Gecerlilik Suresi</label>
                 <input asp-for="Offer.TeklifGecerlilikSuresi" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Offer.TeklifGecerlilikSuresi" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Offer.DanismanlikTeklifGonderim" class="control-label">Danýþmanlýk Teklif Gönderim</label>
+                <label asp-for="Offer.DanismanlikTeklifGonderim" class="control-label">D.Teklif Gonderim</label>
                 <input asp-for="Offer.DanismanlikTeklifGonderim" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Offer.DanismanlikTeklifGonderim" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Offer.DanismanlikSonTeklifBitis" class="control-label">Danýþmanlýk Son Teklif Bitiþ</label>
+                <label asp-for="Offer.DanismanlikSonTeklifBitis" class="control-label">D.Son Teklif Bitiþ</label>
                 <input asp-for="Offer.DanismanlikSonTeklifBitis" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Offer.DanismanlikSonTeklifBitis" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Offer.DanismanlikSonTeklifSunum" class="control-label">Danýþmanlýk Son Teklif Sunum</label>
+                <label asp-for="Offer.DanismanlikSonTeklifSunum" class="control-label">D.Son Teklif Sunum</label>
                 <input asp-for="Offer.DanismanlikSonTeklifSunum" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Offer.DanismanlikSonTeklifSunum" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="control-label">Danýþmanlýk Teklif Geçerlilik Süresi</label>
+                <label asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="control-label">D. Teklif Gecerlilik Suresi</label>
                 <input asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="text-danger"></span>
             </div>
 
             <div class="form-group mt-3">
-                <button type="submit" asp-page-handler="Create" class="btn btn-primary">Create Offer</button>
+                <button type="submit" asp-page-handler="Create" class="btn btn-primary">Kaydet</button>
                 <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
             </div>
         </form>

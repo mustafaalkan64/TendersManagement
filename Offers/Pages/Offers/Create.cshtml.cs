@@ -20,6 +20,8 @@ namespace Pages.Offers
         [BindProperty]
         public Offer Offer { get; set; }
 
+        public SelectList ProjectOwnerList { get; set; }
+
         [BindProperty]
         public OfferItem NewItem { get; set; }
 
@@ -58,11 +60,19 @@ namespace Pages.Offers
                     Value = c.Id.ToString(),
                     Text = c.Name
                 }).ToListAsync()), "Value", "Text");
+
+            ProjectOwnerList = new SelectList(
+               await _context.ProjectOwners.OrderBy(p => p.Name).ToListAsync(),
+               "Id",
+               "Name"
+           );
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
             await LoadDropDownLists();
+
+           
             // Initialize session for offer items
             HttpContext.Session.Set("OfferItems", OfferItems);
             return Page();

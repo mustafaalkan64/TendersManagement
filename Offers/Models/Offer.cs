@@ -11,6 +11,11 @@ namespace Models
         [Display(Name = "Proje Adý")]
         public string OfferName { get; set; }
 
+        [Required]
+        public int ProjectOwnerId { get; set; }
+
+        public ProjectOwner ProjectOwner { get; set; }
+
         [Display(Name = "Toplam Tutar")]
         public decimal TotalPrice { get; set; }
 
