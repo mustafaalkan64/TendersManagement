@@ -2,7 +2,7 @@
 @using global::Pages.Offers
 @model CreateModel
 @{
-    ViewData["Title"] = "Create Offer";
+    ViewData["Title"] = "Yeni Proje";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -129,7 +129,7 @@
 
             <div class="form-group">
                 <label asp-for="Offer.TeklifGonderimTarihi" class="control-label">Teklif Gonderim Tarihi</label>
-                <input asp-for="Offer.TeklifGonderimTarihi" class="form-control" type="datetime-local" value="" />
+                <input asp-for="Offer.TeklifGonderimTarihi" class="form-control" type="datetime-local" value="">
                 <span asp-validation-for="Offer.TeklifGonderimTarihi" class="text-danger"></span>
             </div>
 
@@ -171,7 +171,7 @@
 
             <div class="form-group mt-3">
                 <button type="submit" asp-page-handler="Create" class="btn btn-primary">Kaydet</button>
-                <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
+                <a asp-page="./Index" class="btn btn-secondary">Listeye Don</a>
             </div>
         </form>
     </div>
