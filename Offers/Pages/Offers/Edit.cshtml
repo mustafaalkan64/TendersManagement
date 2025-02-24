@@ -107,6 +107,54 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label asp-for="Offer.ProjectAddress" class="control-label">Proje Adresi</label>
+                <input asp-for="Offer.ProjectAddress" class="form-control" />
+                <span asp-validation-for="Offer.ProjectAddress" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Offer.TeklifGonderimTarihi" class="control-label">Teklif Gönderim Tarihi</label>
+                <input asp-for="Offer.TeklifGonderimTarihi" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Offer.TeklifGonderimTarihi" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Offer.SonTeklifBildirme" class="control-label">Son Teklif Bildirme</label>
+                <input asp-for="Offer.SonTeklifBildirme" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Offer.SonTeklifBildirme" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Offer.TeklifGecerlilikSuresi" class="control-label">Teklif Geçerlilik Süresi</label>
+                <input asp-for="Offer.TeklifGecerlilikSuresi" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Offer.TeklifGecerlilikSuresi" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Offer.DanismanlikTeklifGonderim" class="control-label">Danýþmanlýk Teklif Gönderim</label>
+                <input asp-for="Offer.DanismanlikTeklifGonderim" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Offer.DanismanlikTeklifGonderim" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Offer.DanismanlikSonTeklifBitis" class="control-label">Danýþmanlýk Son Teklif Bitiþ</label>
+                <input asp-for="Offer.DanismanlikSonTeklifBitis" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Offer.DanismanlikSonTeklifBitis" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Offer.DanismanlikSonTeklifSunum" class="control-label">Danýþmanlýk Son Teklif Sunum</label>
+                <input asp-for="Offer.DanismanlikSonTeklifSunum" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Offer.DanismanlikSonTeklifSunum" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="control-label">Danýþmanlýk Teklif Geçerlilik Süresi</label>
+                <input asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="text-danger"></span>
+            </div>
+
             <div class="form-group mt-3">
                 <button type="submit" asp-page-handler="Save" class="btn btn-primary">Save Changes</button>
                 <a asp-page="./Index" class="btn btn-secondary">Back to List</a>

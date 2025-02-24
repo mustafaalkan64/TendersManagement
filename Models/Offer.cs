@@ -16,4 +16,13 @@ public class Offer
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     public List<OfferItem> OfferItems { get; set; } = new List<OfferItem>();
+
+    public string ProjectAddress { get; set; }
+    public DateTime TeklifGonderimTarihi { get; set; }
+    public DateTime SonTeklifBildirme { get; set; }
+    public DateTime TeklifGecerlilikSuresi { get; set; }
+    public DateTime DanismanlikTeklifGonderim { get; set; }
+    public DateTime DanismanlikSonTeklifBitis { get; set; }
+    public DateTime DanismanlikSonTeklifSunum { get; set; }
+    public DateTime DanismanlikTeklifGecerlilikSuresi { get; set; }
 } 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Offers.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250224091734_TeklifTarihleri")]
+    partial class TeklifTarihleri
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -408,16 +411,16 @@ namespace Offers.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DanismanlikSonTeklifBitis")
+                    b.Property<DateTime>("DanismanlikSonTeklifBitis")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DanismanlikSonTeklifSunum")
+                    b.Property<DateTime>("DanismanlikSonTeklifSunum")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DanismanlikTeklifGecerlilikSuresi")
+                    b.Property<DateTime>("DanismanlikTeklifGecerlilikSuresi")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DanismanlikTeklifGonderim")
+                    b.Property<DateTime>("DanismanlikTeklifGonderim")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("OfferName")
@@ -430,13 +433,13 @@ namespace Offers.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTime?>("SonTeklifBildirme")
+                    b.Property<DateTime>("SonTeklifBildirme")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("TeklifGecerlilikSuresi")
+                    b.Property<DateTime>("TeklifGecerlilikSuresi")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("TeklifGonderimTarihi")
+                    b.Property<DateTime>("TeklifGonderimTarihi")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalPrice")

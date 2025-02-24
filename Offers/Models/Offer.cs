@@ -8,7 +8,7 @@ namespace Models
 
         [Required]
         [StringLength(200)]
-        [Display(Name = "Teklif Adý")]
+        [Display(Name = "Proje Adý")]
         public string OfferName { get; set; }
 
         [Display(Name = "Toplam Tutar")]
@@ -16,6 +16,25 @@ namespace Models
 
         [Display(Name = "Oluþturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        [Required]
+        [StringLength(500)]
+        [Display(Name = "Adres")]
+        public string ProjectAddress { get; set; }
+
+        public DateTime? TeklifGonderimTarihi { get; set; }
+
+        public DateTime? SonTeklifBildirme { get; set; }
+
+        public DateTime? TeklifGecerlilikSuresi { get; set; }
+
+        public DateTime? DanismanlikTeklifGonderim { get; set; }
+
+        public DateTime? DanismanlikSonTeklifBitis { get; set; }
+
+        public DateTime? DanismanlikSonTeklifSunum { get; set; }
+
+        public DateTime? DanismanlikTeklifGecerlilikSuresi { get; set; }
 
         public List<OfferItem> OfferItems { get; set; } = new List<OfferItem>();
     }
