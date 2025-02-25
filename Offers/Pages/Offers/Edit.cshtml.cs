@@ -40,6 +40,9 @@ namespace Pages.Offers
         public SelectList EquipmentList { get; set; }
         public SelectList CompanyList { get; set; }
 
+        [BindProperty]
+        public int SelectedCompanyId { get; set; }
+
         private async Task LoadRelatedData(CancellationToken cancellationToken = default)
         {
             var equipmentModels = await _context.EquipmentModels
@@ -84,13 +87,50 @@ namespace Pages.Offers
                 }).ToListAsync(cancellationToken)), "Value", "Text");
 
             var offer = await GetOfferById(Offer.Id);
-            OfferItems = offer.OfferItems.ToList();
+            OfferItems = offer.OfferItems.OrderBy(x => x.Company.Name).ThenBy(x => x.Price).ToList();
 
             ProjectOwnerList = new SelectList(
                await _context.ProjectOwners.OrderBy(p => p.Name).ToListAsync(cancellationToken),
                "Id",
                "Name"
            );
+        }
+
+        public async Task<IActionResult> OnGetEquipmentModelsAsync(int companyId)
+        {
+            var equipmentModels = await GetEquipmentModelsByCompanyId(companyId);
+            return new JsonResult(equipmentModels.Select(em => new
+            {
+                id = em.Id,
+                text = $"{em.Equipment.Name} - {em.Brand} {em.Model}"
+            }));
+        }
+
+        private async Task<List<EquipmentModel>> GetEquipmentModelsByCompanyId(int companyId)
+        {
+            var companyEquipmentModels = await _context.CompanyEquipmentModels
+                .Where(cem => cem.CompanyId == companyId)
+                .Select(cem => cem.EquipmentModelId)
+                .ToListAsync();
+
+            if (companyEquipmentModels.Any())
+            {
+                return await _context.EquipmentModels
+                    .Include(em => em.Equipment)
+                    .Where(em => companyEquipmentModels.Contains(em.Id))
+                    .OrderBy(em => em.Equipment.Name)
+                    .ThenBy(em => em.Brand)
+                    .ThenBy(em => em.Model)
+                    .ToListAsync();
+            }
+
+            // If no company equipment models exist, return all equipment models
+            return await _context.EquipmentModels
+                .Include(em => em.Equipment)
+                .OrderBy(em => em.Equipment.Name)
+                .ThenBy(em => em.Brand)
+                .ThenBy(em => em.Model)
+                .ToListAsync();
         }
 
         public async Task<IActionResult> OnGetAsync(int? id)
@@ -111,6 +151,16 @@ namespace Pages.Offers
             NewItem.EquipmentModelId = 0;
             NewItem.CompanyId = 0;
             return Page();
+        }
+
+        public async Task<IActionResult> OnGetUpdateEquipmentModelsAsync(int companyId)
+        {
+            var equipmentModels = await GetEquipmentModelsByCompanyId(companyId);
+            return new JsonResult(equipmentModels.Select(em => new
+            {
+                id = em.Id,
+                text = $"{em.Equipment.Name} - {em.Brand} {em.Model}"
+            }));
         }
 
         public async Task<IActionResult> OnPostSaveAsync()
@@ -171,7 +221,7 @@ namespace Pages.Offers
 
             NewItem.OfferId = Offer.Id;
 
-            if(OfferItems.Any(x => x.CompanyId == NewItem.CompanyId) && OfferItems.Any(x => x.EquipmentModelId == NewItem.EquipmentModelId))
+            if(OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModelId == NewItem.EquipmentModelId))
             {
                 await LoadRelatedData();
 

@@ -4,6 +4,9 @@
 @{
     ViewData["Title"] = "Proje Duzenle";
 }
+@{
+    var antiforgery = Html.AntiForgeryToken();
+}
 
 <h1>@ViewData["Title"]</h1>
 
@@ -60,14 +63,14 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <select asp-for="NewItem.EquipmentModelId" asp-items="Model.EquipmentModelList" class="form-select">
-                            </select>
-                            <span asp-validation-for="NewItem.EquipmentModelId" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-3">
-                            <select asp-for="NewItem.CompanyId" asp-items="Model.CompanyList" class="form-select">
+                            <select id="companySelect" asp-for="NewItem.CompanyId" asp-items="Model.CompanyList" class="form-select">
                             </select>
                             <span asp-validation-for="NewItem.CompanyId" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="equipmentModelSelect" asp-for="NewItem.EquipmentModelId" asp-items="Model.EquipmentModelList" class="form-select">
+                            </select>
+                            <span asp-validation-for="NewItem.EquipmentModelId" class="text-danger"></span>
                         </div>
                         <div class="col-md-2">
                             <input asp-for="NewItem.Quantity" class="form-control" value="1" placeholder="Quantity" />
@@ -244,6 +247,11 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        $.ajaxSetup({
+            headers: {
+                "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            }
+        });
         function openPriceModal(itemId, price) {
             debugger;
             document.getElementById('itemId').value = itemId;
@@ -252,6 +260,31 @@
 
             var modal = new bootstrap.Modal(document.getElementById('priceModal'));
             modal.show();
+        }
+        $(document).ready(function() {
+            $('#companySelect').change(function() {
+                var companyId = $(this).val();
+                if (companyId) {
+                    updateEquipmentModels(companyId);
+                }
+            });
+        });
+
+        function updateEquipmentModels(companyId) {
+            $.get(`?handler=UpdateEquipmentModels&companyId=${companyId}`, function(data) {
+                var select = $('#equipmentModelSelect');
+                debugger;
+                var dataList = JSON.parse(data);
+                select.empty();
+                select.append('<option value="">Select Equipment Model</option>');
+
+                dataList.forEach(function(item) {
+                    debugger;
+                    select.append($('<option></option>')
+                        .attr('value', item.id)
+                        .text(item.text));
+                });
+            });
         }
     </script>
 }
