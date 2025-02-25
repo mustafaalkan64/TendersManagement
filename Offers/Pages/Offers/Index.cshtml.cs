@@ -29,7 +29,10 @@ namespace Pages.Offers
 
             foreach (var Offer in Offers)
             {
-                Offer.TotalPrice = Offer.OfferItems
+                Offer.TotalPrice = 0;
+                if(Offer.OfferItems.Any())
+                {
+                    Offer.TotalPrice = Offer.OfferItems
                     .GroupBy(oi => oi.Company.Name)
                     .Select(g => new CompanySummaryViewModel
                     {
@@ -37,6 +40,8 @@ namespace Pages.Offers
                         TotalPrice = g.Sum(oi => oi.Price * oi.Quantity)
                     })
                     .OrderBy(s => s.TotalPrice).First().TotalPrice;
+                }
+
             }
         }
     }

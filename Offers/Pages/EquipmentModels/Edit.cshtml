@@ -2,7 +2,7 @@
 @using global::Pages.EquipmentModelPage
 @model EditModel
 @{
-    ViewData["Title"] = "Edit Equipment Model";
+    ViewData["Title"] = "Ekipman Model Duzenle";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -23,21 +23,21 @@
             <input type="hidden" asp-for="EquipmentModel.Id" />
 
             <div class="form-group mb-3">
-                <label asp-for="EquipmentModel.EquipmentId" class="control-label">Equipment</label>
+                <label asp-for="EquipmentModel.EquipmentId" class="control-label">Ekipman</label>
                 <select asp-for="EquipmentModel.EquipmentId" asp-items="Model.EquipmentList" class="form-select">
-                    <option value="">Please select equipment</option>
+                    <option value="">Ekipman Seciniz</option>
                 </select>
                 <span asp-validation-for="EquipmentModel.EquipmentId" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="EquipmentModel.Brand" class="control-label"></label>
+                <label asp-for="EquipmentModel.Brand" class="control-label">Marka</label>
                 <input asp-for="EquipmentModel.Brand" class="form-control" />
                 <span asp-validation-for="EquipmentModel.Brand" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="EquipmentModel.Model" class="control-label"></label>
+                <label asp-for="EquipmentModel.Model" class="control-label">Model</label>
                 <input asp-for="EquipmentModel.Model" class="form-control" />
                 <span asp-validation-for="EquipmentModel.Model" class="text-danger"></span>
             </div>
@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <select name="Features[@i].UnitId" class="form-select">
-                                        <option value="">Birim Seçiniz</option>
+                                        <option value="">Birim Seciniz</option>
                                         @foreach (var unit in Model.Units)
                                         {
                                             <option value="@unit.Id" selected="@(Model.Features[i].UnitId == unit.Id)">
@@ -83,7 +83,7 @@
 
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Kaydet</button>
-                <a asp-page="Index" class="btn btn-secondary">Listeye Dön</a>
+                <a asp-page="Index" class="btn btn-secondary">Listeye Don</a>
             </div>
         </form>
     </div>
