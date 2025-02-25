@@ -87,7 +87,7 @@
             const companyId = select.value;
 
             if (!companyId) {
-                alert('Lütfen þirket seçiniz');
+                alert('Lutfen bir sirket seciniz');
                 return;
             }
 
@@ -103,13 +103,13 @@
                 if (response.ok) {
                     window.location.reload();
                 } else {
-                    alert('Error adding company');
+                    alert('Sirket eklerken hata meydana geldi!');
                 }
             });
         }
 
         function removeCompany(equipmentModelId, companyId) {
-            if (!confirm('Silmek istediðinize emin misiniz?')) {
+            if (!confirm('Silmek istediginize emin misiniz?')) {
                 return;
             }
 
@@ -125,7 +125,7 @@
                 if (response.ok) {
                     window.location.reload();
                 } else {
-                    alert('Error removing company');
+                    alert('Sirket silerken hata meydana geldi!');
                 }
             });
         }

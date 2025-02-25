@@ -75,132 +75,22 @@ namespace Pages.Offers
         {
             await LoadDropDownLists();
 
-           
-            // Initialize session for offer items
-            HttpContext.Session.Set("OfferItems", OfferItems);
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostAddItemAsync(CancellationToken cancellationToken)
-        {
-            if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
-            {
-                await LoadDropDownLists();
-                return Page();
-            }
-
-            // Load existing items from session
-            OfferItems = HttpContext.Session.Get<List<OfferItem>>("OfferItems") ?? new List<OfferItem>();
-
-            // Load related entities for display
-            // Load related entities for display
-            NewItem.EquipmentModel = await _context.EquipmentModels
-                .Include(em => em.Equipment)
-                .FirstOrDefaultAsync(em => em.Id == NewItem.EquipmentModelId, cancellationToken);
-            NewItem.Company = await _context.Companies.FindAsync(NewItem.CompanyId, cancellationToken);
-
-            if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId) && OfferItems.Any(x => x.EquipmentModelId == NewItem.EquipmentModelId))
-            {
-                await LoadDropDownLists();
-                StatusMessage = "Zaten kurum bu ekipmana teklif vermiþ";
-                return Page();
-            }
-
-            if (OfferItems.Any())
-            {
-
-                var filteredItems = OfferItems.Where(x => x.EquipmentModelId == NewItem.EquipmentModelId);
-                var minOffer = filteredItems.Any() ? filteredItems.Min(x => x.Price) : (decimal?)null;
-
-                if (minOffer != null)
-                {
-                    var twentyPercentMore = (double)minOffer * (1.2);
-
-                    if (NewItem.Price < minOffer)
-                    {
-                        StatusMessage = "Teklif tutarý en düþük teklif tutarýndan düþük olamaz";
-                        await LoadDropDownLists();
-                        return Page();
-                    }
-
-                    if ((double)NewItem.Price > twentyPercentMore)
-                    {
-                        StatusMessage = "Teklif tutarý en düþük teklif tutarýnýn %20sinden fazla olamaz";
-                        await LoadDropDownLists();
-
-                        return Page();
-                    }
-                }
-            }
-
-            OfferItems.Add(NewItem);
-
-            // Save back to session
-            HttpContext.Session.Set("OfferItems", OfferItems);
-
-            await LoadDropDownLists();
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostRemoveItemAsync(int index)
-        {
-            OfferItems = HttpContext.Session.Get<List<OfferItem>>("OfferItems") ?? new List<OfferItem>();
-
-            if (index >= 0 && index < OfferItems.Count)
-            {
-                OfferItems.RemoveAt(index);
-                HttpContext.Session.Set("OfferItems", OfferItems);
-            }
-
-            await LoadDropDownLists();
             return Page();
         }
 
         public async Task<IActionResult> OnPostCreateAsync(CancellationToken cancellationToken)
         {
-            OfferItems = HttpContext.Session.Get<List<OfferItem>>("OfferItems") ?? new List<OfferItem>();
-
-            //!ModelState.IsValid ||
-            if (!OfferItems.Any())
-            {
-                if (!OfferItems.Any())
-                {
-                    StatusMessage = "En az bir teklif giriniz";
-                }
-                await LoadDropDownLists();
-                return Page();
-            }
-
-            // Calculate total price
-            Offer.TotalPrice = CalculateTotalPrice();
+            Offer.TotalPrice = 0;
             Offer.CreatedDate = DateTime.Now;
 
             // Add offer
             _context.Offers.Add(Offer);
             await _context.SaveChangesAsync(cancellationToken);
 
-            // Add offer items
-            foreach (var item in OfferItems)
-            {
-                item.OfferId = Offer.Id;
-                _context.OfferItems.Add(new OfferItem() { CompanyId = item.CompanyId, 
-                    CreatedDate = DateTime.Now, 
-                    EquipmentModelId = item.EquipmentModelId, 
-                    OfferId = item.OfferId, 
-                    Price = item.Price, 
-                    Quantity = item.Quantity });
-            }
-            await _context.SaveChangesAsync(cancellationToken);
-
             // Clear session
             HttpContext.Session.Remove("OfferItems");
 
             return RedirectToPage("./Index");
-        }
-
-        public decimal CalculateTotalPrice()
-        {
-            return OfferItems.Sum(item => item.Price * item.Quantity);
         }
     }
 }
