@@ -22,26 +22,50 @@ namespace Pages.EquipmentModelPage
         public IList<EquipmentModel> EquipmentModels { get; set; }
         public List<Company> Companies { get; set; }
 
-        public async Task OnGetAsync()
+        [BindProperty(SupportsGet = true)]
+        public string SearchString { get; set; }
+
+        public async Task OnGetAsync(CancellationToken cancellationToken = default)
         {
-            EquipmentModels = await _context.EquipmentModels
+            //EquipmentModels = await _context.EquipmentModels
+            //.Include(em => em.Equipment)
+            //.Include(em => em.CompanyEquipmentModels)
+            //    .ThenInclude(cem => cem.Company)
+            //.OrderBy(em => em.Equipment.Name)
+            //.ThenBy(em => em.Brand)
+            //.ThenBy(em => em.Model)
+            //.ToListAsync();
+
+            var query = _context.EquipmentModels
             .Include(em => em.Equipment)
             .Include(em => em.CompanyEquipmentModels)
                 .ThenInclude(cem => cem.Company)
-            .OrderBy(em => em.Equipment.Name)
-            .ThenBy(em => em.Brand)
-            .ThenBy(em => em.Model)
-            .ToListAsync();
+            .AsQueryable();
+
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                var searchTerm = SearchString.ToLower();
+                query = query.Where(em =>
+                    em.Equipment.Name.ToLower().Contains(searchTerm) ||
+                    em.Brand.ToLower().Contains(searchTerm) ||
+                    em.Model.ToLower().Contains(searchTerm));
+            }
+
+            EquipmentModels = await query
+                .OrderBy(em => em.Equipment.Name)
+                .ThenBy(em => em.Brand)
+                .ThenBy(em => em.Model)
+                .ToListAsync(cancellationToken);
 
             Companies = await _context.Companies
                 .OrderBy(c => c.Name)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
-        public async Task<IActionResult> OnPostAddCompanyAsync([FromBody] CompanyAssignmentModel model)
+        public async Task<IActionResult> OnPostAddCompanyAsync([FromBody] CompanyAssignmentModel model, CancellationToken cancellationToken = default)
         {
             var exists = await _context.CompanyEquipmentModels
                 .AnyAsync(cem => cem.CompanyId == model.CompanyId &&
-                                cem.EquipmentModelId == model.EquipmentModelId);
+                                cem.EquipmentModelId == model.EquipmentModelId, cancellationToken);
 
             if (!exists)
             {
@@ -50,22 +74,22 @@ namespace Pages.EquipmentModelPage
                     CompanyId = model.CompanyId,
                     EquipmentModelId = model.EquipmentModelId
                 });
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
 
             return new JsonResult(new { success = true });
         }
 
-        public async Task<IActionResult> OnPostRemoveCompanyAsync([FromBody] CompanyAssignmentModel model)
+        public async Task<IActionResult> OnPostRemoveCompanyAsync([FromBody] CompanyAssignmentModel model, CancellationToken cancellationToken = default)
         {
             var companyEquipmentModel = await _context.CompanyEquipmentModels
                 .FirstOrDefaultAsync(cem => cem.CompanyId == model.CompanyId &&
-                                          cem.EquipmentModelId == model.EquipmentModelId);
+                                          cem.EquipmentModelId == model.EquipmentModelId, cancellationToken);
 
             if (companyEquipmentModel != null)
             {
                 _context.CompanyEquipmentModels.Remove(companyEquipmentModel);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
 
             return new JsonResult(new { success = true });

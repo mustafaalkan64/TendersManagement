@@ -19,7 +19,7 @@ namespace Models
         [Display(Name = "Toplam Tutar")]
         public decimal TotalPrice { get; set; }
 
-        [Display(Name = "Oluþturma Tarihi")]
+        [Display(Name = "Olusturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         [Required]
