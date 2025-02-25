@@ -14,10 +14,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Equipment</th>
-            <th>Brand</th>
+            <th>Ekipman</th>
+            <th>Marka</th>
             <th>Model</th>
-            <th>Actions</th>
+            <th>Sirketler</th>
+            <th>Aksiyonlar</th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,32 @@
                 <td>@item.Brand</td>
                 <td>@item.Model</td>
                 <td>
+                    <div class="d-flex align-items-center">
+                        <select id="companySelect_@item.Id" class="form-select me-2" style="width: auto;">
+                            <option value="">Sirket seciniz</option>
+                            @foreach (var company in Model.Companies)
+                            {
+                                <option value="@company.Id">@company.Name</option>
+                            }
+                        </select>
+                        <button type="button" class="btn btn-primary btn-sm"
+                                onclick="addCompany(@item.Id)">
+                            Ekle
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        @foreach (var cem in item.CompanyEquipmentModels)
+                        {
+                            <span class="badge bg-secondary me-1">
+                                @cem.Company.Name
+                                <button type="button" class="btn-close btn-close-white ms-1"
+                                        onclick="removeCompany(@item.Id, @cem.CompanyId)"
+                                        style="font-size: 0.5rem;"></button>
+                            </span>
+                        }
+                    </div>
+                </td>
+                <td>
                     <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Duzenle</a>
                     <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
                 </td>
@@ -35,3 +62,55 @@
         }
     </tbody>
 </table> 
+
+@section Scripts {
+    <script>
+        function addCompany(equipmentModelId) {
+            const select = document.getElementById(`companySelect_${equipmentModelId}`);
+            const companyId = select.value;
+
+            if (!companyId) {
+                alert('Lütfen þirket seçiniz');
+                return;
+            }
+
+            fetch('?handler=AddCompany', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ equipmentModelId, companyId })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error adding company');
+                }
+            });
+        }
+
+        function removeCompany(equipmentModelId, companyId) {
+            if (!confirm('Silmek istediðinize emin misiniz?')) {
+                return;
+            }
+
+            fetch('?handler=RemoveCompany', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ equipmentModelId, companyId })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error removing company');
+                }
+            });
+        }
+    </script>
+}
