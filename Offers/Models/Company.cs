@@ -46,8 +46,6 @@ namespace Models
         [StringLength(20)]
         public string Faks { get; set; }
 
-        public int NewId { get; set; }
-
         [Required]
         [Display(Name = "E-posta")]
         [EmailAddress]
