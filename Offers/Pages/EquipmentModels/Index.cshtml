@@ -2,7 +2,7 @@
 @using global::Pages.EquipmentModelPage
 @model IndexModel
 @{
-    ViewData["Title"] = "Equipment Models";
+    ViewData["Title"] = "Ekipman Modelleri";
 }
 
 <h1>Ekipman Modelleri</h1>
@@ -10,7 +10,7 @@
 <div class="row mb-3">
     <div class="col-md-6">
         <div class="input-group">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search equipment name, brand or model..."
+            <input type="text" id="searchInput" class="form-control" placeholder="Ekipman ismi, modeli veya marka icinde ara.."
                    value="@Model.SearchString" />
             <button class="btn btn-outline-secondary" type="button" onclick="search()">
                 <i class="bi bi-search"></i> Ara
