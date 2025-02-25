@@ -1,27 +1,22 @@
 @page
 @model EditModel
 @{
-    ViewData["Title"] = "Firma D&uuml;zenle";
+    ViewData["Title"] = "Firma Düzenle";
 }
 
-<h1>Firma D&uuml;zenle</h1>
+<h1>@ViewData["Title"]</h1>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Company.Id" />
             <input type="hidden" asp-for="Company.CreatedDate" />
-            
+
             <div class="form-group mb-3">
                 <label asp-for="Company.Name" class="control-label"></label>
                 <input asp-for="Company.Name" class="form-control" />
                 <span asp-validation-for="Company.Name" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Company.TicariUnvan" class="control-label"></label>
-                <input asp-for="Company.TicariUnvan" class="form-control" />
-                <span asp-validation-for="Company.TicariUnvan" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
@@ -68,17 +63,17 @@
 
             <div class="card mt-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Ekipman Modelleri</h5>
+                    <h5 class="mb-0">Equipment Models</h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-6">
-
                             <select asp-for="NewEquipmentModelId" asp-items="Model.EquipmentModelList" class="form-select">
+                                <option value="">Select Equipment Model</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" asp-page-handler="AddEquipmentModel" class="btn btn-primary">Ekle</button>
+                            <button type="submit" asp-page-handler="AddEquipmentModel" class="btn btn-primary">Add Equipment</button>
                         </div>
                     </div>
 
@@ -101,11 +96,11 @@
                                         <td>@item.Brand</td>
                                         <td>@item.Model</td>
                                         <td>
-                                            <button type="submit"
-                                                    asp-page-handler="RemoveEquipmentModel"
+                                            <button type="submit" 
+                                                    asp-page-handler="RemoveEquipmentModel" 
                                                     asp-route-equipmentModelId="@item.Id"
                                                     class="btn btn-danger btn-sm">
-                                                Sil
+                                                Remove
                                             </button>
                                         </td>
                                     </tr>
@@ -115,15 +110,15 @@
                     }
                 </div>
             </div>
-<br />
-            <div class="form-group">
-                <button type="submit" asp-page-handler="Save" class="btn btn-primary">Save</button>
-                <a asp-page="Index" class="btn btn-secondary">Back to List</a>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-page="./Index" class="btn btn-secondary">Geri</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
 } 

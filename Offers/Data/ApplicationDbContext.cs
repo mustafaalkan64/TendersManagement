@@ -19,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<EquipmentFeature> EquipmentFeatures { get; set; }
     public DbSet<Unit> Units { get; set; }
     public DbSet<ProjectOwner> ProjectOwners { get; set; }
+    public DbSet<CompanyEquipmentModel> CompanyEquipmentModels { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

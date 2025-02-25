@@ -46,6 +46,8 @@ namespace Models
         [StringLength(20)]
         public string Faks { get; set; }
 
+        public int NewId { get; set; }
+
         [Required]
         [Display(Name = "E-posta")]
         [EmailAddress]
@@ -54,5 +56,8 @@ namespace Models
 
         [Display(Name = "Oluþturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        public List<CompanyEquipmentModel> CompanyEquipmentModels { get; set; } = new List<CompanyEquipmentModel>();
+
     }
 }

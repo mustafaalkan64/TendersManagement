@@ -25,4 +25,23 @@ namespace Models
 
         public List<EquipmentModelFeature> Features { get; set; } = new List<EquipmentModelFeature>();
     }
+
+    public class EquipmentModelDto
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public int EquipmentId { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Model { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Brand { get; set; }
+
+        // Navigation property
+        public Equipment Equipment { get; set; }
+    }
 }
