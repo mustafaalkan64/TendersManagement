@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Models;
 using Microsoft.AspNetCore.Authorization;
+using DocumentFormat.OpenXml.Packaging;
+using System.Reflection;
+using System.IO;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Pages.Offers
 {
@@ -15,10 +20,12 @@ namespace Pages.Offers
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public EditModel(ApplicationDbContext context)
+        public EditModel(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [BindProperty]
@@ -206,6 +213,56 @@ namespace Pages.Offers
             }
 
             return RedirectToPage("./Index");
+        }
+
+        public async Task<IActionResult> OnPostDownloadAsync()
+        {
+            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "Template6.docx");
+
+            if (!System.IO.File.Exists(templatePath))
+            {
+                return NotFound("Template not found.");
+            }
+
+            var company = await _context.Companies.FindAsync(1);
+
+            // Create a copy of the template to modify
+            byte[] modifiedDocument;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                }
+
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                {
+                    ReplaceText(wordDoc, "Firmaadi", company.Name);
+                    ReplaceText(wordDoc, "Unvan", company.TicariUnvan.ToUpper());
+                    ReplaceText(wordDoc, "Vergino", company.VergiNo);
+                    ReplaceText(wordDoc, "Ticarisicilno", company.TicariSicilNo);
+                    ReplaceText(wordDoc, "Firmaadresi", company.Address);
+                    ReplaceText(wordDoc, "Firmatelefon", company.Telefon);
+                    ReplaceText(wordDoc, "Firmafax", company.Faks);
+                    ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
+                }
+
+                modifiedDocument = memoryStream.ToArray();
+            }
+
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EditedDocument.docx");
+        }
+
+        private void ReplaceText(WordprocessingDocument wordDoc, string placeholder, string newText)
+        {
+            var body = wordDoc.MainDocumentPart.Document.Body;
+            foreach (var text in body.Descendants<Text>())
+            {
+                if (text.Text.Contains(placeholder))
+                {
+                    text.Text = text.Text.Replace(placeholder, newText);
+                }
+            }
         }
 
         public async Task<IActionResult> OnPostAddItemAsync()
