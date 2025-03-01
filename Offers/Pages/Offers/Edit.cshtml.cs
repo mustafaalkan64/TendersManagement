@@ -215,7 +215,7 @@ namespace Pages.Offers
             return RedirectToPage("./Index");
         }
 
-        public async Task<IActionResult> OnPostDownloadAsync()
+        public async Task<IActionResult> OnPostDownloadAsync(int companyId)
         {
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "Template6.docx");
 
@@ -224,7 +224,8 @@ namespace Pages.Offers
                 return NotFound("Template not found.");
             }
 
-            var company = await _context.Companies.FindAsync(1);
+            var company = await _context.Companies.FindAsync(companyId);
+            var projectOwner = await _context.ProjectOwners.FindAsync(Offer.ProjectOwnerId);   
 
             // Create a copy of the template to modify
             byte[] modifiedDocument;
@@ -237,30 +238,71 @@ namespace Pages.Offers
 
                 using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
                 {
-                    ReplaceText(wordDoc, "Firmaadi", company.Name);
-                    ReplaceText(wordDoc, "Unvan", company.TicariUnvan.ToUpper());
-                    ReplaceText(wordDoc, "Vergino", company.VergiNo);
-                    ReplaceText(wordDoc, "Ticarisicilno", company.TicariSicilNo);
-                    ReplaceText(wordDoc, "Firmaadresi", company.Address);
-                    ReplaceText(wordDoc, "Firmatelefon", company.Telefon);
-                    ReplaceText(wordDoc, "Firmafax", company.Faks);
+                    ReplaceText(wordDoc, "{Firmaisim}", company.Name);
+                    ReplaceText(wordDoc, "{Unvan}", company.TicariUnvan.ToUpper());
+                    ReplaceText(wordDoc, "vrg", company.VergiNo);
+                    ReplaceText(wordDoc, "vergdaire", company.VergiDairesiAdi);
+                    ReplaceText(wordDoc, "Ticarisicil", company.TicariSicilNo);
+                    ReplaceText(wordDoc, "fffaaaxxx", company.Address);
+                    ReplaceText(wordDoc, "xxxaaayyyy", company.Telefon);
+                    ReplaceText(wordDoc, "ffkkss", company.Faks);
                     ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
+                    ReplaceText(wordDoc, "Yatirimci", projectOwner?.Name ?? "");
+                    ReplaceText(wordDoc, "aaaa", projectOwner?.Address ?? "");
+                    ReplaceText(wordDoc, "yzyzyz", Offer.OfferName ?? "");
+                    ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
                 }
 
                 modifiedDocument = memoryStream.ToArray();
             }
 
-            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EditedDocument.docx");
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
         }
 
         private void ReplaceText(WordprocessingDocument wordDoc, string placeholder, string newText)
         {
+            //var body = wordDoc.MainDocumentPart.Document.Body;
+            //foreach (var text in body.Descendants<Text>())
+            //{
+            //    if (text.Text.Contains(placeholder))
+            //    {
+            //        text.Text = text.Text.Replace(placeholder, newText);
+            //    }
+            //}
+
             var body = wordDoc.MainDocumentPart.Document.Body;
+
+            // Replace text in the main body of the document
             foreach (var text in body.Descendants<Text>())
             {
                 if (text.Text.Contains(placeholder))
                 {
                     text.Text = text.Text.Replace(placeholder, newText);
+                }
+            }
+
+            // Replace text inside content controls (structured document tags)
+            foreach (var sdt in body.Descendants<SdtElement>())
+            {
+                foreach (var text in sdt.Descendants<Text>())
+                {
+                    if (text.Text.Contains(placeholder))
+                    {
+                        text.Text = text.Text.Replace(placeholder, newText);
+                    }
+                }
+            }
+
+            // Replace text inside fields (e.g., merge fields)
+            foreach (var fieldCode in body.Descendants<FieldCode>())
+            {
+                if (fieldCode.Text.Contains(placeholder))
+                {
+                    var fieldText = fieldCode.Parent.Descendants<Text>().FirstOrDefault();
+                    if (fieldText != null)
+                    {
+                        fieldText.Text = fieldText.Text.Replace(placeholder, newText);
+                    }
                 }
             }
         }
