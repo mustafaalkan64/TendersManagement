@@ -9,17 +9,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Templates\TeklifTemplate.docx" />
     <None Remove="Templates\Template.docx" />
     <None Remove="Templates\Template3.docx" />
     <None Remove="Templates\Template4.docx" />
     <None Remove="Templates\Template5.docx" />
-    <None Remove="Templates\Template6.docx" />
     <None Remove="Templates\TemplateTeklif.docx" />
     <None Remove="Templates\TemplateTeklif2.docx" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Template6.docx">
+    <EmbeddedResource Include="Templates\TeklifTemplate.docx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\CetinkayaTeklif.docx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

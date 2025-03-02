@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,6 +15,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Hosting;
 using System.Text;
 using DocumentFormat.OpenXml;
+using System.Globalization;
 
 namespace Pages.Offers
 {
@@ -184,14 +185,14 @@ namespace Pages.Offers
 
             if (!(Offer.SonTeklifBildirme > Offer.TeklifGonderimTarihi))
             {
-                StatusMessage = "Son teklif bildirme tarihi teklif gönderim tarihinden sonra olmalýdýr";
+                StatusMessage = "Son teklif bildirme tarihi teklif gÃ¶nderim tarihinden sonra olmalÄ±dÄ±r";
                 await LoadRelatedData();
                 return Page();
             }
 
             if (!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme)) {
 
-                StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalýdýr";
+                StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden Ã¶nce olmalÄ±dÄ±r";
                 await LoadRelatedData();
                 return Page();
             }
@@ -219,12 +220,7 @@ namespace Pages.Offers
 
         public async Task<IActionResult> OnPostDownloadAsync(int companyId)
         {
-            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "Template6.docx");
-
-            if (!System.IO.File.Exists(templatePath))
-            {
-                return NotFound("Template not found.");
-            }
+            string templatePath = "";
 
             var offer = await GetOfferById(Offer.Id);
 
@@ -232,64 +228,141 @@ namespace Pages.Offers
 
             var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
 
-            var projectOwner = offer.ProjectOwner;  
+            var projectOwner = offer.ProjectOwner;
+            CultureInfo trCulture = new CultureInfo("tr-TR");
 
             // Create a copy of the template to modify
             byte[] modifiedDocument;
-            using (MemoryStream memoryStream = new MemoryStream())
+            if (company.Name == "Ã‡etinkaya")
             {
-                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "CetinkayaTeklif.docx");
+                if (!System.IO.File.Exists(templatePath))
                 {
-                    await fileStream.CopyToAsync(memoryStream);
+                    return NotFound("Template not found.");
                 }
 
-                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                using (MemoryStream memoryStream = new MemoryStream())
                 {
-                    ReplaceText(wordDoc, "{Firmaisim}", company.Name);
-                    ReplaceText(wordDoc, "{Unvan}", company.TicariUnvan.ToUpper());
-                    ReplaceText(wordDoc, "vrg", company.VergiNo);
-                    ReplaceText(wordDoc, "vergdaire", company.VergiDairesiAdi);
-                    ReplaceText(wordDoc, "Ticarisicil", company.TicariSicilNo);
-                    ReplaceText(wordDoc, "fffaaaxxx", company.Address);
-                    ReplaceText(wordDoc, "xxxaaayyyy", company.Telefon);
-                    ReplaceText(wordDoc, "ffkkss", company.Faks);
-                    ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
-                    ReplaceText(wordDoc, "Yatirimci", projectOwner?.Name ?? "");
-                    ReplaceText(wordDoc, "aaaa", projectOwner?.Address ?? "");
-                    ReplaceText(wordDoc, "yzyzyz", Offer.OfferName ?? "");
-                    ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
-
-                    decimal totalPrices = 0;
-                    foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
+                    using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
                     {
-                        var result = new StringBuilder();
-                        foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
-                        {
-                            result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} { feature.Unit?.Name ?? ""}");
-                        }
-                        var equipment = offerItem.EquipmentModel.Equipment.Name;
-                        var features = result.ToString();
-                        var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
-                        var sayi = offerItem.Quantity;
-                        var price = offerItem.Price;
-                        var totalPrice = sayi * price;
-                        totalPrices += totalPrice;
-
-                        string[] rowValues = { equipment, features, equipmentModel, "Adet", sayi.ToString(), price.ToString(), totalPrice.ToString() }; // Example row values
-
-                        AddRowToTable(wordDoc, rowValues);
-
+                        await fileStream.CopyToAsync(memoryStream);
                     }
-                    string[] totalPriceRow = { "", "", "", "", "", "Toplam Fiyat (TL) ", totalPrices.ToString() }; // Example row values
-                    AddRowToTable(wordDoc, totalPriceRow);
+
+                    using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                    {
+                        ReplaceText(wordDoc, "frmadx", company.TicariUnvan);
+                        ReplaceText(wordDoc, "{Unvan}", company.TicariUnvan.ToUpper());
+                        ReplaceText(wordDoc, "vrg", company.VergiNo);
+                        ReplaceText(wordDoc, "vergdaire", company.VergiDairesiAdi);
+                        ReplaceText(wordDoc, "Ticarisicil", company.TicariSicilNo);
+                        ReplaceText(wordDoc, "fffaaaxxx", company.Address);
+                        ReplaceText(wordDoc, "xxxaaayyyy", company.Telefon);
+                        ReplaceText(wordDoc, "ffkkss", company.Faks);
+                        ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
+                        ReplaceText(wordDoc, "Yatirimci", projectOwner?.Name ?? "");
+                        ReplaceText(wordDoc, "aaaa", projectOwner?.Address ?? "");
+                        ReplaceText(wordDoc, "yzyzyz", Offer.OfferName ?? "");
+                        ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
+
+                        decimal totalPrices = 0;
+                        foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
+                        {
+                            var result = new StringBuilder();
+                            foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
+                            {
+                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name ?? ""}");
+                            }
+                            var equipment = offerItem.EquipmentModel.Equipment.Name;
+                            var features = result.ToString();
+                            var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
+                            var sayi = offerItem.Quantity;
+                            var price = offerItem.Price;
+                            var totalPrice = sayi * price;
+                            totalPrices += totalPrice;
+
+                            string[] rowValues = { equipment, features, equipmentModel, "Adet", sayi.ToString(), price.ToString("#,##0.00", trCulture) + " TL", totalPrice.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
+
+                            AddRowToTable(wordDoc, rowValues, true);
+
+                        }
+                        string[] totalPriceRow = { "", "", "", "", "", "Toplam Fiyat (TL) ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
+                        AddRowToTable(wordDoc, totalPriceRow, true);
+                    }
+
+
+
+                    modifiedDocument = memoryStream.ToArray();
+                }
+            }
+            else
+            {
+                templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "TeklifTemplate.docx");
+                if (!System.IO.File.Exists(templatePath))
+                {
+                    return NotFound("Template not found.");
                 }
 
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                    {
+                        await fileStream.CopyToAsync(memoryStream);
+                    }
+
+                    using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                    {
+                        ReplaceText(wordDoc, "A1", company.TicariUnvan.ToUpper());
+                        ReplaceText(wordDoc, "{Unvan}", company.TicariUnvan);
+                        ReplaceText(wordDoc, "B2", company.VergiNo);
+                        ReplaceText(wordDoc, "C3", company.VergiDairesiAdi);
+                        ReplaceText(wordDoc, "D4", company.TicariSicilNo);
+                        ReplaceText(wordDoc, "E5", company.Address);
+                        ReplaceText(wordDoc, "F6", company.Telefon);
+                        ReplaceText(wordDoc, "G7", company.Faks);
+                        ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
+                        ReplaceText(wordDoc, "I9", projectOwner?.Name ?? "");
+                        ReplaceText(wordDoc, "K10", projectOwner?.Address ?? "");
+                        ReplaceText(wordDoc, "L11", Offer.OfferName ?? "");
+                        ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "N13", Offer.SonTeklifBildirme?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
+
+                        decimal totalPrices = 0;
+                        var no = 1;
+
+                        
+                        foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
+                        {
+                            var result = new StringBuilder();
+                            foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
+                            {
+                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name ?? ""}");
+                            }
+                            var equipment = offerItem.EquipmentModel.Equipment.Name;
+                            var features = result.ToString();
+                            var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
+                            var sayi = offerItem.Quantity;
+                            var price = offerItem.Price;
+                            var totalPrice = sayi * price;
+                            totalPrices += totalPrice;
+
+                            string[] rowValues = { no.ToString(), equipment, features, equipmentModel, "Adet", sayi.ToString(), price.ToString("#,##0.00", trCulture) + " TL", totalPrice.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
+
+                            AddRowToTable(wordDoc, rowValues, false);
+                            no += 1;
+
+                        }
+                        string[] totalPriceRow = { "", "", "", "", "", "", "GENEL TOPLAM ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
+                        AddRowToTable(wordDoc, totalPriceRow, false);
+                    }
 
 
-                modifiedDocument = memoryStream.ToArray();
+
+                    modifiedDocument = memoryStream.ToArray();
+                }
             }
 
-            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
+                return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
         }
 
         private TableCell CreateStyledCell(string text)
@@ -306,6 +379,41 @@ namespace Pages.Offers
             runProperties.Append(new Italic()); // Make text italic
             runProperties.Append(new RunFonts() { Ascii = "Calibri", HighAnsi = "Calibri" }); // Set font to Calibri
             runProperties.Append(new FontSize() { Val = "19" }); // Set font size to 9.5pt (19 in OpenXml)
+
+            // Split text by new line character and add runs
+            string[] lines = text.Split('\n');
+            foreach (string line in lines)
+            {
+                Run run = new Run(new Text(line) { Space = SpaceProcessingModeValues.Preserve });
+                run.PrependChild(runProperties.CloneNode(true)); // Clone run properties for each run
+                paragraph.Append(run);
+
+                // Add a line break if it's not the last line
+                if (line != lines.Last())
+                {
+                    paragraph.Append(new Run(new Break()));
+                }
+            }
+
+            // Create cell and add the styled paragraph
+            TableCell cell = new TableCell(paragraph);
+            return cell;
+        }
+
+        private TableCell CreateStyledCellForAnotherOrders(string text)
+        {
+            // Create paragraph
+            Paragraph paragraph = new Paragraph();
+            ParagraphProperties paragraphProperties = new ParagraphProperties();
+            paragraphProperties.Append(new Justification() { Val = JustificationValues.Center }); // Center align
+            paragraph.PrependChild(paragraphProperties);
+
+            // Create run properties for styling
+            RunProperties runProperties = new RunProperties();
+            //runProperties.Append(new Bold());   // Make text bold
+            //runProperties.Append(new Italic()); // Make text italic
+            runProperties.Append(new RunFonts() { Ascii = "Times New Roman", HighAnsi = "Times New Roman" }); // Set font to Calibri
+            runProperties.Append(new FontSize() { Val = "28" }); // Set font size to 9.5pt (19 in OpenXml)
 
             // Split text by new line character and add runs
             string[] lines = text.Split('\n');
@@ -375,7 +483,7 @@ namespace Pages.Offers
             }
         }
 
-        private void AddRowToTable(WordprocessingDocument wordDoc, string[] cellValues)
+        private void AddRowToTable(WordprocessingDocument wordDoc, string[] cellValues, bool isCetinkaya = true)
         {
 
                 var mainPart = wordDoc.MainDocumentPart;
@@ -393,8 +501,16 @@ namespace Pages.Offers
                 // Add cells with values
                 foreach (var value in cellValues)
                 {
-                    TableCell cell = CreateStyledCell(value);
-                    newRow.Append(cell);
+                    if(isCetinkaya)
+                    {
+                        TableCell cell = CreateStyledCell(value);
+                        newRow.Append(cell);
+                    }
+                    else
+                    {
+                        TableCell cell = CreateStyledCellForAnotherOrders(value);
+                        newRow.Append(cell);
+                    }
                 }
 
                 // Append the row to the table
@@ -423,7 +539,7 @@ namespace Pages.Offers
             {
                 await LoadRelatedData();
 
-                StatusMessage = "Zaten kurum bu ekipmana teklif vermiþ";
+                StatusMessage = "Zaten kurum bu ekipmana teklif vermiÅŸ";
                 await UpdateOfferTotalPrice(Offer.Id);
                 return Page();
             }
@@ -442,7 +558,7 @@ namespace Pages.Offers
                     {
                         await LoadRelatedData();
 
-                        StatusMessage = "Teklif tutarý en düþük teklif tutarýndan düþük olamaz";
+                        StatusMessage = "Teklif tutarÄ± en dÃ¼ÅŸÃ¼k teklif tutarÄ±ndan dÃ¼ÅŸÃ¼k olamaz";
                         await UpdateOfferTotalPrice(Offer.Id);
                         return Page();
                     }
@@ -451,7 +567,7 @@ namespace Pages.Offers
                     {
                         await LoadRelatedData();
 
-                        StatusMessage = "Teklif tutarý en düþük teklif tutarýnýn %20sinden fazla olamaz";
+                        StatusMessage = "Teklif tutarÄ± en dÃ¼ÅŸÃ¼k teklif tutarÄ±nÄ±n %20sinden fazla olamaz";
                         await UpdateOfferTotalPrice(Offer.Id);
                         return Page();
                     }
