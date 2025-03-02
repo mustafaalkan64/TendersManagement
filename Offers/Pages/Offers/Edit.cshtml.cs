@@ -13,6 +13,8 @@ using System.Reflection;
 using System.IO;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Hosting;
+using System.Text;
+using DocumentFormat.OpenXml;
 
 namespace Pages.Offers
 {
@@ -224,8 +226,13 @@ namespace Pages.Offers
                 return NotFound("Template not found.");
             }
 
-            var company = await _context.Companies.FindAsync(companyId);
-            var projectOwner = await _context.ProjectOwners.FindAsync(Offer.ProjectOwnerId);   
+            var offer = await GetOfferById(Offer.Id);
+
+            var offerItems = offer.OfferItems.ToList();
+
+            var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
+
+            var projectOwner = offer.ProjectOwner;  
 
             // Create a copy of the template to modify
             byte[] modifiedDocument;
@@ -251,12 +258,73 @@ namespace Pages.Offers
                     ReplaceText(wordDoc, "aaaa", projectOwner?.Address ?? "");
                     ReplaceText(wordDoc, "yzyzyz", Offer.OfferName ?? "");
                     ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
+
+                    decimal totalPrices = 0;
+                    foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
+                    {
+                        var result = new StringBuilder();
+                        foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
+                        {
+                            result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} { feature.Unit?.Name ?? ""}");
+                        }
+                        var equipment = offerItem.EquipmentModel.Equipment.Name;
+                        var features = result.ToString();
+                        var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
+                        var sayi = offerItem.Quantity;
+                        var price = offerItem.Price;
+                        var totalPrice = sayi * price;
+                        totalPrices += totalPrice;
+
+                        string[] rowValues = { equipment, features, equipmentModel, "Adet", sayi.ToString(), price.ToString(), totalPrice.ToString() }; // Example row values
+
+                        AddRowToTable(wordDoc, rowValues);
+
+                    }
+                    string[] totalPriceRow = { "", "", "", "", "", "Toplam Fiyat (TL) ", totalPrices.ToString() }; // Example row values
+                    AddRowToTable(wordDoc, totalPriceRow);
                 }
+
+
 
                 modifiedDocument = memoryStream.ToArray();
             }
 
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
+        }
+
+        private TableCell CreateStyledCell(string text)
+        {
+            // Create paragraph
+            Paragraph paragraph = new Paragraph();
+            ParagraphProperties paragraphProperties = new ParagraphProperties();
+            paragraphProperties.Append(new Justification() { Val = JustificationValues.Center }); // Center align
+            paragraph.PrependChild(paragraphProperties);
+
+            // Create run properties for styling
+            RunProperties runProperties = new RunProperties();
+            runProperties.Append(new Bold());   // Make text bold
+            runProperties.Append(new Italic()); // Make text italic
+            runProperties.Append(new RunFonts() { Ascii = "Calibri", HighAnsi = "Calibri" }); // Set font to Calibri
+            runProperties.Append(new FontSize() { Val = "19" }); // Set font size to 9.5pt (19 in OpenXml)
+
+            // Split text by new line character and add runs
+            string[] lines = text.Split('\n');
+            foreach (string line in lines)
+            {
+                Run run = new Run(new Text(line) { Space = SpaceProcessingModeValues.Preserve });
+                run.PrependChild(runProperties.CloneNode(true)); // Clone run properties for each run
+                paragraph.Append(run);
+
+                // Add a line break if it's not the last line
+                if (line != lines.Last())
+                {
+                    paragraph.Append(new Run(new Break()));
+                }
+            }
+
+            // Create cell and add the styled paragraph
+            TableCell cell = new TableCell(paragraph);
+            return cell;
         }
 
         private void ReplaceText(WordprocessingDocument wordDoc, string placeholder, string newText)
@@ -305,6 +373,35 @@ namespace Pages.Offers
                     }
                 }
             }
+        }
+
+        private void AddRowToTable(WordprocessingDocument wordDoc, string[] cellValues)
+        {
+
+                var mainPart = wordDoc.MainDocumentPart;
+                var table = mainPart.Document.Body.Elements<Table>().Skip(1).Take(1).FirstOrDefault(); // Select the first table
+
+                if (table == null)
+                {
+                    Console.WriteLine("No table found in the document.");
+                    return;
+                }
+
+                // Create a new row
+                TableRow newRow = new TableRow();
+
+                // Add cells with values
+                foreach (var value in cellValues)
+                {
+                    TableCell cell = CreateStyledCell(value);
+                    newRow.Append(cell);
+                }
+
+                // Append the row to the table
+                table.Append(newRow);
+
+                // Save changes
+                mainPart.Document.Save();
         }
 
         public async Task<IActionResult> OnPostAddItemAsync()
@@ -411,11 +508,16 @@ namespace Pages.Offers
         {
 
             return await _context.Offers
+            .Include(o => o.ProjectOwner)
             .Include(o => o.OfferItems)
                 .ThenInclude(oi => oi.EquipmentModel)
                     .ThenInclude(em => em.Equipment)
             .Include(o => o.OfferItems)
                 .ThenInclude(oi => oi.Company)
+            .Include(o => o.OfferItems)
+                .ThenInclude(oi => oi.EquipmentModel)
+                  .ThenInclude(em => em.Features)
+                   .ThenInclude(o => o.Unit)
             .FirstOrDefaultAsync(o => o.Id == id);
         }
 
