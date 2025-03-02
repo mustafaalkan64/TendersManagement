@@ -263,6 +263,8 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "aaaa", projectOwner?.Address ?? "");
                         ReplaceText(wordDoc, "yzyzyz", Offer.OfferName ?? "");
                         ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
+                        ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "N13", Offer.SonTeklifBildirme?.ToString("dd.MM.yyyy"));
 
                         decimal totalPrices = 0;
                         foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
