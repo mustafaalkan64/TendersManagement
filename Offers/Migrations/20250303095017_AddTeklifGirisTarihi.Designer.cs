@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Offers.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250225082340_AddMissingUnits")]
-    partial class AddMissingUnits
+    [Migration("20250303095017_AddTeklifGirisTarihi")]
+    partial class AddTeklifGirisTarihi
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -507,6 +507,9 @@ namespace Offers.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("TeklifGirisTarihi")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
@@ -717,7 +720,7 @@ namespace Offers.Migrations
                         .IsRequired();
 
                     b.HasOne("Models.EquipmentModel", "EquipmentModel")
-                        .WithMany()
+                        .WithMany("CompanyEquipmentModels")
                         .HasForeignKey("EquipmentModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -824,6 +827,8 @@ namespace Offers.Migrations
 
             modelBuilder.Entity("Models.EquipmentModel", b =>
                 {
+                    b.Navigation("CompanyEquipmentModels");
+
                     b.Navigation("Features");
                 });
 

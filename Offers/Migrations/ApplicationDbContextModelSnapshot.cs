@@ -504,6 +504,9 @@ namespace Offers.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("TeklifGirisTarihi")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
@@ -566,92 +569,6 @@ namespace Offers.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Units");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Kg",
-                            ShortCode = "Kg"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Ton",
-                            ShortCode = "Ton"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Lt",
-                            ShortCode = "Lt"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Cm",
-                            ShortCode = "Cm"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Mm",
-                            ShortCode = "Mm"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "M",
-                            ShortCode = "M"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "m³",
-                            ShortCode = "m³"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "m²",
-                            ShortCode = "m²"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "°",
-                            ShortCode = "°"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Name = "Adet",
-                            ShortCode = "Adet"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Name = "Hp",
-                            ShortCode = "Hp"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Name = "-",
-                            ShortCode = "-"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Name = "Evet",
-                            ShortCode = "Evet"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Name = "Hayır",
-                            ShortCode = "Hayır"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -714,7 +631,7 @@ namespace Offers.Migrations
                         .IsRequired();
 
                     b.HasOne("Models.EquipmentModel", "EquipmentModel")
-                        .WithMany()
+                        .WithMany("CompanyEquipmentModels")
                         .HasForeignKey("EquipmentModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -821,6 +738,8 @@ namespace Offers.Migrations
 
             modelBuilder.Entity("Models.EquipmentModel", b =>
                 {
+                    b.Navigation("CompanyEquipmentModels");
+
                     b.Navigation("Features");
                 });
 

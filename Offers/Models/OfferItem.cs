@@ -29,6 +29,9 @@ namespace Models
         [Display(Name = "Oluþturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
+        [Display(Name = "Teklif Giriþ Tarihi")]
+        public DateTime TeklifGirisTarihi { get; set; } = DateTime.Now;
+
         // Navigation properties
         public Offer Offer { get; set; }
         public EquipmentModel EquipmentModel { get; set; }

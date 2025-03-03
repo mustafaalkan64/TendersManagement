@@ -227,6 +227,8 @@ namespace Pages.Offers
 
             var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
 
+            var teklifGirisTarihi = offerItems.FirstOrDefault(x => x.CompanyId == companyId && x.OfferId == Offer.Id && x.TeklifGirisTarihi != DateTime.MinValue)?.TeklifGirisTarihi;
+
             var projectOwner = offer.ProjectOwner;
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
@@ -261,7 +263,7 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "Yatirimci", projectOwner?.Name.ToUpper() ?? "");
                         ReplaceText(wordDoc, "aaaa", projectOwner?.Address.ToUpper() ?? "");
                         ReplaceText(wordDoc, "yzyzyz", Offer.OfferName.ToUpper() ?? "");
-                        ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
+                        ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "N13", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
@@ -337,7 +339,7 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "L11", Offer.OfferName.ToUpper() ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "N13", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-                        ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
+                        ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
                         ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy")); 
                         ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
 
@@ -351,9 +353,9 @@ namespace Pages.Offers
                             var result = new StringBuilder();
                             foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                             {
-                                result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper() ?? ""}");
+                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name ?? ""}");
                             }
-                            var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
+                            var equipment = offerItem.EquipmentModel.Equipment.Name;
                             equipmentList.Add(equipment);
                             var features = result.ToString();
                             var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
@@ -564,7 +566,14 @@ namespace Pages.Offers
                 mainPart.Document.Save();
         }
 
-        public async Task<IActionResult> OnPostAddItemAsync()
+        private DateTime GetRandomDate(DateTime? start, DateTime? end)
+        {
+            Random rand = new Random();
+            int range = (end.Value - start.Value).Days;
+            return start.Value.AddDays(rand.Next(range + 1));
+        }
+
+        public async Task<IActionResult> OnPostAddItemAsync(CancellationToken cancellationToken = default)
         {
             var offer = await GetOfferById(Offer.Id);
             
@@ -578,8 +587,13 @@ namespace Pages.Offers
             }
 
             NewItem.OfferId = Offer.Id;
+            var offerItem = OfferItems.Where(x => x.OfferId == Offer.Id && x.CompanyId == NewItem.CompanyId && x.TeklifGirisTarihi != DateTime.MinValue).FirstOrDefault();
+            if (offerItem == null)
+                NewItem.TeklifGirisTarihi = GetRandomDate(Offer.TeklifGonderimTarihi, Offer.SonTeklifBildirme);
+            else
+                NewItem.TeklifGirisTarihi = offerItem.TeklifGirisTarihi;
 
-            if(OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModelId == NewItem.EquipmentModelId))
+            if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModelId == NewItem.EquipmentModelId))
             {
                 await LoadRelatedData();
 
@@ -619,6 +633,15 @@ namespace Pages.Offers
             }
 
             _context.OfferItems.Add(NewItem);
+            await _context.SaveChangesAsync();
+
+            var offerItems = await _context.OfferItems.Where(oi => oi.OfferId == Offer.Id && oi.CompanyId == NewItem.CompanyId && oi.TeklifGirisTarihi == DateTime.MinValue).ToListAsync(cancellationToken);
+            var teklifGirisTarihi = GetRandomDate(Offer.TeklifGonderimTarihi, Offer.SonTeklifBildirme);
+            foreach (var item in offerItems)
+            {
+                item.TeklifGirisTarihi = teklifGirisTarihi;
+                _context.Entry(item).State = EntityState.Modified;
+            }
             await _context.SaveChangesAsync();
 
             // Update total price
