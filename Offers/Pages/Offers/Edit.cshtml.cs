@@ -343,6 +343,7 @@ namespace Pages.Offers
 
                         decimal totalPrices = 0;
                         var no = 1;
+                        var equipmentList = new List<string>();
 
                         var equipmentNames = new StringBuilder();
                         foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
@@ -353,7 +354,7 @@ namespace Pages.Offers
                                 result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper() ?? ""}");
                             }
                             var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
-                            equipmentNames.AppendLine(equipment);
+                            equipmentList.Add(equipment);
                             var features = result.ToString();
                             var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
                             var sayi = offerItem.Quantity;
@@ -370,10 +371,9 @@ namespace Pages.Offers
                         string[] totalPriceRow = { "", "", "", "", "", "", "GENEL TOPLAM ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
                         AddRowToTable(wordDoc, totalPriceRow, false);
 
+                        var equipments = ConvertListToString(equipmentList.Distinct().ToList());
+                        ReplaceText(wordDoc, "O14", equipments);
                     }
-
-
-
                     modifiedDocument = memoryStream.ToArray();
                 }
             }
@@ -418,12 +418,16 @@ namespace Pages.Offers
             return cell;
         }
 
-        private TableCell CreateStyledCellForAnotherOrders(string text)
+        private TableCell CreateStyledCellForAnotherOrders(string text, bool isLeft = false)
         {
             // Create paragraph
             Paragraph paragraph = new Paragraph();
             ParagraphProperties paragraphProperties = new ParagraphProperties();
-            paragraphProperties.Append(new Justification() { Val = JustificationValues.Center }); // Center align
+            if(!isLeft)
+                paragraphProperties.Append(new Justification() { Val = JustificationValues.Center }); // Center align
+            else
+                paragraphProperties.Append(new Justification() { Val = JustificationValues.Left }); // Center align
+
             paragraph.PrependChild(paragraphProperties);
 
             // Create run properties for styling
@@ -535,7 +539,8 @@ namespace Pages.Offers
                 // Create a new row
                 TableRow newRow = new TableRow();
 
-                // Add cells with values
+            // Add cells with values
+                int order = 0;
                 foreach (var value in cellValues)
                 {
                     if(isCetinkaya)
@@ -545,8 +550,10 @@ namespace Pages.Offers
                     }
                     else
                     {
-                        TableCell cell = CreateStyledCellForAnotherOrders(value);
+                        bool isLeft = order == 2 ? true : false;
+                        TableCell cell = CreateStyledCellForAnotherOrders(value, isLeft);
                         newRow.Append(cell);
+                        order++;
                     }
                 }
 
@@ -686,6 +693,10 @@ namespace Pages.Offers
             }
 
             return RedirectToPage("./Edit", new { id = offerItem?.OfferId });
+        }
+        private string ConvertListToString(IEnumerable<string> list)
+        {
+            return string.Join(", ", list);
         }
     }
 } 
