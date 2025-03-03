@@ -265,7 +265,7 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "yzyzyz", Offer.OfferName.ToUpper() ?? "");
                         ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        ReplaceText(wordDoc, "N13", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "N13", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
 
@@ -278,7 +278,7 @@ namespace Pages.Offers
                             var result = new StringBuilder();
                             foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                             {
-                                result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper() ?? ""}");
+                                result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper().Replace("-", "") ?? ""}");
                             }
                             var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
                             equipmentList.Add(equipment);
@@ -338,7 +338,7 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "K10", projectOwner?.Address.ToUpper() ?? "");
                         ReplaceText(wordDoc, "L11", Offer.OfferName.ToUpper() ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        ReplaceText(wordDoc, "N13", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "N13", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
                         ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy")); 
                         ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
@@ -353,7 +353,7 @@ namespace Pages.Offers
                             var result = new StringBuilder();
                             foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                             {
-                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name ?? ""}");
+                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-","") ?? ""}");
                             }
                             var equipment = offerItem.EquipmentModel.Equipment.Name;
                             equipmentList.Add(equipment);
