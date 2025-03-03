@@ -384,6 +384,71 @@ namespace Pages.Offers
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
         }
 
+        public async Task<IActionResult> OnPostTeknikSartnameAsync()
+        {
+            string templatePath = "";
+
+            var offer = await GetOfferById(Offer.Id);
+
+            var offerItems = offer.OfferItems.ToList();
+
+            var projectOwner = offer.ProjectOwner;
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+
+            // Create a copy of the template to modify
+            byte[] modifiedDocument;
+
+            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "TeknikSartname.docx");
+            if (!System.IO.File.Exists(templatePath))
+            {
+                return NotFound("Template not found.");
+            }
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                }
+
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                {
+                    ReplaceText(wordDoc, "AAAA", offer.OfferName);
+                    ReplaceText(wordDoc, "BBBB", offer.ProjectAddress);
+                    ReplaceText(wordDoc, "AXBY", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "DDMMYYYY", offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
+
+                    decimal totalPrices = 0;
+                    var no = 1;
+                    var equipmentList = new List<string>();
+
+                    var equipmentNames = new StringBuilder();
+                    foreach (var offerItem in offerItems.ToList())
+                    {
+                        var result = new StringBuilder();
+                        foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
+                        {
+                            result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
+                        }
+                        var equipment = offerItem.EquipmentModel.Equipment.Name;
+                        equipmentList.Add(equipment);
+                        var features = result.ToString();
+                        var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
+                        var sayi = offerItem.Quantity;
+
+                        string[] rowValues = { no.ToString(), equipment, features, equipmentModel, "Adet", sayi.ToString()}; // Example row values
+
+                        AddRowToTable(wordDoc, rowValues, false, true);
+                        no += 1;
+
+                    }
+                }
+                modifiedDocument = memoryStream.ToArray();
+            }
+
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Teknik Şartname.docx");
+        }
+
         public async Task<IActionResult> OnPostDavetAsync(int companyId)
         {
             string templatePath = "";
@@ -393,8 +458,6 @@ namespace Pages.Offers
             var offerItems = offer.OfferItems.ToList();
 
             var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
-
-            var teklifGirisTarihi = offerItems.FirstOrDefault(x => x.CompanyId == companyId && x.OfferId == Offer.Id && x.TeklifGirisTarihi != DateTime.MinValue)?.TeklifGirisTarihi;
 
             var projectOwner = offer.ProjectOwner;
             CultureInfo trCulture = new CultureInfo("tr-TR");
@@ -427,7 +490,7 @@ namespace Pages.Offers
                     ReplaceText(wordDoc, "G7", company.Address);
                     ReplaceText(wordDoc, "H8", company.Telefon);
                     ReplaceText(wordDoc, "AXBY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                    ReplaceText(wordDoc, "DDMMYYY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy")); 
+                    ReplaceText(wordDoc, "DDMMYYY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                     ReplaceText(wordDoc, "XXYY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                     ReplaceText(wordDoc, "BCDAY", Offer.SonTeklifBildirme?.ToString("dd.MM.yyyy"));
                     ReplaceText(wordDoc, "HHMM", Offer.SonTeklifBildirme?.ToString("HH.mm"));
@@ -581,11 +644,15 @@ namespace Pages.Offers
             }
         }
 
-        private void AddRowToTable(WordprocessingDocument wordDoc, string[] cellValues, bool isCetinkaya = true)
+        private void AddRowToTable(WordprocessingDocument wordDoc, string[] cellValues, bool isCetinkaya = true, bool isTeknikSartname = false)
         {
 
+            Table? table = null;
             var mainPart = wordDoc.MainDocumentPart;
-            var table = mainPart.Document.Body.Elements<Table>().Skip(1).Take(1).FirstOrDefault(); // Select the first table
+            if(!isTeknikSartname)
+                table = mainPart.Document.Body.Elements<Table>().Skip(1).Take(1).FirstOrDefault(); // Select the first table
+            else
+                table = mainPart.Document.Body.Elements<Table>().FirstOrDefault(); // Select the first table
 
             if (table == null)
             {

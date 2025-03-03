@@ -217,13 +217,14 @@
                 @foreach (var item in Model.OfferItems.GroupBy(x => x.CompanyId))
                 {
                     var companyName = Model.CompanyList.FirstOrDefault(c => c.Value == item.Key.ToString())?.Text ?? "Ýndir";
-                    <button type="submit" asp-page-handler="Download" asp-route-companyId="@item.Key" class="btn btn-primary">@companyName Teklif</button>
+                    <button type="submit" asp-page-handler="Download" asp-route-companyId="@item.Key" class="btn btn-info">@companyName Teklif</button>
                 }
                 @foreach (var item in Model.OfferItems.GroupBy(x => x.CompanyId))
                 {
                     var companyName = Model.CompanyList.FirstOrDefault(c => c.Value == item.Key.ToString())?.Text ?? "Ýndir";
-                    <button type="submit" asp-page-handler="Davet" asp-route-companyId="@item.Key" class="btn btn-primary">@companyName Davet</button>
+                    <button type="submit" asp-page-handler="Davet" asp-route-companyId="@item.Key" class="btn btn-warning">@companyName Davet</button>
                 }
+                <button type="submit" asp-page-handler="TeknikSartname" class="btn btn-success">Teknik Þartname</button>
                 <a asp-page="./Index" class="btn btn-secondary">Listeye Don</a>
             </div>
         </form>
