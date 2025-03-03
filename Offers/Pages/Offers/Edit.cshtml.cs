@@ -61,7 +61,7 @@ namespace Pages.Offers
             .OrderBy(em => em.Equipment.Name)
             .ThenBy(em => em.Brand)
             .ThenBy(em => em.Model)
-            .ToListAsync(cancellationToken);  
+            .ToListAsync(cancellationToken);
 
             CompanySummaries = await _context.OfferItems
                 .Where(oi => oi.OfferId == Offer.Id)
@@ -151,7 +151,7 @@ namespace Pages.Offers
                 return NotFound();
             }
 
-            Offer =  await GetOfferById(id);
+            Offer = await GetOfferById(id);
 
             if (Offer == null)
             {
@@ -176,7 +176,7 @@ namespace Pages.Offers
 
         public async Task<IActionResult> OnPostSaveAsync()
         {
-            if(string.IsNullOrEmpty(Offer.OfferName))
+            if (string.IsNullOrEmpty(Offer.OfferName))
             {
                 await LoadRelatedData();
                 return Page();
@@ -189,7 +189,8 @@ namespace Pages.Offers
                 return Page();
             }
 
-            if (!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme)) {
+            if (!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme))
+            {
 
                 StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalıdır";
                 await LoadRelatedData();
@@ -340,7 +341,7 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "N13", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
-                        ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy")); 
+                        ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
 
                         decimal totalPrices = 0;
@@ -353,7 +354,7 @@ namespace Pages.Offers
                             var result = new StringBuilder();
                             foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                             {
-                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-","") ?? ""}");
+                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
                             }
                             var equipment = offerItem.EquipmentModel.Equipment.Name;
                             equipmentList.Add(equipment);
@@ -380,7 +381,61 @@ namespace Pages.Offers
                 }
             }
 
-                return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
+        }
+
+        public async Task<IActionResult> OnPostDavetAsync(int companyId)
+        {
+            string templatePath = "";
+
+            var offer = await GetOfferById(Offer.Id);
+
+            var offerItems = offer.OfferItems.ToList();
+
+            var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
+
+            var teklifGirisTarihi = offerItems.FirstOrDefault(x => x.CompanyId == companyId && x.OfferId == Offer.Id && x.TeklifGirisTarihi != DateTime.MinValue)?.TeklifGirisTarihi;
+
+            var projectOwner = offer.ProjectOwner;
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+
+            // Create a copy of the template to modify
+            byte[] modifiedDocument;
+
+            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "Davet.docx");
+            if (!System.IO.File.Exists(templatePath))
+            {
+                return NotFound("Template not found.");
+            }
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                }
+
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                {
+                    ReplaceText(wordDoc, "A1", offer.ProjectOwner.Name.ToUpper());
+                    ReplaceText(wordDoc, "C3", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "H10", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "B2", company.Name);
+                    ReplaceText(wordDoc, "D4", company.Address);
+                    ReplaceText(wordDoc, "E5", offer.ProjectAddress);
+                    ReplaceText(wordDoc, "F6", offer.OfferName);
+                    ReplaceText(wordDoc, "G7", company.Address);
+                    ReplaceText(wordDoc, "H8", company.Telefon);
+                    ReplaceText(wordDoc, "AXBY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "DDMMYYY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy")); 
+                    ReplaceText(wordDoc, "XXYY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "BCDAY", Offer.SonTeklifBildirme?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "HHMM", Offer.SonTeklifBildirme?.ToString("HH.mm"));
+                }
+                modifiedDocument = memoryStream.ToArray();
+            }
+
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Davet.docx");
         }
 
         private TableCell CreateStyledCell(string text)
@@ -425,7 +480,7 @@ namespace Pages.Offers
             // Create paragraph
             Paragraph paragraph = new Paragraph();
             ParagraphProperties paragraphProperties = new ParagraphProperties();
-            if(!isLeft)
+            if (!isLeft)
                 paragraphProperties.Append(new Justification() { Val = JustificationValues.Center }); // Center align
             else
                 paragraphProperties.Append(new Justification() { Val = JustificationValues.Left }); // Center align
@@ -484,7 +539,7 @@ namespace Pages.Offers
 
                         foreach (string line in lines)
                         {
-                            if(!string.IsNullOrEmpty(line))
+                            if (!string.IsNullOrEmpty(line))
                             {
                                 Run run = new Run();
                                 run.Append(new Text(line) { Space = SpaceProcessingModeValues.Preserve });
@@ -529,41 +584,41 @@ namespace Pages.Offers
         private void AddRowToTable(WordprocessingDocument wordDoc, string[] cellValues, bool isCetinkaya = true)
         {
 
-                var mainPart = wordDoc.MainDocumentPart;
-                var table = mainPart.Document.Body.Elements<Table>().Skip(1).Take(1).FirstOrDefault(); // Select the first table
+            var mainPart = wordDoc.MainDocumentPart;
+            var table = mainPart.Document.Body.Elements<Table>().Skip(1).Take(1).FirstOrDefault(); // Select the first table
 
-                if (table == null)
-                {
-                    Console.WriteLine("No table found in the document.");
-                    return;
-                }
+            if (table == null)
+            {
+                Console.WriteLine("No table found in the document.");
+                return;
+            }
 
-                // Create a new row
-                TableRow newRow = new TableRow();
+            // Create a new row
+            TableRow newRow = new TableRow();
 
             // Add cells with values
-                int order = 0;
-                foreach (var value in cellValues)
+            int order = 0;
+            foreach (var value in cellValues)
+            {
+                if (isCetinkaya)
                 {
-                    if(isCetinkaya)
-                    {
-                        TableCell cell = CreateStyledCell(value);
-                        newRow.Append(cell);
-                    }
-                    else
-                    {
-                        bool isLeft = order == 2 ? true : false;
-                        TableCell cell = CreateStyledCellForAnotherOrders(value, isLeft);
-                        newRow.Append(cell);
-                        order++;
-                    }
+                    TableCell cell = CreateStyledCell(value);
+                    newRow.Append(cell);
                 }
+                else
+                {
+                    bool isLeft = order == 2 ? true : false;
+                    TableCell cell = CreateStyledCellForAnotherOrders(value, isLeft);
+                    newRow.Append(cell);
+                    order++;
+                }
+            }
 
-                // Append the row to the table
-                table.Append(newRow);
+            // Append the row to the table
+            table.Append(newRow);
 
-                // Save changes
-                mainPart.Document.Save();
+            // Save changes
+            mainPart.Document.Save();
         }
 
         private DateTime GetRandomDate(DateTime? start, DateTime? end)
@@ -576,7 +631,7 @@ namespace Pages.Offers
         public async Task<IActionResult> OnPostAddItemAsync(CancellationToken cancellationToken = default)
         {
             var offer = await GetOfferById(Offer.Id);
-            
+
             OfferItems = offer.OfferItems.ToList();
 
             if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
@@ -722,4 +777,4 @@ namespace Pages.Offers
             return string.Join(", ", list);
         }
     }
-} 
+}
