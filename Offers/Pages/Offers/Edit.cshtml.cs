@@ -711,7 +711,7 @@ namespace Pages.Offers
                 return Page();
             }
 
-            var equipmentModelUnitFeature = await _context.EquipmentModelFeatures.Include(x => x.Unit).FirstOrDefaultAsync(x => x.EquipmentModelId == NewItem.EquipmentModelId && x.Unit.Name == "Hp");
+            var equipmentModelUnitFeature = await _context.EquipmentModelFeatures.Include(x => x.Unit).FirstOrDefaultAsync(x => x.EquipmentModelId == NewItem.EquipmentModelId && x.Unit.Name == "Hp", cancellationToken);
             if(equipmentModelUnitFeature != null)
             {
                 string[] valueRange = equipmentModelUnitFeature.FeatureValue.Split('-');
@@ -724,7 +724,7 @@ namespace Pages.Offers
                     {
                         await LoadRelatedData();
 
-                        StatusMessage = "Traktör Hp degeri, makine ekipman hp degeri araliginda veya bu degerden buyuk olmalidir";
+                        StatusMessage = "Traktor Hp degeri, makine ekipman hp degeri araliginda veya bu degerden buyuk olmalidir";
                         await UpdateOfferTotalPrice(Offer.Id);
                         return Page();
                     }
@@ -735,7 +735,7 @@ namespace Pages.Offers
                     {
                         await LoadRelatedData();
 
-                        StatusMessage = "Traktör Hp degeri, makine ekipman hp degerinden küçük olmamalıdır";
+                        StatusMessage = "Traktor Hp degeri, makine ekipman hp degerinden küçük olmamalidir";
                         await UpdateOfferTotalPrice(Offer.Id);
                         return Page();
                     }
@@ -790,16 +790,19 @@ namespace Pages.Offers
             }
 
             _context.OfferItems.Add(NewItem);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             var offerItems = await _context.OfferItems.Where(oi => oi.OfferId == Offer.Id && oi.CompanyId == NewItem.CompanyId && oi.TeklifGirisTarihi == DateTime.MinValue).ToListAsync(cancellationToken);
-            var teklifGirisTarihi = GetRandomDate(Offer.TeklifGonderimTarihi, Offer.SonTeklifBildirme);
-            foreach (var item in offerItems)
+            if (offerItems.Any())
             {
-                item.TeklifGirisTarihi = teklifGirisTarihi;
-                _context.Entry(item).State = EntityState.Modified;
+                var teklifGirisTarihi = GetRandomDate(Offer.TeklifGonderimTarihi, Offer.SonTeklifBildirme);
+                foreach (var item in offerItems)
+                {
+                    item.TeklifGirisTarihi = teklifGirisTarihi;
+                    _context.Entry(item).State = EntityState.Modified;
+                }
+                await _context.SaveChangesAsync(cancellationToken);
             }
-            await _context.SaveChangesAsync();
 
             // Update total price
             await UpdateOfferTotalPrice(Offer.Id);
