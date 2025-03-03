@@ -699,7 +699,10 @@ namespace Pages.Offers
         {
             var offer = await GetOfferById(Offer.Id);
 
+            var projectOwnerTraktorHp = offer.ProjectOwner.Hp;
+
             OfferItems = offer.OfferItems.ToList();
+
 
             if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
@@ -707,6 +710,38 @@ namespace Pages.Offers
                 await UpdateOfferTotalPrice(Offer.Id);
                 return Page();
             }
+
+            var equipmentModelUnitFeature = await _context.EquipmentModelFeatures.Include(x => x.Unit).FirstOrDefaultAsync(x => x.EquipmentModelId == NewItem.EquipmentModelId && x.Unit.Name == "Hp");
+            if(equipmentModelUnitFeature != null)
+            {
+                string[] valueRange = equipmentModelUnitFeature.FeatureValue.Split('-');
+                if(valueRange.Length > 1)
+                {
+                    var firstValue = valueRange.First();
+                    var lastOne = valueRange.Last();
+                    if (projectOwnerTraktorHp < Int32.Parse(lastOne))
+                        //if (!((projectOwnerTraktorHp > Int32.Parse(firstValue) && projectOwnerTraktorHp <= Int32.Parse(lastOne)) || projectOwnerTraktorHp > Int32.Parse(lastOne)))
+                    {
+                        await LoadRelatedData();
+
+                        StatusMessage = "Traktör Hp degeri, makine ekipman hp degeri araliginda veya bu degerden buyuk olmalidir";
+                        await UpdateOfferTotalPrice(Offer.Id);
+                        return Page();
+                    }
+                }
+                else
+                {
+                    if(projectOwnerTraktorHp < Int32.Parse(equipmentModelUnitFeature.FeatureValue))
+                    {
+                        await LoadRelatedData();
+
+                        StatusMessage = "Traktör Hp degeri, makine ekipman hp degerinden küçük olmamalıdır";
+                        await UpdateOfferTotalPrice(Offer.Id);
+                        return Page();
+                    }
+                }
+            }
+
 
             NewItem.OfferId = Offer.Id;
             var offerItem = OfferItems.Where(x => x.OfferId == Offer.Id && x.CompanyId == NewItem.CompanyId && x.TeklifGirisTarihi != DateTime.MinValue).FirstOrDefault();
