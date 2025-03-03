@@ -10,7 +10,6 @@ using Models;
 using Microsoft.AspNetCore.Authorization;
 using DocumentFormat.OpenXml.Packaging;
 using System.Reflection;
-using System.IO;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Hosting;
 using System.Text;
@@ -259,22 +258,28 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "xxxaaayyyy", company.Telefon);
                         ReplaceText(wordDoc, "ffkkss", company.Faks);
                         ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
-                        ReplaceText(wordDoc, "Yatirimci", projectOwner?.Name ?? "");
-                        ReplaceText(wordDoc, "aaaa", projectOwner?.Address ?? "");
-                        ReplaceText(wordDoc, "yzyzyz", Offer.OfferName ?? "");
+                        ReplaceText(wordDoc, "Yatirimci", projectOwner?.Name.ToUpper() ?? "");
+                        ReplaceText(wordDoc, "aaaa", projectOwner?.Address.ToUpper() ?? "");
+                        ReplaceText(wordDoc, "yzyzyz", Offer.OfferName.ToUpper() ?? "");
                         ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        ReplaceText(wordDoc, "N13", Offer.SonTeklifBildirme?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "N13", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
 
                         decimal totalPrices = 0;
+                        var equipmentNames = new StringBuilder();
+                        var equipmentList = new List<string>();
+
                         foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
                         {
                             var result = new StringBuilder();
                             foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                             {
-                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name ?? ""}");
+                                result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper() ?? ""}");
                             }
-                            var equipment = offerItem.EquipmentModel.Equipment.Name;
+                            var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
+                            equipmentList.Add(equipment);
                             var features = result.ToString();
                             var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
                             var sayi = offerItem.Quantity;
@@ -289,9 +294,14 @@ namespace Pages.Offers
                         }
                         string[] totalPriceRow = { "", "", "", "", "", "Toplam Fiyat (TL) ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
                         AddRowToTable(wordDoc, totalPriceRow, true);
+
+                        foreach (var equipment in equipmentList.Distinct().ToList())
+                        {
+                            equipmentNames.AppendLine(equipment);
+                        }
+
+                        ReplaceText(wordDoc, "AXCCD", equipmentNames.ToString());
                     }
-
-
 
                     modifiedDocument = memoryStream.ToArray();
                 }
@@ -322,25 +332,28 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "F6", company.Telefon);
                         ReplaceText(wordDoc, "G7", company.Faks);
                         ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
-                        ReplaceText(wordDoc, "I9", projectOwner?.Name ?? "");
-                        ReplaceText(wordDoc, "K10", projectOwner?.Address ?? "");
-                        ReplaceText(wordDoc, "L11", Offer.OfferName ?? "");
+                        ReplaceText(wordDoc, "I9", projectOwner?.Name.ToUpper() ?? "");
+                        ReplaceText(wordDoc, "K10", projectOwner?.Address.ToUpper() ?? "");
+                        ReplaceText(wordDoc, "L11", Offer.OfferName.ToUpper() ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        ReplaceText(wordDoc, "N13", Offer.SonTeklifBildirme?.ToString("dd.MM.yyyy"));
+                        ReplaceText(wordDoc, "N13", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "ddmmyyyy", DateTime.Now.ToString("dd.MM.yyyy") ?? "");
+                        ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy")); 
+                        ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
 
                         decimal totalPrices = 0;
                         var no = 1;
 
-                        
+                        var equipmentNames = new StringBuilder();
                         foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
                         {
                             var result = new StringBuilder();
                             foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                             {
-                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name ?? ""}");
+                                result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper() ?? ""}");
                             }
-                            var equipment = offerItem.EquipmentModel.Equipment.Name;
+                            var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
+                            equipmentNames.AppendLine(equipment);
                             var features = result.ToString();
                             var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
                             var sayi = offerItem.Quantity;
@@ -356,6 +369,7 @@ namespace Pages.Offers
                         }
                         string[] totalPriceRow = { "", "", "", "", "", "", "GENEL TOPLAM ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
                         AddRowToTable(wordDoc, totalPriceRow, false);
+
                     }
 
 
@@ -397,8 +411,10 @@ namespace Pages.Offers
                 }
             }
 
+            TableCellProperties tcp = new TableCellProperties(new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center });
             // Create cell and add the styled paragraph
             TableCell cell = new TableCell(paragraph);
+            cell.AppendChild(tcp);
             return cell;
         }
 
@@ -432,21 +448,16 @@ namespace Pages.Offers
                 }
             }
 
+            TableCellProperties tcp = new TableCellProperties(new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center });
             // Create cell and add the styled paragraph
             TableCell cell = new TableCell(paragraph);
+            cell.AppendChild(tcp);
+
             return cell;
         }
 
         private void ReplaceText(WordprocessingDocument wordDoc, string placeholder, string newText)
         {
-            //var body = wordDoc.MainDocumentPart.Document.Body;
-            //foreach (var text in body.Descendants<Text>())
-            //{
-            //    if (text.Text.Contains(placeholder))
-            //    {
-            //        text.Text = text.Text.Replace(placeholder, newText);
-            //    }
-            //}
 
             var body = wordDoc.MainDocumentPart.Document.Body;
 
@@ -456,7 +467,31 @@ namespace Pages.Offers
                 if (text.Text.Contains(placeholder))
                 {
                     text.Text = text.Text.Replace(placeholder, newText);
+                    string[] lines = newText.Split('\n');
+
+
+                    // Create a paragraph
+
+                    if (lines.Length > 1)
+                    {
+                        Paragraph paragraph = new Paragraph();
+
+                        foreach (string line in lines)
+                        {
+                            if(!string.IsNullOrEmpty(line))
+                            {
+                                Run run = new Run();
+                                run.Append(new Text(line) { Space = SpaceProcessingModeValues.Preserve });
+                                run.Append(new Break());
+                                paragraph.Append(run);
+                            }
+
+                        }
+
+                        text.Parent.ReplaceChild(paragraph, text);
+                    }
                 }
+
             }
 
             // Replace text inside content controls (structured document tags)
