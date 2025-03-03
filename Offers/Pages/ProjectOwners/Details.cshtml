@@ -2,7 +2,7 @@
 @using global::Pages.ProjectOwner
 @model DetailsModel
 @{
-    ViewData["Title"] = "Proje Sahibi Detayı";
+    ViewData["Title"] = "Proje Sahibi Detay";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -35,6 +35,18 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ProjectOwner.Address)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ProjectOwner.Traktor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ProjectOwner.Traktor)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ProjectOwner.Hp)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ProjectOwner.Hp)
         </dd>
     </dl>
 </div>

@@ -22,5 +22,11 @@ namespace Models
         [Required(ErrorMessage = "Adres zorunludur")]
         [Display(Name = "Adres")]
         public string Address { get; set; }
+
+        [Display(Name = "Traktor")]
+        public string Traktor { get; set; }
+
+        [Display(Name = "Hp")]
+        public int Hp { get; set; }
     }
 }
