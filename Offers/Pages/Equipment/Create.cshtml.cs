@@ -34,6 +34,19 @@ public class CreateModel : PageModel
     {
         try
         {
+            if(Features.Any(x => x.Min == 0) || Features.Any(x => x.Max == 0))
+            {
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+                StatusMessage = "Min veya Max deger 0 olamaz";
+                return Page();
+            }
+
+            if (Features.Any(x => x.FeatureKey == "") || Features.Any(x => x.FeatureValue == ""))
+            {
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+                StatusMessage = "Tip ve deger girilmelidir";
+                return Page();
+            }
             if (string.IsNullOrEmpty(Equipment.Name))
             {
                 Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using System.Text;
 using DocumentFormat.OpenXml;
 using System.Globalization;
+using System.Threading;
 
 namespace Pages.Offers
 {
@@ -384,7 +385,7 @@ namespace Pages.Offers
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
         }
 
-        public async Task<IActionResult> OnPostTeknikSartnameAsync()
+        public async Task<IActionResult> OnPostTeknikSartnameAsync(CancellationToken cancellationToken)
         {
             string templatePath = "";
 
@@ -423,12 +424,40 @@ namespace Pages.Offers
                     var equipmentList = new List<string>();
 
                     var equipmentNames = new StringBuilder();
+                    var minMaxFeatures = await _context.EquipmentModelFeatures
+                        .GroupBy(emf => new { emf.EquipmentModel.EquipmentId, emf.FeatureKey })
+                        .Select(g => new
+                        {
+                            EquipmentId = g.Key.EquipmentId,
+                            FeatureKey = g.Key.FeatureKey,
+                            MinFeatureValue = g.Min(emf => emf.FeatureValue),
+                            MaxFeatureValue = g.Max(emf => emf.FeatureValue)
+                        })
+                        .ToListAsync(cancellationToken);
+
                     foreach (var offerItem in offerItems.ToList())
                     {
                         var result = new StringBuilder();
                         foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                         {
-                            result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
+                            var min = offerItem.EquipmentModel.Equipment.Features.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey)?.Min;
+                            var max = offerItem.EquipmentModel.Equipment.Features.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey)?.Max;
+
+
+                            if (min != null && max != null)
+                            {
+                                if(minMaxFeatures.Any(x => x.FeatureKey == feature.FeatureKey && x.EquipmentId == feature.EquipmentModel.EquipmentId))
+                                {
+                                    var minMaxFeature = minMaxFeatures.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey);
+                                    var minVal = int.Parse(minMaxFeature.MinFeatureValue) - min;
+                                    var maxVal = int.Parse(minMaxFeature.MaxFeatureValue) + max;
+                                    result.AppendLine($"{feature.FeatureKey} {minVal} - {maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
+                                }
+                            }
+                            else
+                            {
+                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
+                            }
                         }
                         var equipment = offerItem.EquipmentModel.Equipment.Name;
                         equipmentList.Add(equipment);
@@ -855,6 +884,7 @@ namespace Pages.Offers
             .Include(o => o.OfferItems)
                 .ThenInclude(oi => oi.EquipmentModel)
                     .ThenInclude(em => em.Equipment)
+                        .ThenInclude(em => em.Features)
             .Include(o => o.OfferItems)
                 .ThenInclude(oi => oi.Company)
             .Include(o => o.OfferItems)

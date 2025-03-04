@@ -14,8 +14,10 @@ namespace Models
         [StringLength(100)]
         public string FeatureKey { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Deger 0'dan buyuk olmali")]
         public int? Min { get; set; }
-        
+
+        [Range(1, int.MaxValue, ErrorMessage = "Deger 0'dan buyuk olmali")]
         public int? Max { get; set; }
 
         [Required]
