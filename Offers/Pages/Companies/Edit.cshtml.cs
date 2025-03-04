@@ -14,12 +14,12 @@ namespace Offers.Pages.Companies
         public EditModel(ApplicationDbContext context)
         {
             _context = context;
-            SelectedEquipmentModels = new List<EquipmentModel>();
+            SelectedEquipmentModels = new List<CompanyEquipmentModel>();
         }
 
         [BindProperty]
         public Company Company { get; set; }
-        public List<EquipmentModel> SelectedEquipmentModels { get; set; }
+        public List<CompanyEquipmentModel> SelectedEquipmentModels { get; set; }
         
         [BindProperty]
         public int NewEquipmentModelId { get; set; }
@@ -45,12 +45,39 @@ namespace Offers.Pages.Companies
 
             // Initialize session with existing equipment models
             SelectedEquipmentModels = Company.CompanyEquipmentModels
-                .Select(cem => cem.EquipmentModel)
                 .ToList();
             HttpContext.Session.Set("SelectedEquipmentModels", SelectedEquipmentModels);
 
             await LoadEquipmentModelList();
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostUpdatePriceAsync(int id, decimal price)
+        {
+            var companyEquipmentModel = await _context.CompanyEquipmentModels
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (companyEquipmentModel == null)
+            {
+                return NotFound();
+            }
+
+            companyEquipmentModel.Price = price;
+            _context.Attach(companyEquipmentModel).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new { success = true });
+        }
+
+
+        public async Task<IActionResult> OnGetEquipmentModelPriceAsync(int companyId, int equipmentModelId)
+        {
+            var companyEquipmentModel = await _context.CompanyEquipmentModels
+                .Where(cem => cem.CompanyId == companyId && cem.EquipmentModelId == equipmentModelId)
+                .Select(cem => new { cem.Price })
+                .FirstOrDefaultAsync();
+
+            return new JsonResult(new { price = companyEquipmentModel?.Price ?? 0 });
         }
 
         public async Task<IActionResult> OnPostAddEquipmentModelAsync()
@@ -62,17 +89,18 @@ namespace Offers.Pages.Companies
                 return Page();
             }
 
-            var equipmentModel = await _context.EquipmentModels
-                .Include(em => em.Equipment)
+            var equipmentModel = await _context.CompanyEquipmentModels
+                .Include(x => x.EquipmentModel)
+                 .ThenInclude(em => em.Equipment)
                 .FirstOrDefaultAsync(em => em.Id == NewEquipmentModelId);
 
             if (equipmentModel != null)
             {
-                SelectedEquipmentModels = HttpContext.Session.Get<List<EquipmentModel>>("SelectedEquipmentModels") ?? new List<EquipmentModel>();
+                SelectedEquipmentModels = HttpContext.Session.Get<List<CompanyEquipmentModel>>("SelectedEquipmentModels") ?? new List<CompanyEquipmentModel>();
 
                 foreach (var selectedEquipmentModel in SelectedEquipmentModels)
                 {
-                    selectedEquipmentModel.Equipment = await _context.Equipment.AsNoTracking().FirstOrDefaultAsync(x => x.Id == selectedEquipmentModel.EquipmentId);
+                    selectedEquipmentModel.EquipmentModel.Equipment = await _context.Equipment.AsNoTracking().FirstOrDefaultAsync(x => x.Id == selectedEquipmentModel.EquipmentModel.EquipmentId);
                 }
                 if (!SelectedEquipmentModels.Any(em => em.Id == equipmentModel.Id))
                 {
@@ -87,10 +115,10 @@ namespace Offers.Pages.Companies
 
         public async Task<IActionResult> OnPostRemoveEquipmentModelAsync(int equipmentModelId)
         {
-            SelectedEquipmentModels = HttpContext.Session.Get<List<EquipmentModel>>("SelectedEquipmentModels") ?? new List<EquipmentModel>();
+            SelectedEquipmentModels = HttpContext.Session.Get<List<CompanyEquipmentModel>>("SelectedEquipmentModels") ?? new List<CompanyEquipmentModel>();
             foreach (var selectedEquipmentModel in SelectedEquipmentModels)
             {
-                selectedEquipmentModel.Equipment = await _context.Equipment.AsNoTracking().FirstOrDefaultAsync(x => x.Id == selectedEquipmentModel.EquipmentId);
+                selectedEquipmentModel.EquipmentModel.Equipment = await _context.Equipment.AsNoTracking().FirstOrDefaultAsync(x => x.Id == selectedEquipmentModel.EquipmentModel.EquipmentId);
             }
             var itemToRemove = SelectedEquipmentModels.FirstOrDefault(em => em.Id == equipmentModelId);
 

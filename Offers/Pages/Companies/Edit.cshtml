@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model EditModel
 @{
     ViewData["Title"] = "Firma D&uuml;zenle";
@@ -71,40 +71,32 @@
                     <h5 class="mb-0">Ekipman Modelleri</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-
-                            <select asp-for="NewEquipmentModelId" asp-items="Model.EquipmentModelList" class="form-select">
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" asp-page-handler="AddEquipmentModel" class="btn btn-primary">Ekle</button>
-                        </div>
-                    </div>
-
-                    @if (Model.SelectedEquipmentModels.Any())
-                    {
-                        <table class="table">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Equipment</th>
-                                    <th>Brand</th>
+                                    <th>Ekipman</th>
                                     <th>Model</th>
-                                    <th></th>
+                                    <th>Marka</th>
+                                    <th>Fiyat</th>
+                                    <th>İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var item in Model.SelectedEquipmentModels)
                                 {
                                     <tr>
-                                        <td>@item.Equipment.Name</td>
-                                        <td>@item.Brand</td>
-                                        <td>@item.Model</td>
+                                        <td>@item.EquipmentModel.Equipment.Name</td>
+                                        <td>@item.EquipmentModel.Model</td>
+                                        <td>@item.EquipmentModel.Brand</td>
+                                        <td>@item.Price.ToString("N2") ₺</td>
                                         <td>
-                                            <button type="submit"
-                                                    asp-page-handler="RemoveEquipmentModel"
-                                                    asp-route-equipmentModelId="@item.Id"
-                                                    class="btn btn-danger btn-sm">
+                                            <button type="button" class="btn btn-warning btn-sm"
+                                                    onclick="editPrice(@item.Id, @item.Price)">
+                                                Fiyat Güncelle
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                    onclick="removeEquipmentModel(@item.Id)">
                                                 Sil
                                             </button>
                                         </td>
@@ -112,7 +104,7 @@
                                 }
                             </tbody>
                         </table>
-                    }
+                    </div>
                 </div>
             </div>
 <br />
@@ -126,4 +118,25 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function editPrice(id, currentPrice) {
+            const newPrice = prompt("Yeni fiyat giriniz:", currentPrice);
+            if (newPrice !== null) {
+                $.ajax({
+                    url: "?handler=UpdatePrice",
+                    type: "POST",
+                    data: {
+                        id: id,
+                        price: newPrice
+                    },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function() {
+                        location.reload();
+                    }
+                });
+            }
+        }
+   </script>
 } 

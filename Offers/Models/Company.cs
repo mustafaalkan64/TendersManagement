@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Models
 {
@@ -55,6 +56,7 @@ namespace Models
         [Display(Name = "Oluþturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
+        [JsonIgnore]
         public List<CompanyEquipmentModel> CompanyEquipmentModels { get; set; } = new List<CompanyEquipmentModel>();
 
     }

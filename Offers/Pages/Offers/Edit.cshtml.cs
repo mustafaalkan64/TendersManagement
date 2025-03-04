@@ -907,6 +907,17 @@ namespace Pages.Offers
 
             return RedirectToPage("./Edit", new { id = offerItem?.OfferId });
         }
+
+        public async Task<IActionResult> OnGetEquipmentModelPriceAsync(int companyId, int equipmentModelId)
+        {
+            var companyEquipmentModel = await _context.CompanyEquipmentModels
+                .Where(cem => cem.CompanyId == companyId && cem.EquipmentModelId == equipmentModelId)
+                .Select(cem => new { cem.Price })
+                .FirstOrDefaultAsync();
+
+            return new JsonResult(companyEquipmentModel?.Price);
+        }
+
         private string ConvertListToString(IEnumerable<string> list)
         {
             return string.Join(", ", list);
