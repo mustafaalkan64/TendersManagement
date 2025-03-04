@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -67,7 +68,7 @@ namespace Offers.Pages.Equipment
                 }
                 _context.Attach(Equipment).State = EntityState.Modified;
 
-                StatusMessage = "Equipment updated successfully.";
+                StatusMessage = "Ekipman Kaydedildi";
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -82,7 +83,13 @@ namespace Offers.Pages.Equipment
                 }
             }
 
-            return RedirectToPage("./List");
+            Equipment = await _context.Equipment
+            .Include(e => e.Features)
+                .FirstOrDefaultAsync(m => m.Id == Equipment.Id);
+
+            Features = Equipment.Features.ToList();
+            Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+            return Page();
         }
 
         private bool EquipmentExists(int id)

@@ -14,6 +14,10 @@ namespace Models
         [StringLength(100)]
         public string FeatureKey { get; set; }
 
+        public int? Min { get; set; }
+        
+        public int? Max { get; set; }
+
         [Required]
         [StringLength(2000)]
         public string FeatureValue { get; set; }

@@ -52,10 +52,7 @@ public class CreateModel : PageModel
             }
             await _context.SaveChangesAsync();
 
-            StatusMessage = "Equipment created successfully.";
-
-            return RedirectToPage("./List");
-
+            return RedirectToPage("./Edit", new { id = Equipment.Id });
         }
         catch (Exception ex)
         {

@@ -33,20 +33,40 @@
     <div class="card mb-3">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Features</h5>
-                <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Add Feature</button>
+                <h5 class="mb-0">Ozellikler</h5>
+                <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Ozellik Ekle</button>
             </div>
         </div>
         <div class="card-body">
+            <div id="featuresHeaderContainer">
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label style="font-weight: bold;">Tip</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="font-weight: bold;">Degeri</label>
+                    </div>
+                    <div class="col-md-1">
+                        <label style="font-weight: bold;">Birim</label>
+                    </div>
+                    <div class="col-md-2">
+                        <label style="font-weight: bold;">Min</label>
+                    </div>
+                    <div class="col-md-2">
+                        <label style="font-weight: bold;">Max</label>
+                    </div>
+                    <div class="col-md-1">
+                    </div>
+                </div>
+            </div>
             <div id="featuresContainer">
-                <!-- Feature rows will be added here -->
             </div>
         </div>
     </div>
     <br />
     <button type="submit" class="btn btn-primary">Olu&#351;tur</button>
     <a asp-page="Index" class="btn btn-secondary">Ekipman Listesi</a>
-</form> 
+</form>
 
 @section Scripts {
     @{
@@ -60,21 +80,28 @@
             const row = document.createElement('div');
             row.className = 'row mb-2 feature-row';
             row.innerHTML = `
-                <div class="col-md-4">
-                    <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Feature Key" required />
-                </div>
-                <div class="col-md-4">
-                    <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Feature Value" />
+                <div class="col-md-3">
+                    <input name="Features[${index}].FeatureKey" class="form-control" placeholder="Tip" required />
                 </div>
                 <div class="col-md-3">
+                    <input name="Features[${index}].FeatureValue" class="form-control" placeholder="Deger" required />
+                </div>
+                <div class="col-md-1">
                     <select name="Features[${index}].UnitId" class="form-select">
-                        <option value="">Birim Seçiniz</option>
-                        @foreach (var unit in Model.Units)
-                        {
-                            <option value="@unit.Id">@unit.Name</option>
-                        }
+                        <option value="">Birim Seciniz</option>
+                            @foreach (var unit in Model.Units)
+                            {
+                               <option value="@unit.Id">@unit.Name</option>
+                            }
                     </select>
                 </div>
+                <div class="col-md-2">
+                    <input type="number" name="Features[${index}].Min" class="form-control" placeholder="Min" />
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="Features[${index}].Max" class="form-control" placeholder="Max" />
+                </div>
+
                 <div class="col-md-1">
                     <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureRow(this)">Remove</button>
                 </div>
