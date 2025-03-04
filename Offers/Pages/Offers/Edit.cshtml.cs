@@ -436,7 +436,7 @@ namespace Pages.Offers
                         var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
                         var sayi = offerItem.Quantity;
 
-                        string[] rowValues = { no.ToString(), equipment, features, equipmentModel, "Adet", sayi.ToString()}; // Example row values
+                        string[] rowValues = { no.ToString(), equipment, features, "Adet", sayi.ToString()}; // Example row values
 
                         AddRowToTable(wordDoc, rowValues, false, true);
                         no += 1;

@@ -224,7 +224,7 @@
                     var companyName = Model.CompanyList.FirstOrDefault(c => c.Value == item.Key.ToString())?.Text ?? "Ýndir";
                     <button type="submit" asp-page-handler="Davet" asp-route-companyId="@item.Key" class="btn btn-warning">@companyName Davet</button>
                 }
-                <button type="submit" asp-page-handler="TeknikSartname" class="btn btn-success">Teknik Þartname</button>
+                <button type="submit" asp-page-handler="TeknikSartname" class="btn btn-success">Teknik Sartname</button>
                 <a asp-page="./Index" class="btn btn-secondary">Listeye Don</a>
             </div>
         </form>
