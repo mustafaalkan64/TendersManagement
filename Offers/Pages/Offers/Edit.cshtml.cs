@@ -549,6 +549,54 @@ namespace Pages.Offers
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Davet.docx");
         }
 
+        public async Task<IActionResult> OnPostGarantiDavetAsync(int companyId, CancellationToken cancellationToken = default)
+        {
+            string templatePath = "";
+
+            var offer = await GetOfferById(Offer.Id);
+
+            var offerItems = offer.OfferItems.ToList();
+
+            var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
+
+            var projectOwner = offer.ProjectOwner;
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+
+            // Create a copy of the template to modify
+            byte[] modifiedDocument;
+
+            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "GarantiDavet.docx");
+            if (!System.IO.File.Exists(templatePath))
+            {
+                return NotFound("Template not found.");
+            }
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                }
+
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                {
+                    ReplaceText(wordDoc, "AXDC", offer.ProjectOwner.Name.ToUpper());
+                    ReplaceText(wordDoc, "C3", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "A0", offer.ProjectAddress);
+                    ReplaceText(wordDoc, "B1", offer.OfferName);
+                    ReplaceText(wordDoc, "D4", offer.ProjectOwner.Address);
+                    ReplaceText(wordDoc, "E5", offer.ProjectOwner.Telephone);
+                    ReplaceText(wordDoc, "XTDA", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "BCDY", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "XYZT", Offer.DanismanlikSonTeklifSunum?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "AA", Offer.DanismanlikSonTeklifSunum?.ToString("HH.mm"));
+                }
+                modifiedDocument = memoryStream.ToArray();
+            }
+
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-Davet.docx");
+        }
+
         private TableCell CreateStyledCell(string text)
         {
             // Create paragraph

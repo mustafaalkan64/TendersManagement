@@ -8,7 +8,10 @@
 <h1>Offer Teknik Sartname List</h1>
 
 <p>
-    <a asp-page="Create" asp-route-offerId="@Model.OfferId">Yeni</a>
+    <a asp-page="Create" asp-route-offerId="@Model.OfferId" class="btn btn-primary btn-sm">Yeni</a>
+</p>
+<p>
+    <a asp-page="/Offers/Edit" asp-route-id="@Model.OfferId">Proje Sayfasina Don</a>
 </p>
 <table class="table">
     <thead>

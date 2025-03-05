@@ -202,7 +202,7 @@
 
             <div class="form-group col-md-4">
                 <label asp-for="Offer.DanismanlikSonTeklifSunum" class="control-label">D.Son Teklif Sunum</label>
-                <input asp-for="Offer.DanismanlikSonTeklifSunum" class="form-control" type="date" />
+                <input asp-for="Offer.DanismanlikSonTeklifSunum" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Offer.DanismanlikSonTeklifSunum" class="text-danger"></span>
             </div>
 
@@ -230,6 +230,9 @@
                 }
                 <button type="submit" asp-page-handler="TeknikSartname" class="btn btn-success">Teknik Sartname</button>
                 <a asp-page="./Index" class="btn btn-secondary">Listeye Don</a>
+            </div>
+            <div class="form-group mt-3">
+                <button type="submit" asp-page-handler="GarantiDavet" class="btn btn-info">Garanti Davet</button>
             </div>
         </form>
     </div>
