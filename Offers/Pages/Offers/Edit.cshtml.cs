@@ -557,8 +557,6 @@ namespace Pages.Offers
 
             var offerItems = offer.OfferItems.ToList();
 
-            var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
-
             var projectOwner = offer.ProjectOwner;
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
@@ -595,6 +593,71 @@ namespace Pages.Offers
             }
 
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-Davet.docx");
+        }
+
+        public async Task<IActionResult> OnPostGarantiTeklifAsync(int companyId, CancellationToken cancellationToken = default)
+        {
+            string templatePath = "";
+
+            var offer = await GetOfferById(Offer.Id);
+
+            var offerItems = offer.OfferItems.ToList();
+
+            var projectOwner = offer.ProjectOwner;
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+
+            // Create a copy of the template to modify
+            byte[] modifiedDocument;
+
+            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "GarantiTeklif.docx");
+            if (!System.IO.File.Exists(templatePath))
+            {
+                return NotFound("Template not found.");
+            }
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                }
+
+                var companySummaries = await _context.OfferItems
+                .Where(oi => oi.OfferId == Offer.Id)
+                .GroupBy(oi => oi.Company.Name)
+                .Select(g => new CompanySummaryViewModel
+                {
+                    CompanyName = g.Key,
+                    TotalPrice = g.Sum(oi => oi.Price * oi.Quantity)
+                })
+                .OrderBy(s => s.TotalPrice)
+                .ToListAsync(cancellationToken);
+
+                var minOfferAmount = companySummaries.Any() ? companySummaries.First().TotalPrice : 0;
+
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                {
+                    var isPlaniHazirligi = (minOfferAmount * (decimal)Offer.IsPlaniHazirligiYuzde) / 100;
+                    var otp = (minOfferAmount * (decimal)Offer.OTPYuzde) / 100;
+                    ReplaceText(wordDoc, "AXBY", offer.TeklifSunumTarihi?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "A1", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "B2", offer.ProjectOwner.Address);
+                    ReplaceText(wordDoc, "Z1", offer.OfferName);
+                    ReplaceText(wordDoc, "C3", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "D4", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "E5", Offer.HazirlanmaSuresi.ToString());
+                    ReplaceText(wordDoc, "F6", Offer.PersonelSayisi.ToString());
+                    ReplaceText(wordDoc, "H7", isPlaniHazirligi.ToString("#,##0.00", trCulture));
+                    ReplaceText(wordDoc, "I8", otp.ToString("#,##0.00", trCulture));
+                    ReplaceText(wordDoc, "K9", (isPlaniHazirligi + otp).ToString("#,##0.00", trCulture));
+                    ReplaceText(wordDoc, "ASDX", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "BDFX", offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+
+                }
+                modifiedDocument = memoryStream.ToArray();
+            }
+
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-Teklif.docx");
         }
 
         public async Task<IActionResult> OnPostGarantiTeknikSartnameAsync(CancellationToken cancellationToken = default)
