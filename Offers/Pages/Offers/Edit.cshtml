@@ -212,6 +212,10 @@
                 <span asp-validation-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="text-danger"></span>
             </div>
 
+            <div>
+                <a asp-page="/OfferTeknikSartname/Index" asp-route-offerId="@Model.Offer.Id">Teknik Sartname Duzenle</a>
+            </div>
+
             <div class="form-group mt-3">
                 <button type="submit" asp-page-handler="Save" class="btn btn-primary">Kaydet</button>
                 @foreach (var item in Model.OfferItems.GroupBy(x => x.CompanyId))

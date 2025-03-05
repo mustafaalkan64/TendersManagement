@@ -20,6 +20,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Unit> Units { get; set; }
     public DbSet<ProjectOwner> ProjectOwners { get; set; }
     public DbSet<CompanyEquipmentModel> CompanyEquipmentModels { get; set; }
+    public DbSet<OfferTeknikSartname> OfferTeknikSartnames { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,0 +1,43 @@
+﻿@page
+@using global::Pages.OfferTeknikSartname
+@model EditModel
+@{
+    ViewData["Title"] = "Duzenle";
+}
+
+<h1>Teknik Sartname Duzenle</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="OfferTeknikSartname.Id" />
+    <div class="form-group">
+        <label asp-for="OfferTeknikSartname.No" class="control-label"></label>
+        <input asp-for="OfferTeknikSartname.No" class="form-control" />
+        <span asp-validation-for="OfferTeknikSartname.No" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="OfferTeknikSartname.EquipmentName" class="control-label"></label>
+        <input asp-for="OfferTeknikSartname.EquipmentName" class="form-control" />
+        <span asp-validation-for="OfferTeknikSartname.EquipmentName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="OfferTeknikSartname.Features" class="control-label"></label>
+        <textarea asp-for="OfferTeknikSartname.Features" class="form-control"></textarea>
+        <span asp-validation-for="OfferTeknikSartname.Features" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="OfferTeknikSartname.Birim" class="control-label"></label>
+        <input asp-for="OfferTeknikSartname.Birim" class="form-control" />
+        <span asp-validation-for="OfferTeknikSartname.Birim" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="OfferTeknikSartname.Miktar" class="control-label"></label>
+        <input asp-for="OfferTeknikSartname.Miktar" class="form-control" />
+        <span asp-validation-for="OfferTeknikSartname.Miktar" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="OfferTeknikSartname.OfferId" />
+    </br>
+    <div class="form-group">
+        <input type="submit" value="Kaydet" class="btn btn-primary" />
+    </div>
+</form>
