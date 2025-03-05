@@ -14,6 +14,22 @@ namespace Models
         [Required]
         public int ProjectOwnerId { get; set; }
 
+        [Required]
+        [Display(Name = "Hazirlanma Suresi")]
+        public int HazirlanmaSuresi { get; set; }
+
+        [Required]
+        [Display(Name = "Personel Sayisi")]
+        public int PersonelSayisi { get; set; }
+
+        [Required]
+        [Display(Name = "Is Plani Hazirligi Yuzde")]
+        public int IsPlaniHazirligiYuzde { get; set; } = 3;
+
+        [Required]
+        [Display(Name = "OTPYuzde")]
+        public int OTPYuzde { get; set; } = 1;
+
         public ProjectOwner ProjectOwner { get; set; }
 
         [Display(Name = "Toplam Tutar")]

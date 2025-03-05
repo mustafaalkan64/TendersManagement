@@ -128,6 +128,30 @@
             </div> *@
 
             <div class="form-group col-md-4">
+                <label asp-for="Offer.HazirlanmaSuresi" class="control-label">Hazirlanma Suresi</label>
+                <input asp-for="Offer.HazirlanmaSuresi" class="form-control" type="number" />
+                <span asp-validation-for="Offer.HazirlanmaSuresi" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label asp-for="Offer.PersonelSayisi" class="control-label">Calisan Personel Sayisi</label>
+                <input asp-for="Offer.PersonelSayisi" class="form-control" type="number" />
+                <span asp-validation-for="Offer.PersonelSayisi" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label asp-for="Offer.IsPlaniHazirligiYuzde" class="control-label">Is plani hazirligi yuzde</label>
+                <input asp-for="Offer.IsPlaniHazirligiYuzde" class="form-control" type="number" />
+                <span asp-validation-for="Offer.IsPlaniHazirligiYuzde" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label asp-for="Offer.OTPYuzde" class="control-label">OTP Yuzde</label>
+                <input asp-for="Offer.OTPYuzde" class="form-control" type="number" />
+                <span asp-validation-for="Offer.OTPYuzde" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-4">
                 <label asp-for="Offer.TeklifGonderimTarihi" class="control-label">Teklif Gonderim Tarihi</label>
                 <input asp-for="Offer.TeklifGonderimTarihi" class="form-control" type="date" />
                 <span asp-validation-for="Offer.TeklifGonderimTarihi" class="text-danger"></span>
