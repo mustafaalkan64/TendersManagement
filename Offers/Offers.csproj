@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="Templates\Davet.docx" />
     <None Remove="Templates\GarantiDavet.docx" />
+    <None Remove="Templates\GarantiTeknikSartname.docx" />
     <None Remove="Templates\TeklifTemplate.docx" />
     <None Remove="Templates\TeknikSartname.docx" />
     <None Remove="Templates\Template.docx" />
@@ -26,6 +27,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\GarantiDavet.docx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\GarantiTeknikSartname.docx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\TeklifTemplate.docx">

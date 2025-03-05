@@ -597,6 +597,46 @@ namespace Pages.Offers
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-Davet.docx");
         }
 
+        public async Task<IActionResult> OnPostGarantiTeknikSartnameAsync(CancellationToken cancellationToken = default)
+        {
+            string templatePath = "";
+
+            var offer = await GetOfferById(Offer.Id);
+
+            var offerItems = offer.OfferItems.ToList();
+
+            var projectOwner = offer.ProjectOwner;
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+
+            // Create a copy of the template to modify
+            byte[] modifiedDocument;
+
+            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "GarantiTeknikSartname.docx");
+            if (!System.IO.File.Exists(templatePath))
+            {
+                return NotFound("Template not found.");
+            }
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                }
+
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
+                {
+                    ReplaceText(wordDoc, "AZDC", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "AXDY", offer.OfferName);
+                    ReplaceText(wordDoc, "BCDY", offer.ProjectAddress);
+                    ReplaceText(wordDoc, "XDAY", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
+                }
+                modifiedDocument = memoryStream.ToArray();
+            }
+
+            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-TeknikŞartname.docx");
+        }
+
         private TableCell CreateStyledCell(string text)
         {
             // Create paragraph
