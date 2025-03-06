@@ -28,6 +28,9 @@ builder.Services.AddRazorPages()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
 
+// Add services to the container.
+builder.Services.AddMemoryCache(); // Add MemoryCache service
+
 // Configure request localization
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
