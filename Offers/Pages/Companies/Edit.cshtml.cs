@@ -113,18 +113,20 @@ namespace Offers.Pages.Companies
             return Page();
         }
 
-        public async Task<IActionResult> OnPostRemoveEquipmentModelAsync(int equipmentModelId)
+        public async Task<IActionResult> OnPostRemoveEquipmentModelAsync(int equipmentModelId, CancellationToken cancellationToken = default)
         {
             SelectedEquipmentModels = HttpContext.Session.Get<List<CompanyEquipmentModel>>("SelectedEquipmentModels") ?? new List<CompanyEquipmentModel>();
             foreach (var selectedEquipmentModel in SelectedEquipmentModels)
             {
-                selectedEquipmentModel.EquipmentModel.Equipment = await _context.Equipment.AsNoTracking().FirstOrDefaultAsync(x => x.Id == selectedEquipmentModel.EquipmentModel.EquipmentId);
+                selectedEquipmentModel.EquipmentModel.Equipment = await _context.Equipment.AsNoTracking().FirstOrDefaultAsync(x => x.Id == selectedEquipmentModel.EquipmentModel.EquipmentId, cancellationToken);
             }
             var itemToRemove = SelectedEquipmentModels.FirstOrDefault(em => em.Id == equipmentModelId);
 
             if (itemToRemove != null)
             {
                 SelectedEquipmentModels.Remove(itemToRemove);
+                _context.CompanyEquipmentModels.Remove(itemToRemove);
+                await _context.SaveChangesAsync(cancellationToken);
                 HttpContext.Session.Set("SelectedEquipmentModels", SelectedEquipmentModels);
             }
 
@@ -168,16 +170,18 @@ namespace Offers.Pages.Companies
             _context.CompanyEquipmentModels.RemoveRange(existingModels);
 
             // Add selected equipment models
-            var selectedModels = HttpContext.Session.Get<List<EquipmentModel>>("SelectedEquipmentModels") ?? new List<EquipmentModel>();
-            foreach (var equipmentModel in selectedModels)
+            var selectedModels = HttpContext.Session.Get<List<CompanyEquipmentModel>>("SelectedEquipmentModels") ?? new List<CompanyEquipmentModel>();
+            foreach (var model in selectedModels)
             {
                 var companyEquipmentModel = new CompanyEquipmentModel
                 {
-                    CompanyId = Company.Id,
-                    EquipmentModelId = equipmentModel.Id
+                    CompanyId = model.CompanyId,
+                    EquipmentModelId = model.EquipmentModelId,
+                    Price = 0
                 };
                 _context.CompanyEquipmentModels.Add(companyEquipmentModel);
             }
+
 
             // Clear session
             HttpContext.Session.Remove("SelectedEquipmentModels");

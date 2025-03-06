@@ -526,8 +526,8 @@ namespace Pages.Offers
                     ReplaceText(wordDoc, "A1", offer.ProjectOwner.Name.ToUpper());
                     ReplaceText(wordDoc, "C3", offer.ProjectOwner.Name);
                     ReplaceText(wordDoc, "H10", offer.ProjectOwner.Name);
-                    ReplaceText(wordDoc, "B2", company.Name);
-                    ReplaceText(wordDoc, "D4", company.Address);
+                    ReplaceText(wordDoc, "B2", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "D4", offer.ProjectOwner.Address);
                     ReplaceText(wordDoc, "E5", offer.ProjectAddress);
                     ReplaceText(wordDoc, "F6", offer.OfferName);
                     ReplaceText(wordDoc, "G7", company.Address);
@@ -772,29 +772,33 @@ namespace Pages.Offers
                 if (text.Text.Contains(placeholder))
                 {
                     text.Text = text.Text.Replace(placeholder, newText);
-                    string[] lines = newText.Split('\n');
-
-
-                    // Create a paragraph
-
-                    if (lines.Length > 1)
+                    if(newText != null)
                     {
-                        Paragraph paragraph = new Paragraph();
+                        string[] lines = newText.Split('\n');
 
-                        foreach (string line in lines)
+
+                        // Create a paragraph
+
+                        if (lines.Length > 1)
                         {
-                            if (!string.IsNullOrEmpty(line))
+                            Paragraph paragraph = new Paragraph();
+
+                            foreach (string line in lines)
                             {
-                                Run run = new Run();
-                                run.Append(new Text(line) { Space = SpaceProcessingModeValues.Preserve });
-                                run.Append(new Break());
-                                paragraph.Append(run);
+                                if (!string.IsNullOrEmpty(line))
+                                {
+                                    Run run = new Run();
+                                    run.Append(new Text(line) { Space = SpaceProcessingModeValues.Preserve });
+                                    run.Append(new Break());
+                                    paragraph.Append(run);
+                                }
+
                             }
 
+                            text.Parent.ReplaceChild(paragraph, text);
                         }
-
-                        text.Parent.ReplaceChild(paragraph, text);
                     }
+                    
                 }
 
             }

@@ -138,5 +138,23 @@
                 });
             }
         }
+
+        function removeEquipmentModel(id) {
+
+                $.ajax({
+                    url: "?handler=RemoveEquipmentModel",
+                    type: "POST",
+                    data: {
+                        equipmentModelId: id,
+                    },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function() {
+                        location.reload();
+                    }
+                });
+
+        }
    </script>
 } 

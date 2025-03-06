@@ -32,6 +32,20 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey(oi => oi.OfferId)
             .OnDelete(DeleteBehavior.Cascade);
 
+
+        modelBuilder.Entity<CompanyEquipmentModel>()
+            .HasOne(oi => oi.Company)
+            .WithMany(o => o.CompanyEquipmentModels)
+            .HasForeignKey(oi => oi.CompanyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+        modelBuilder.Entity<CompanyEquipmentModel>()
+            .HasOne(oi => oi.EquipmentModel)
+            .WithMany(o => o.CompanyEquipmentModels)
+            .HasForeignKey(oi => oi.EquipmentModelId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<EquipmentModel>()
             .HasOne(em => em.Equipment)
             .WithMany(e => e.Models)
