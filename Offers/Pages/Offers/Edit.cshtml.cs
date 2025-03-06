@@ -526,12 +526,12 @@ namespace Pages.Offers
                     ReplaceText(wordDoc, "A1", offer.ProjectOwner.Name.ToUpper());
                     ReplaceText(wordDoc, "C3", offer.ProjectOwner.Name);
                     ReplaceText(wordDoc, "H10", offer.ProjectOwner.Name);
-                    ReplaceText(wordDoc, "B2", offer.ProjectOwner.Name);
-                    ReplaceText(wordDoc, "D4", offer.ProjectOwner.Address);
+                    ReplaceText(wordDoc, "B2", company.TicariUnvan);
+                    ReplaceText(wordDoc, "D4", company.Address);
                     ReplaceText(wordDoc, "E5", offer.ProjectAddress);
                     ReplaceText(wordDoc, "F6", offer.OfferName);
-                    ReplaceText(wordDoc, "G7", company.Address);
-                    ReplaceText(wordDoc, "H8", company.Telefon);
+                    ReplaceText(wordDoc, "G7", offer.ProjectOwner.Address);
+                    ReplaceText(wordDoc, "H8", offer.ProjectOwner.Telephone);
                     ReplaceText(wordDoc, "AXBY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                     ReplaceText(wordDoc, "DDMMYYY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                     ReplaceText(wordDoc, "XXYY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
