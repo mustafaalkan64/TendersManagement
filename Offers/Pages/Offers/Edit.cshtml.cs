@@ -632,6 +632,8 @@ namespace Pages.Offers
                     ReplaceText(wordDoc, "D4", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                     ReplaceText(wordDoc, "E5", Offer.HazirlanmaSuresi.ToString());
                     ReplaceText(wordDoc, "F6", Offer.PersonelSayisi.ToString());
+                    ReplaceText(wordDoc, "LX", Offer.OtpHazirlanmaSuresi.ToString());
+                    ReplaceText(wordDoc, "MY", Offer.OtpPersonelSayisi.ToString());
                     ReplaceText(wordDoc, "H7", isPlaniHazirligi.ToString("#,##0.00", trCulture));
                     ReplaceText(wordDoc, "I8", otp.ToString("#,##0.00", trCulture));
                     ReplaceText(wordDoc, "K9", (isPlaniHazirligi + otp).ToString("#,##0.00", trCulture));

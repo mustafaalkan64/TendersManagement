@@ -23,6 +23,14 @@ namespace Models
         public int PersonelSayisi { get; set; }
 
         [Required]
+        [Display(Name = "OTP Hazirlanma Suresi")]
+        public int OtpHazirlanmaSuresi { get; set; }
+
+        [Required]
+        [Display(Name = "OTP Personel Sayisi")]
+        public int OtpPersonelSayisi { get; set; }
+
+        [Required]
         [Display(Name = "Is Plani Hazirligi Yuzde")]
         public int IsPlaniHazirligiYuzde { get; set; } = 3;
 
