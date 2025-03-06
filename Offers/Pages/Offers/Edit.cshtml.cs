@@ -17,6 +17,7 @@ using DocumentFormat.OpenXml;
 using System.Globalization;
 using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
+using Offers.Services.Offer;
 
 namespace Pages.Offers
 {
@@ -24,12 +25,14 @@ namespace Pages.Offers
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IOfferService _offerService;
         private readonly IMemoryCache _cache;
 
-        public EditModel(ApplicationDbContext context, IMemoryCache cache)
+        public EditModel(ApplicationDbContext context, IMemoryCache cache, IOfferService offerService)
         {
             _context = context;
             _cache = cache;
+            _offerService = offerService;
         }
 
         [BindProperty]
@@ -894,7 +897,6 @@ namespace Pages.Offers
             if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
                 await LoadRelatedData(Offer.Id);
-                await UpdateOfferTotalPrice(Offer.Id);
                 return Page();
             }
 
@@ -973,7 +975,10 @@ namespace Pages.Offers
 
             _context.OfferItems.Add(NewItem);
             await _context.SaveChangesAsync(cancellationToken);
+
             ClearCache(Offer.Id);
+            await _offerService.ReCreateOfferTeknikSartnameByOfferId(Offer.Id);
+
 
             var offerItems = await _context.OfferItems.Where(oi => oi.OfferId == Offer.Id && oi.CompanyId == NewItem.CompanyId && oi.TeklifGirisTarihi == DateTime.MinValue).ToListAsync(cancellationToken);
             if (offerItems.Any())
@@ -986,9 +991,6 @@ namespace Pages.Offers
                 }
                 await _context.SaveChangesAsync(cancellationToken);
             }
-
-            // Update total price
-            await UpdateOfferTotalPrice(Offer.Id);
 
             return RedirectToPage("./Edit", new { id = Offer.Id });
         }
@@ -1004,26 +1006,11 @@ namespace Pages.Offers
             var offerId = offerItem.OfferId;
             _context.OfferItems.Remove(offerItem);
             await _context.SaveChangesAsync();
+            ClearCache(Offer.Id);
 
-            // Update total price
-            await UpdateOfferTotalPrice(offerId);
+            await _offerService.ReCreateOfferTeknikSartnameByOfferId(Offer.Id);
 
             return RedirectToPage("./Edit", new { id = offerId });
-        }
-
-        private async Task UpdateOfferTotalPrice(int offerId)
-        {
-            var offer = await _context.Offers.AsNoTracking()
-                .Include(o => o.OfferItems)
-                .FirstOrDefaultAsync(o => o.Id == offerId).ConfigureAwait(false);
-
-            if (offer != null)
-            {
-                _context.Entry(offer).State = EntityState.Modified;
-                offer.TotalPrice = offer.OfferItems.Sum(item => item.Price * item.Quantity);
-                Offer.TotalPrice = offer.TotalPrice;
-            }
-            ClearCache(offerId);
         }
 
         private bool OfferExists(int id)
@@ -1033,34 +1020,7 @@ namespace Pages.Offers
 
         private async Task<Offer?> GetOfferByIdAsync(int? id)
         {
-            string cacheKey = $"offer_{id}"; // Unique key for each offer
-
-            // Try to get the cached data first
-            if (!_cache.TryGetValue(cacheKey, out Offer cachedOffer))
-            {
-                // Data not in cache, fetch from the database
-                cachedOffer = await _context.Offers
-                    .Include(o => o.ProjectOwner)
-                    .Include(o => o.OfferItems)
-                        .ThenInclude(oi => oi.EquipmentModel)
-                            .ThenInclude(em => em.Equipment)
-                                .ThenInclude(em => em.Features)
-                    .Include(o => o.OfferItems)
-                        .ThenInclude(oi => oi.Company)
-                    .Include(o => o.OfferItems)
-                        .ThenInclude(oi => oi.EquipmentModel)
-                            .ThenInclude(em => em.Features)
-                                .ThenInclude(o => o.Unit)
-                    .FirstOrDefaultAsync(o => o.Id == id);
-
-                if (cachedOffer != null)
-                {
-                    // Set the data in the cache with an expiration time of 1 hour
-                    _cache.Set(cacheKey, cachedOffer, TimeSpan.FromHours(1));
-                }
-            }
-
-            return cachedOffer; // Return the cached or fetched offer
+            return await _offerService.GetOfferByIdAsync(id);
         }
 
         public void ClearCache(int id)
