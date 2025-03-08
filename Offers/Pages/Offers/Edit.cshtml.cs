@@ -18,6 +18,7 @@ using System.Globalization;
 using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
 using Offers.Services.Offer;
+using System.Text.RegularExpressions;
 
 namespace Pages.Offers
 {
@@ -334,8 +335,8 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "F6", company.Telefon);
                         ReplaceText(wordDoc, "G7", company.Faks);
                         ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
-                        ReplaceText(wordDoc, "I9", projectOwner?.Name.ToUpper() ?? "");
-                        ReplaceText(wordDoc, "K10", projectOwner?.Address.ToUpper() ?? "");
+                        ReplaceText(wordDoc, "I9", projectOwner?.Name ?? "");
+                        ReplaceText(wordDoc, "K10", projectOwner?.Address ?? "");
                         ReplaceText(wordDoc, "L11", Offer.OfferName.ToUpper() ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "N13", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
@@ -391,6 +392,8 @@ namespace Pages.Offers
 
             var offerItems = offer.OfferItems.ToList();
 
+            OfferItems = offerItems;
+
             var projectOwner = offer.ProjectOwner;
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
@@ -420,8 +423,10 @@ namespace Pages.Offers
                     var offerTeknikSartname = await _context.OfferTeknikSartnames.Where(x => x.OfferId == offer.Id).ToListAsync(cancellationToken);
                     if(offerTeknikSartname.Any())
                     {
+
                         foreach (var teknikSartname in offerTeknikSartname)
                         {
+                            teknikSartname.Features = Regex.Replace(teknikSartname.Features, @"[\r\n]$", "");
                             string[] rowValues = { 
                                 teknikSartname.No.ToString(), 
                                 teknikSartname.EquipmentName.ToString(),
@@ -429,7 +434,6 @@ namespace Pages.Offers
                                 teknikSartname.Birim,
                                 teknikSartname.Miktar.ToString()
                             }; // Example row values
-
                             AddRowToTable(wordDoc, rowValues, false, true);
                         }
                     }
@@ -439,8 +443,12 @@ namespace Pages.Offers
                         var no = 1;
                         var equipmentList = new List<string>();
 
-                        var equipmentNames = new StringBuilder();
-                        var minMaxFeatures = await _context.EquipmentModelFeatures
+                        var _equipmentModelIds = new List<int>();
+                        foreach (var offerItem in offerItems.ToList())
+                        {
+                            _equipmentModelIds.Add(offerItem.EquipmentModelId);
+                        }
+                        var minMaxFeatures = await _context.EquipmentModelFeatures.Where(x => _equipmentModelIds.Contains(x.EquipmentModelId))
                             .GroupBy(emf => new { emf.EquipmentModel.EquipmentId, emf.FeatureKey })
                             .Select(g => new
                             {
@@ -477,7 +485,7 @@ namespace Pages.Offers
                             }
                             var equipment = offerItem.EquipmentModel.Equipment.Name;
                             equipmentList.Add(equipment);
-                            var features = result.ToString();
+                            var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
                             var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
                             var sayi = offerItem.Quantity;
 
