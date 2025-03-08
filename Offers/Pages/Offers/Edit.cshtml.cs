@@ -284,7 +284,7 @@ namespace Pages.Offers
                             var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
                             equipmentList.Add(equipment);
                             var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
-                            var equipmentModel = offerItem.EquipmentModel.Brand + "\n" + offerItem.EquipmentModel.Model;
+                            var equipmentModel = offerItem.EquipmentModel.Brand.ToUpper() + "\n" + offerItem.EquipmentModel.Model.ToUpper();
                             var sayi = offerItem.Quantity;
                             var price = offerItem.Price;
                             var totalPrice = sayi * price;
@@ -303,7 +303,7 @@ namespace Pages.Offers
                             equipmentNames.AppendLine(equipment);
                         }
 
-                        ReplaceText(wordDoc, "AXCCD", equipmentNames.ToString());
+                        ReplaceText(wordDoc, "AXCCD", Regex.Replace(equipmentNames.ToString(), @"[\r\n]$", ""));
                     }
 
                     modifiedDocument = memoryStream.ToArray();
@@ -417,9 +417,13 @@ namespace Pages.Offers
 
                 using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
                 {
+                    var equipmentNames = string.Join(", ", offerItems
+                        .Select(x => x.EquipmentModel.Equipment.Name)
+                        .Distinct());
                     ReplaceText(wordDoc, "AAAA", offer.OfferName);
                     ReplaceText(wordDoc, "BBBB", offer.ProjectAddress);
                     ReplaceText(wordDoc, "AXBY", offer.ProjectOwner.Name);
+                    ReplaceText(wordDoc, "XXXX", equipmentNames);
                     ReplaceText(wordDoc, "DDMMYYYY", offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
 
                     var offerTeknikSartname = await _context.OfferTeknikSartnames.Where(x => x.OfferId == offer.Id).ToListAsync(cancellationToken);

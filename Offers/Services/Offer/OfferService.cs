@@ -63,6 +63,7 @@ namespace Offers.Services.Offer
                 var result = new StringBuilder();
                 foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                 {
+                    
                     var min = offerItem.EquipmentModel.Equipment.Features.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey)?.Min;
                     var max = offerItem.EquipmentModel.Equipment.Features.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey)?.Max;
 
@@ -83,12 +84,29 @@ namespace Offers.Services.Offer
 
                             var minVal = int.Parse(minValue) - min;
                             var maxVal = int.Parse(maxValue) + max;
-                            result.AppendLine($"{feature.FeatureKey} {minVal}-{maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
+                            if(offer.ProjectOwner.Hp > maxVal)
+                                maxVal = offer.ProjectOwner.Hp;
+
+                            if (feature.FeatureKey.Contains("Ebat", StringComparison.Ordinal) ||
+                                feature.FeatureKey.Contains("Lastik Ebadı", StringComparison.Ordinal) ||
+                                feature.FeatureKey.Contains("Boyut", StringComparison.Ordinal))
+                            {
+                                result.AppendLine($"{feature.FeatureKey} Belirtiniz");
+                            }
+                            else 
+                                result.AppendLine($"{feature.FeatureKey} {minVal}-{maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
                         }
                     }
                     else
                     {
-                        result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
+                        if (feature.FeatureKey.Contains("Ebat", StringComparison.Ordinal) ||
+                                feature.FeatureKey.Contains("Lastik Ebadı", StringComparison.Ordinal) ||
+                                feature.FeatureKey.Contains("Boyut", StringComparison.Ordinal))
+                        {
+                            result.AppendLine($"{feature.FeatureKey} Belirtiniz");
+                        }
+                        else
+                            result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
                     }
                 }
                 var features = result.ToString();
