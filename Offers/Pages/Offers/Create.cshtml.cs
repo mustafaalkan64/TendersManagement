@@ -81,6 +81,7 @@ namespace Pages.Offers
         public async Task<IActionResult> OnPostCreateAsync(CancellationToken cancellationToken)
         {
             Offer.TotalPrice = 0;
+            Offer.IsApproved = false;
             Offer.CreatedDate = DateTime.Now;
 
             // Add offer

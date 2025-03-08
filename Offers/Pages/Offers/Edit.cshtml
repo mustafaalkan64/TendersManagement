@@ -253,7 +253,14 @@
             </div>
 
             <div class="form-group mt-3">
-                <button type="submit" asp-page-handler="Save" class="btn btn-primary">Kaydet</button>
+                @if (!Model.Offer.IsApproved || (User.IsInRole("Admin") && Model.Offer.IsApproved))
+                {
+                    <button type="submit" asp-page-handler="Save" class="btn btn-primary">Kaydet</button>
+                }
+                @if (User.IsInRole("Admin") && !Model.Offer.IsApproved)
+                {
+                    <button type="submit" asp-page-handler="Approve" class="btn btn-primary">Onayla</button>
+                }
                 @foreach (var item in Model.OfferItems.GroupBy(x => x.CompanyId))
                 {
                     var companyName = Model.CompanyList.FirstOrDefault(c => c.Value == item.Key.ToString())?.Text ?? "Ýndir";

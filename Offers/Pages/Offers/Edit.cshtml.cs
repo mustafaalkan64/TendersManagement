@@ -173,6 +173,30 @@ namespace Pages.Offers
             }));
         }
 
+        public async Task<IActionResult> OnPostApproveAsync()
+        {
+            Offer.IsApproved = true;
+            _context.Attach(Offer).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                ClearCache(Offer.Id);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OfferExists(Offer.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToPage("./Index");
+        }
+
         public async Task<IActionResult> OnPostSaveAsync()
         {
             if (string.IsNullOrEmpty(Offer.OfferName))

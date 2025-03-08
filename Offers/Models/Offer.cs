@@ -38,6 +38,8 @@ namespace Models
         [Display(Name = "OTPYuzde")]
         public int OTPYuzde { get; set; } = 1;
 
+        public bool IsApproved { get; set; } = false;
+
         public ProjectOwner ProjectOwner { get; set; }
 
         [Display(Name = "Toplam Tutar")]
