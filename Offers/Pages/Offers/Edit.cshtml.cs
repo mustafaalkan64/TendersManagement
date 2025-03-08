@@ -78,6 +78,11 @@ namespace Pages.Offers
 
             var equipmentModels = new List<EquipmentModel?>();
 
+            if(NewItem.CompanyId > 0)
+            {
+                equipmentModels = await GetEquipmentModelsByCompanyId(NewItem.CompanyId);
+            }
+
             CompanySummaries = OfferItems
                 .GroupBy(oi => oi.Company.Name)
                 .Select(g => new CompanySummaryViewModel
@@ -917,7 +922,6 @@ namespace Pages.Offers
                     if(projectOwnerTraktorHp < Int32.Parse(equipmentModelUnitFeature.FeatureValue))
                     {
                         await LoadRelatedData(Offer.Id);
-
                         StatusMessage = "Traktor Hp degeri, makine ekipman hp degerinden küçük olmamalidir";
                         return Page();
                     }
@@ -935,7 +939,6 @@ namespace Pages.Offers
             if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModelId == NewItem.EquipmentModelId))
             {
                 await LoadRelatedData(Offer.Id);
-
                 StatusMessage = "Zaten kurum bu ekipmana teklif vermiş";
                 return Page();
             }
@@ -943,7 +946,9 @@ namespace Pages.Offers
 
             if (OfferItems.Any())
             {
-                var filteredItems = OfferItems.Where(x => x.EquipmentModelId == NewItem.EquipmentModelId);
+                var equipmentModel = await _context.EquipmentModels.FindAsync(NewItem.EquipmentModelId);
+                var filteredItems = OfferItems.Where(x => x.EquipmentModel.EquipmentId == equipmentModel?.EquipmentId);
+                //var filteredItems = OfferItems.Where(x => x.EquipmentModelId == NewItem.EquipmentModelId);
                 var minOffer = filteredItems.Any() ? filteredItems.Min(x => x.Price) : (decimal?)null;
 
                 if (minOffer != null)
@@ -1039,14 +1044,14 @@ namespace Pages.Offers
 
                 if (newPrice <= min)
                 {
-                    StatusMessage = "Teklif tutarı en düşük teklif tutarından düşük olamaz";
+                    StatusMessage = "Teklif tutarı en dusuk teklif miktarindan az olamaz";
                     await LoadRelatedData(offerId);
                     return Page();
                 }
 
                 if(newPrice > twentyPercentMore)
                 {
-                    StatusMessage = "Teklif tutarı en düşük teklif tutarının yuzde 20si araliginda olmalidir";
+                    StatusMessage = "Teklif tutarı en dusuk teklif miktarindan yuzde 20si araliginda olmalidir";
                     await LoadRelatedData(offerId);
                     return Page();
                 }
