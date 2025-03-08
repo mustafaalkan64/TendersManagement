@@ -283,8 +283,8 @@ namespace Pages.Offers
                             }
                             var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
                             equipmentList.Add(equipment);
-                            var features = result.ToString();
-                            var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
+                            var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
+                            var equipmentModel = offerItem.EquipmentModel.Brand + "\n" + offerItem.EquipmentModel.Model;
                             var sayi = offerItem.Quantity;
                             var price = offerItem.Price;
                             var totalPrice = sayi * price;
