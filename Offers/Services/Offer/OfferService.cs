@@ -50,16 +50,6 @@ namespace Offers.Services.Offer
         public async Task<List<OfferTeknikSartname>> GetOfferTeknikSartnameByOfferId(int? offerId, CancellationToken cancellationToken = default)
         {
             var offer = await GetOfferByIdAsync(offerId);
-            var minMaxFeatures = await _context.EquipmentModelFeatures
-                        .GroupBy(emf => new { emf.EquipmentModel.EquipmentId, emf.FeatureKey })
-                        .Select(g => new
-                        {
-                            EquipmentId = g.Key.EquipmentId,
-                            FeatureKey = g.Key.FeatureKey,
-                            MinFeatureValue = g.Min(emf => emf.FeatureValue),
-                            MaxFeatureValue = g.Max(emf => emf.FeatureValue)
-                        })
-                        .ToListAsync(cancellationToken);
 
             int no = 1;
             List<Models.OfferTeknikSartname> offerTeknikSartnameList = new();
@@ -79,11 +69,20 @@ namespace Offers.Services.Offer
 
                     if (min != null && max != null)
                     {
-                        if (minMaxFeatures.Any(x => x.FeatureKey == feature.FeatureKey && x.EquipmentId == feature.EquipmentModel.EquipmentId))
+                        var values = offer.OfferItems.Where(x => x.EquipmentModel.Features.Any(x => x.FeatureKey == feature.FeatureKey) && x.EquipmentModel.EquipmentId == feature.EquipmentModel.EquipmentId).Select(x => x.EquipmentModel).ToList();
+                        if (values != null)
                         {
-                            var minMaxFeature = minMaxFeatures.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey);
-                            var minVal = int.Parse(minMaxFeature.MinFeatureValue) - min;
-                            var maxVal = int.Parse(minMaxFeature.MaxFeatureValue) + max;
+                            var filteredFeatures = values
+                                .SelectMany(x => x.Features)
+                                .Where(y => y.FeatureKey == feature.FeatureKey)
+                                .Select(y => y.FeatureValue)
+                                .ToList();
+
+                            var minValue = filteredFeatures.Any() ? filteredFeatures.Min() : default;
+                            var maxValue = filteredFeatures.Any() ? filteredFeatures.Max() : default;
+
+                            var minVal = int.Parse(minValue) - min;
+                            var maxVal = int.Parse(maxValue) + max;
                             result.AppendLine($"{feature.FeatureKey} {minVal}-{maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
                         }
                     }

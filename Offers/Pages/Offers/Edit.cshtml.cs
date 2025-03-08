@@ -390,6 +390,8 @@ namespace Pages.Offers
 
             var offer = await GetOfferByIdAsync(Offer.Id);
 
+            var _equipmentModelIds = new List<int>();
+
             var offerItems = offer.OfferItems.ToList();
 
             OfferItems = offerItems;
@@ -439,61 +441,18 @@ namespace Pages.Offers
                     }
                     else
                     {
-                        decimal totalPrices = 0;
-                        var no = 1;
-                        var equipmentList = new List<string>();
-
-                        var _equipmentModelIds = new List<int>();
-                        foreach (var offerItem in offerItems.ToList())
+                        var teknikSartnameList = await _offerService.GetOfferTeknikSartnameByOfferId(offer.Id);
+                        foreach (var teknikSartname in teknikSartnameList)
                         {
-                            _equipmentModelIds.Add(offerItem.EquipmentModelId);
-                        }
-                        var minMaxFeatures = await _context.EquipmentModelFeatures.Where(x => _equipmentModelIds.Contains(x.EquipmentModelId))
-                            .GroupBy(emf => new { emf.EquipmentModel.EquipmentId, emf.FeatureKey })
-                            .Select(g => new
-                            {
-                                EquipmentId = g.Key.EquipmentId,
-                                FeatureKey = g.Key.FeatureKey,
-                                MinFeatureValue = g.Min(emf => emf.FeatureValue),
-                                MaxFeatureValue = g.Max(emf => emf.FeatureValue)
-                            })
-                            .ToListAsync(cancellationToken);
-
-                        foreach (var offerItem in offerItems.ToList())
-                        {
-                            var result = new StringBuilder();
-                            foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
-                            {
-                                var min = offerItem.EquipmentModel.Equipment.Features.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey)?.Min;
-                                var max = offerItem.EquipmentModel.Equipment.Features.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey)?.Max;
-
-
-                                if (min != null && max != null)
-                                {
-                                    if (minMaxFeatures.Any(x => x.FeatureKey == feature.FeatureKey && x.EquipmentId == feature.EquipmentModel.EquipmentId))
-                                    {
-                                        var minMaxFeature = minMaxFeatures.FirstOrDefault(x => x.FeatureKey == feature.FeatureKey);
-                                        var minVal = int.Parse(minMaxFeature.MinFeatureValue) - min;
-                                        var maxVal = int.Parse(minMaxFeature.MaxFeatureValue) + max;
-                                        result.AppendLine($"{feature.FeatureKey} {minVal}-{maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
-                                    }
-                                }
-                                else
-                                {
-                                    result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
-                                }
-                            }
-                            var equipment = offerItem.EquipmentModel.Equipment.Name;
-                            equipmentList.Add(equipment);
-                            var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
-                            var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
-                            var sayi = offerItem.Quantity;
-
-                            string[] rowValues = { no.ToString(), equipment, features, "Adet", sayi.ToString() }; // Example row values
-
+                            teknikSartname.Features = Regex.Replace(teknikSartname.Features, @"[\r\n]$", "");
+                            string[] rowValues = {
+                                teknikSartname.No.ToString(),
+                                teknikSartname.EquipmentName.ToString(),
+                                teknikSartname.Features,
+                                teknikSartname.Birim,
+                                teknikSartname.Miktar.ToString()
+                            }; // Example row values
                             AddRowToTable(wordDoc, rowValues, false, true);
-                            no += 1;
-
                         }
                     }                   
                 }
