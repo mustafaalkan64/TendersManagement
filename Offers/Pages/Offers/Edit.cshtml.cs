@@ -1026,10 +1026,31 @@ namespace Pages.Offers
 
         public async Task<IActionResult> OnPostUpdatePriceAsync(int itemId, decimal newPrice)
         {
-            var offerItem = await _context.OfferItems.FindAsync(itemId);
+            var offerItem = await _context.OfferItems.Include(x => x.EquipmentModel).ThenInclude(x => x.Equipment).FirstOrDefaultAsync(x => x.Id == itemId);
 
             if (offerItem != null)
             {
+                var offerId = offerItem.OfferId;
+                var offerDetail = await GetOfferByIdAsync(offerId);
+
+                decimal? min = offerDetail?.OfferItems.Where(x => x.EquipmentModel.EquipmentId == offerItem.EquipmentModel.Equipment.Id).Min(x => x.Price);
+
+                var twentyPercentMore = min * (decimal)1.2;
+
+                if (newPrice <= min)
+                {
+                    StatusMessage = "Teklif tutarı en düşük teklif tutarından düşük olamaz";
+                    await LoadRelatedData(offerId);
+                    return Page();
+                }
+
+                if(newPrice > twentyPercentMore)
+                {
+                    StatusMessage = "Teklif tutarı en düşük teklif tutarının yuzde 20si araliginda olmalidir";
+                    await LoadRelatedData(offerId);
+                    return Page();
+                }
+
                 offerItem.Price = newPrice;
                 _context.Entry(offerItem).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
