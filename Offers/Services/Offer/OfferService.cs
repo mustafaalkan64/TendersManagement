@@ -84,7 +84,7 @@ namespace Offers.Services.Offer
 
                             var minVal = int.Parse(minValue) - min;
                             var maxVal = int.Parse(maxValue) + max;
-                            if(offer.ProjectOwner.Hp > maxVal)
+                            if(feature.FeatureKey.Contains("Güç", StringComparison.Ordinal) && offer.ProjectOwner.Hp > maxVal)
                                 maxVal = offer.ProjectOwner.Hp;
 
                             if (feature.FeatureKey.Contains("Ebat", StringComparison.Ordinal) ||
