@@ -22,7 +22,7 @@ using System.Text.RegularExpressions;
 
 namespace Pages.Offers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, User")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;

@@ -7,7 +7,7 @@ using Models;
 
 namespace Pages.EquipmentModelPage
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, User")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;

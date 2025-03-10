@@ -91,7 +91,7 @@ namespace Offers.Services.Offer
                                 feature.FeatureKey.Contains("Lastik Ebadı", StringComparison.Ordinal) ||
                                 feature.FeatureKey.Contains("Boyut", StringComparison.Ordinal))
                             {
-                                result.AppendLine($"{feature.FeatureKey} Belirtiniz");
+                                result.AppendLine($"{feature.FeatureKey} Belirtiniz.");
                             }
                             else 
                                 result.AppendLine($"{feature.FeatureKey} {minVal}-{maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
@@ -103,7 +103,7 @@ namespace Offers.Services.Offer
                                 feature.FeatureKey.Contains("Lastik Ebadı", StringComparison.Ordinal) ||
                                 feature.FeatureKey.Contains("Boyut", StringComparison.Ordinal))
                         {
-                            result.AppendLine($"{feature.FeatureKey} Belirtiniz");
+                            result.AppendLine($"{feature.FeatureKey} Belirtiniz.");
                         }
                         else
                             result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
