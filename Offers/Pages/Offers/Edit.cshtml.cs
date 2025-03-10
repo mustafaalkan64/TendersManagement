@@ -366,7 +366,7 @@ namespace Pages.Offers
                         ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
                         ReplaceText(wordDoc, "I9", projectOwner?.Name ?? "");
                         ReplaceText(wordDoc, "K10", projectOwner?.Address ?? "");
-                        ReplaceText(wordDoc, "L11", Offer.OfferName.ToUpper() ?? "");
+                        ReplaceText(wordDoc, "L11", Offer.OfferName ?? "");
                         ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "N13", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
                         ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
@@ -387,7 +387,7 @@ namespace Pages.Offers
                             }
                             var equipment = offerItem.EquipmentModel.Equipment.Name;
                             equipmentList.Add(equipment);
-                            var features = result.ToString();
+                            var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
                             var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
                             var sayi = offerItem.Quantity;
                             var price = offerItem.Price;
@@ -741,7 +741,7 @@ namespace Pages.Offers
             //runProperties.Append(new Bold());   // Make text bold
             //runProperties.Append(new Italic()); // Make text italic
             runProperties.Append(new RunFonts() { Ascii = "Times New Roman", HighAnsi = "Times New Roman" }); // Set font to Calibri
-            runProperties.Append(new FontSize() { Val = "28" }); // Set font size to 9.5pt (19 in OpenXml)
+            runProperties.Append(new FontSize() { Val = "24" }); // Set font size to 9.5pt (19 in OpenXml)
 
             // Split text by new line character and add runs
             string[] lines = text.Split('\n');
