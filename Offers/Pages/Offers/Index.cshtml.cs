@@ -24,6 +24,7 @@ namespace Pages.Offers
         {
             Offers = await _context.Offers
                 .AsNoTracking()
+                .Include(a => a.ProjectOwner)
                 .Include(o => o.OfferItems)
                     .ThenInclude(x => x.Company)
                 .OrderByDescending(o => o.CreatedDate)
