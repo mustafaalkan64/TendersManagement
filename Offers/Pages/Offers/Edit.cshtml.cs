@@ -217,13 +217,13 @@ namespace Pages.Offers
                 return Page();
             }
 
-            if (!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme))
-            {
+            //if (!(Offer.TeklifSunumTarihi > Offer.TeklifGonderimTarihi && Offer.TeklifSunumTarihi <= Offer.SonTeklifBildirme))
+            //{
 
-                StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalıdır";
-                await LoadRelatedData(Offer.Id);
-                return Page();
-            }
+            //    StatusMessage = "Teklif sunum tarihi teklif gonderim tarihinden sonra ve son teklif bildirme tarihinden önce olmalıdır";
+            //    await LoadRelatedData(Offer.Id);
+            //    return Page();
+            //}
 
             _context.Attach(Offer).State = EntityState.Modified;
 
@@ -627,7 +627,7 @@ namespace Pages.Offers
                 {
                     var isPlaniHazirligi = (minOfferAmount * (decimal)Offer.IsPlaniHazirligiYuzde) / 100;
                     var otp = (minOfferAmount * (decimal)Offer.OTPYuzde) / 100;
-                    ReplaceText(wordDoc, "AXBY", offer.TeklifSunumTarihi?.ToString("dd.MM.yyyy"));
+                    ReplaceText(wordDoc, "AXBY", GetRandomDate(Offer.DanismanlikTeklifGonderim, Offer.DanismanlikSonTeklifSunum).ToString("dd.MM.yyyy"));
                     ReplaceText(wordDoc, "A1", offer.ProjectOwner.Name);
                     ReplaceText(wordDoc, "B2", offer.ProjectOwner.Address);
                     ReplaceText(wordDoc, "Z1", offer.OfferName);
