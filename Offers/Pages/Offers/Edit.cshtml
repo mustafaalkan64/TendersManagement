@@ -27,7 +27,7 @@
                 <div class="col-md-6">
                     <div class="form-group mb-6">
                         <label asp-for="Offer.ProjectOwnerId">Proje Sahibi</label>
-                        <select asp-for="Offer.ProjectOwnerId" asp-items="Model.ProjectOwnerList" class="form-select">
+                        <select asp-for="Offer.ProjectOwnerId" asp-items="Model.ProjectOwnerList" class="form-select" disabled="disabled">
                             <option value="">Proje Sahibi Sec</option>
                         </select>
                         <span asp-validation-for="Offer.ProjectOwnerId" class="text-danger"></span>
