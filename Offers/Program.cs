@@ -133,7 +133,7 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new PermissionRequirement("OfferEkle")));
 
     options.AddPolicy("CanEditOffer", policy =>
-        policy.Requirements.Add(new PermissionRequirement("OfferGuncelle")));
+        policy.Requirements.Add(new PermissionRequirement("OfferDuzenle")));
 
     options.AddPolicy("CanDeleteOffer", policy =>
         policy.Requirements.Add(new PermissionRequirement("OfferSil")));
