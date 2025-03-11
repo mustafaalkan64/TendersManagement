@@ -46,7 +46,7 @@ namespace Pages.Roles
             RoleId = role.Id;
             RoleName = role.Name;
 
-            Permissions = await _context.Permissions
+            Permissions = await _context.Permissions.OrderBy(p => p.DisplayName)
                 .Select(p => new PermissionViewModel
                 {
                     PermissionId = p.Id,
