@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Pages.ProjectOwner
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanAddOwner")]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;

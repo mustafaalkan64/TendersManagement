@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Pages.OfferTeknikSartname
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanListTeknikSartname")]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 namespace Offers.Pages.Companies
 {
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Policy = "CanListCompany")]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

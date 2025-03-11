@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Pages.EquipmentModelPage
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanAddEquipmentModel")]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;

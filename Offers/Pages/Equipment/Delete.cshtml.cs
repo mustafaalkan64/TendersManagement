@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Models;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Policy = "CanDeleteEquipment")]
 public class DeleteModel : PageModel
 {
     private readonly ApplicationDbContext _context;

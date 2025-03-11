@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pages.EquipmentModelPage
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanDeleteEquipmentModel")]
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;

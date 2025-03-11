@@ -6,7 +6,7 @@ using Models;
 
 namespace Pages.ProjectOwner
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanSeeDetailsOwner")]
     public class DetailsModel : PageModel
     {
         private readonly ApplicationDbContext _context;

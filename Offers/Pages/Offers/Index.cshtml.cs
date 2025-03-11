@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Pages.Offers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanListOffer")]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

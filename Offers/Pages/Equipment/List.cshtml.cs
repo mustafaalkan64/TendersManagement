@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
-[Authorize(Roles = "Admin, User")]
+[Authorize(Policy = "CanListEquipment")]
 public class EquipmentListModel : PageModel
 {
     private readonly ApplicationDbContext _context;

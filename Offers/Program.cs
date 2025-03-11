@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Offers.Data;
+using Offers.Permissions;
 using Offers.Services.Offer;
 using System;
 using System.Globalization;
@@ -23,6 +25,14 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 var cultureInfo = new CultureInfo("tr-TR");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
+
 
 // Add services to the container.
 builder.Services.AddRazorPages()
@@ -47,16 +57,96 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+
+builder.Services.AddAuthorization(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    options.AddPolicy("CanEditEquipment", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanDuzenle")));
+
+    options.AddPolicy("CanAddEquipment", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanEkle")));
+
+    options.AddPolicy("CanDeleteEquipment", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanSil")));
+
+    options.AddPolicy("CanListEquipment", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanListele")));
+
+    options.AddPolicy("CanEditEquipmentModel", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanModelDuzenle")));
+
+    options.AddPolicy("CanDeleteEquipmentModel", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanModelSil")));
+
+    options.AddPolicy("CanAddEquipmentModel", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanModelEkle")));
+
+    options.AddPolicy("CanListEquipmentModel", policy =>
+        policy.Requirements.Add(new PermissionRequirement("EkipmanModelListele")));
+
+    options.AddPolicy("CanEditCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("SirketDuzenle")));
+
+    options.AddPolicy("CanDeleteCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("SirketSil")));
+
+    options.AddPolicy("CanAddCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("SirketEkle")));
+
+    options.AddPolicy("CanSeeDetailsCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("SirketDetay")));
+
+    options.AddPolicy("CanListCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("SirketListele")));
+
+    options.AddPolicy("CanEditOwner", policy =>
+        policy.Requirements.Add(new PermissionRequirement("YatirimciDuzenle")));
+
+    options.AddPolicy("CanDeleteOwner", policy =>
+        policy.Requirements.Add(new PermissionRequirement("YatirimciSil")));
+
+    options.AddPolicy("CanAddOwner", policy =>
+        policy.Requirements.Add(new PermissionRequirement("YatirimciEkle")));
+
+    options.AddPolicy("CanListOwner", policy =>
+        policy.Requirements.Add(new PermissionRequirement("YatirimciListele")));
+
+    options.AddPolicy("CanSeeDetailsOwner", policy =>
+        policy.Requirements.Add(new PermissionRequirement("YatirimciDetay")));
+
+    options.AddPolicy("CanEditTeknikSartname", policy =>
+        policy.Requirements.Add(new PermissionRequirement("TeknikSartnameDuzenle")));
+
+    options.AddPolicy("CanDeleteTeknikSartname", policy =>
+        policy.Requirements.Add(new PermissionRequirement("TeknikSartnameSil")));
+
+    options.AddPolicy("CanAddTeknikSartname", policy =>
+        policy.Requirements.Add(new PermissionRequirement("TeknikSartnameEkle")));
+
+    options.AddPolicy("CanListTeknikSartname", policy =>
+        policy.Requirements.Add(new PermissionRequirement("TeknikSartnameListele")));
+
+    options.AddPolicy("CanListOffer", policy =>
+        policy.Requirements.Add(new PermissionRequirement("OfferListele")));
+
+    options.AddPolicy("CanAddOffer", policy =>
+        policy.Requirements.Add(new PermissionRequirement("OfferEkle")));
+
+    options.AddPolicy("CanEditOffer", policy =>
+        policy.Requirements.Add(new PermissionRequirement("OfferGuncelle")));
+
+    options.AddPolicy("CanDeleteOffer", policy =>
+        policy.Requirements.Add(new PermissionRequirement("OfferSil")));
+
 });
+
+builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IOfferService, OfferService>();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Policy = "CanAddEquipment")]
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _context;

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 namespace Offers.Pages.Companies
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanEditCompany")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;

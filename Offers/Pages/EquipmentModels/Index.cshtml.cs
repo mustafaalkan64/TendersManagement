@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pages.EquipmentModelPage
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanListEquipmentModel")]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

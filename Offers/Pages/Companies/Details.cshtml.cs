@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 namespace Offers.Pages.Companies
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanSeeDetailsCompany")]
     public class DetailsModel : PageModel
     {
         private readonly ApplicationDbContext _context;

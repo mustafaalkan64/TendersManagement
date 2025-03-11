@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pages.ProjectOwner
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanEditOwner")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;

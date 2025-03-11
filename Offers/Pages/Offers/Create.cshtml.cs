@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Pages.Offers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanAddOffer")]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;

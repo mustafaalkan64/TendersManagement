@@ -6,7 +6,7 @@ using Models;
 
 namespace Pages.Offers {
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanDeleteOffer")]
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;

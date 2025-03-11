@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Pages.OfferTeknikSartname
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanDeleteTeknikSartname")]
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;

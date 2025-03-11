@@ -21,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<ProjectOwner> ProjectOwners { get; set; }
     public DbSet<CompanyEquipmentModel> CompanyEquipmentModels { get; set; }
     public DbSet<OfferTeknikSartname> OfferTeknikSartnames { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,7 +51,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<EquipmentModel>()
             .HasOne(em => em.Equipment)
             .WithMany(e => e.Models)
-            .HasForeignKey(em => em.EquipmentId);
-
+            .HasForeignKey(em => em.EquipmentId);     
+        
     }
 } 

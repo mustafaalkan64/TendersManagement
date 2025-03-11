@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Pages.OfferTeknikSartname
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanEditTeknikSartname")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;

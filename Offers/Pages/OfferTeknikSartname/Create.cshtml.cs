@@ -5,7 +5,7 @@ using Models;
 
 namespace Pages.OfferTeknikSartname
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanAddTeknikSartname")]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;

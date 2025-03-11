@@ -6,7 +6,7 @@ using Models;
 
 namespace Pages.ProjectOwner
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanListOwner")]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

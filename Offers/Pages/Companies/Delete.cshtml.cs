@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 namespace Offers.Pages.Companies
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanDeleteCompany")]
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;

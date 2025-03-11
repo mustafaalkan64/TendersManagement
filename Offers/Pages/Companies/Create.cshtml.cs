@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Models;
 namespace Offers.Pages.Companies
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "CanAddCompany")]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
