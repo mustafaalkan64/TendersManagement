@@ -20,6 +20,7 @@ The system is built using cutting-edge technologies to ensure high performance a
 - **Entity Framework Core 9** (Code-First Migrations & Data Seeding)
 - **ASP.NET Identity** for Authentication & Authorization
 - **Razor Pages** for UI Development
+- **MsSql** for Database
 - **User, Role, and Permission Management** for Access Control
 
 ## Installation & Setup
