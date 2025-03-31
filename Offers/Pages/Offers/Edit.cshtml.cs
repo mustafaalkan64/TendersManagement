@@ -28,6 +28,7 @@ namespace Pages.Offers
         private readonly ApplicationDbContext _context;
         private readonly IOfferService _offerService;
         private readonly IMemoryCache _cache;
+        private const string Cetinkaya = "Çetinkaya";
 
         public EditModel(ApplicationDbContext context, IMemoryCache cache, IOfferService offerService)
         {
@@ -264,7 +265,7 @@ namespace Pages.Offers
 
             // Create a copy of the template to modify
             byte[] modifiedDocument;
-            if (company.Name == "Çetinkaya")
+            if (company.Name == Cetinkaya)
             {
                 templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "CetinkayaTeklif.docx");
                 if (!System.IO.File.Exists(templatePath))
