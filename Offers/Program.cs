@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -166,12 +167,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    DbInitializer.Seed(context);
-}
-
 // Apply localization settings
 app.UseRequestLocalization();
 
@@ -193,6 +188,8 @@ using (var scope = app.Services.CreateScope())
 
         // Seed Roles and Admin User
         await DbSeeder.SeedRolesAndAdminAsync(services);
+
+        DbInitializer.Seed(context);
     }
     catch (Exception ex)
     {

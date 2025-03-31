@@ -51,7 +51,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<EquipmentModel>()
             .HasOne(em => em.Equipment)
             .WithMany(e => e.Models)
-            .HasForeignKey(em => em.EquipmentId);     
-        
+            .HasForeignKey(em => em.EquipmentId);
+
     }
 } 
