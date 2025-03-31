@@ -63,7 +63,7 @@ namespace Pages.Offers
 
         private async Task LoadRelatedData(int? id = 0, CancellationToken cancellationToken = default)
         {
-            Offer = await GetOfferByIdAsync(id);
+            Offer = await GetOfferByIdAsync(id, cancellationToken);
             if (Offer == null)
             {
                 throw new ArgumentNullException("Teklif Bulunamadi");
@@ -81,7 +81,7 @@ namespace Pages.Offers
 
             if(NewItem.CompanyId > 0)
             {
-                equipmentModels = await GetEquipmentModelsByCompanyId(NewItem.CompanyId);
+                equipmentModels = await GetEquipmentModelsByCompanyId(NewItem.CompanyId, cancellationToken);
             }
 
             CompanySummaries = OfferItems
@@ -134,12 +134,12 @@ namespace Pages.Offers
             }));
         }
 
-        private async Task<List<EquipmentModel>> GetEquipmentModelsByCompanyId(int companyId)
+        private async Task<List<EquipmentModel>> GetEquipmentModelsByCompanyId(int companyId, CancellationToken cancellationToken = default)
         {
             var companyEquipmentModels = await _context.CompanyEquipmentModels
                 .Where(cem => cem.CompanyId == companyId)
                 .Select(cem => cem.EquipmentModelId)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             if (companyEquipmentModels.Any())
             {
@@ -149,7 +149,7 @@ namespace Pages.Offers
                     .OrderBy(em => em.Equipment.Name)
                     .ThenBy(em => em.Brand)
                     .ThenBy(em => em.Model)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
             }
 
             // If no company equipment models exist, return all equipment models
@@ -158,20 +158,20 @@ namespace Pages.Offers
                 .OrderBy(em => em.Equipment.Name)
                 .ThenBy(em => em.Brand)
                 .ThenBy(em => em.Model)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(int? id, CancellationToken cancellationToken = default)
         {
-            await LoadRelatedData(id);
+            await LoadRelatedData(id, cancellationToken);
             NewItem.EquipmentModelId = 0;
             NewItem.CompanyId = 0;
             return Page();
         }
 
-        public async Task<IActionResult> OnGetUpdateEquipmentModelsAsync(int companyId)
+        public async Task<IActionResult> OnGetUpdateEquipmentModelsAsync(int companyId, CancellationToken cancellationToken = default)
         {
-            var equipmentModels = await GetEquipmentModelsByCompanyId(companyId);
+            var equipmentModels = await GetEquipmentModelsByCompanyId(companyId, cancellationToken);
             return new JsonResult(equipmentModels.Select(em => new
             {
                 id = em.Id,
@@ -203,18 +203,18 @@ namespace Pages.Offers
             return RedirectToPage("./Index");
         }
 
-        public async Task<IActionResult> OnPostSaveAsync()
+        public async Task<IActionResult> OnPostSaveAsync(CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(Offer.OfferName))
             {
-                await LoadRelatedData(Offer.Id);
+                await LoadRelatedData(Offer.Id, cancellationToken);
                 return Page();
             }
 
             if (!(Offer.SonTeklifBildirme > Offer.TeklifGonderimTarihi))
             {
                 StatusMessage = "Son teklif bildirme tarihi teklif gönderim tarihinden sonra olmalıdır";
-                await LoadRelatedData(Offer.Id);
+                await LoadRelatedData(Offer.Id, cancellationToken);
                 return Page();
             }
 
@@ -230,7 +230,7 @@ namespace Pages.Offers
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 ClearCache(Offer.Id);
             }
             catch (DbUpdateConcurrencyException)
@@ -265,7 +265,7 @@ namespace Pages.Offers
 
             // Create a copy of the template to modify
             byte[] modifiedDocument;
-            if (company.Name == Cetinkaya)
+            if (company?.Name == Cetinkaya)
             {
                 templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "CetinkayaTeklif.docx");
                 if (!System.IO.File.Exists(templatePath))
@@ -496,17 +496,17 @@ namespace Pages.Offers
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Teknik Şartname.docx");
         }
 
-        public async Task<IActionResult> OnPostDavetAsync(int companyId)
+        public async Task<IActionResult> OnPostDavetAsync(int companyId, CancellationToken cancellationToken = default)
         {
             string templatePath = "";
 
-            var offer = await GetOfferByIdAsync(Offer.Id);
+            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
 
-            var offerItems = offer.OfferItems.ToList();
+            var offerItems = offer?.OfferItems.ToList();
 
-            var company = offerItems.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
+            var company = offerItems?.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
 
-            var projectOwner = offer.ProjectOwner;
+            var projectOwner = offer?.ProjectOwner;
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
             // Create a copy of the template to modify
@@ -527,7 +527,7 @@ namespace Pages.Offers
 
                 using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
                 {
-                    ReplaceText(wordDoc, "A1", offer.ProjectOwner.Name.ToUpper());
+                    ReplaceText(wordDoc, "A1", offer?.ProjectOwner?.Name?.ToUpper());
                     ReplaceText(wordDoc, "C3", offer.ProjectOwner.Name);
                     ReplaceText(wordDoc, "H10", offer.ProjectOwner.Name);
                     ReplaceText(wordDoc, "B2", company.TicariUnvan);
@@ -552,7 +552,7 @@ namespace Pages.Offers
         {
             string templatePath = "";
 
-            var offer = await GetOfferByIdAsync(Offer.Id);
+            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
 
             // Create a copy of the template to modify
             byte[] modifiedDocument;
@@ -593,7 +593,7 @@ namespace Pages.Offers
         {
             string templatePath = "";
 
-            var offer = await GetOfferByIdAsync(Offer.Id);
+            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
             // Create a copy of the template to modify
@@ -612,7 +612,7 @@ namespace Pages.Offers
                     await fileStream.CopyToAsync(memoryStream);
                 }
 
-                var companySummaries = offer.OfferItems
+                var companySummaries = offer?.OfferItems
                     .GroupBy(oi => oi.Company.Name)
                     .Select(g => new CompanySummaryViewModel
                     {
@@ -655,7 +655,7 @@ namespace Pages.Offers
         {
             string templatePath = "";
 
-            var offer = await GetOfferByIdAsync(Offer.Id);
+            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
 
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
@@ -888,7 +888,7 @@ namespace Pages.Offers
 
         public async Task<IActionResult> OnPostAddItemAsync(CancellationToken cancellationToken = default)
         {
-            var offer = await GetOfferByIdAsync(Offer.Id);
+            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
 
             var projectOwnerTraktorHp = offer.ProjectOwner.Hp;
 
@@ -897,7 +897,7 @@ namespace Pages.Offers
 
             if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
-                await LoadRelatedData(Offer.Id);
+                await LoadRelatedData(Offer.Id, cancellationToken);
                 return Page();
             }
 
@@ -912,7 +912,7 @@ namespace Pages.Offers
                     if (projectOwnerTraktorHp < Int32.Parse(lastOne))
                         //if (!((projectOwnerTraktorHp > Int32.Parse(firstValue) && projectOwnerTraktorHp <= Int32.Parse(lastOne)) || projectOwnerTraktorHp > Int32.Parse(lastOne)))
                     {
-                        await LoadRelatedData(Offer.Id);
+                        await LoadRelatedData(Offer.Id, cancellationToken);
 
                         StatusMessage = "Traktor Hp degeri, makine ekipman hp degeri araliginda veya bu degerden buyuk olmalidir";
                         return Page();
@@ -922,7 +922,7 @@ namespace Pages.Offers
                 {
                     if(projectOwnerTraktorHp < Int32.Parse(equipmentModelUnitFeature.FeatureValue))
                     {
-                        await LoadRelatedData(Offer.Id);
+                        await LoadRelatedData(Offer.Id, cancellationToken);
                         StatusMessage = "Traktor Hp degeri, makine ekipman hp degerinden küçük olmamalidir";
                         return Page();
                     }
@@ -939,7 +939,7 @@ namespace Pages.Offers
 
             if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModelId == NewItem.EquipmentModelId))
             {
-                await LoadRelatedData(Offer.Id);
+                await LoadRelatedData(Offer.Id, cancellationToken);
                 StatusMessage = "Zaten kurum bu ekipmana teklif vermiş";
                 return Page();
             }
@@ -958,7 +958,7 @@ namespace Pages.Offers
 
                     if (NewItem.Price < minOffer)
                     {
-                        await LoadRelatedData(Offer.Id);
+                        await LoadRelatedData(Offer.Id, cancellationToken);
 
                         StatusMessage = "Teklif tutarı en düşük teklif tutarından düşük olamaz";
                         return Page();
@@ -966,7 +966,7 @@ namespace Pages.Offers
 
                     if ((double)NewItem.Price > twentyPercentMore)
                     {
-                        await LoadRelatedData(Offer.Id);
+                        await LoadRelatedData(Offer.Id, cancellationToken);
 
                         StatusMessage = "Teklif tutarı en düşük teklif tutarının %20sinden fazla olamaz";
                         return Page();
@@ -996,9 +996,9 @@ namespace Pages.Offers
             return RedirectToPage("./Edit", new { id = Offer.Id });
         }
 
-        public async Task<IActionResult> OnPostDeleteItemAsync(int itemId)
+        public async Task<IActionResult> OnPostDeleteItemAsync(int itemId, CancellationToken cancellationToken = default)
         {
-            var offerItem = await _context.OfferItems.FindAsync(itemId);
+            var offerItem = await _context.OfferItems.FindAsync(itemId, cancellationToken);
             if (offerItem == null)
             {
                 return NotFound();
@@ -1006,7 +1006,7 @@ namespace Pages.Offers
 
             var offerId = offerItem.OfferId;
             _context.OfferItems.Remove(offerItem);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             ClearCache(Offer.Id);
 
             await _offerService.ReCreateOfferTeknikSartnameByOfferId(Offer.Id);
@@ -1019,9 +1019,9 @@ namespace Pages.Offers
             return _context.Offers.Any(e => e.Id == id);
         }
 
-        private async Task<Offer?> GetOfferByIdAsync(int? id)
+        private async Task<Offer?> GetOfferByIdAsync(int? id, CancellationToken cancellationToken = default)
         {
-            return await _offerService.GetOfferByIdAsync(id);
+            return await _offerService.GetOfferByIdAsync(id, cancellationToken);
         }
 
         public void ClearCache(int id)
@@ -1030,14 +1030,14 @@ namespace Pages.Offers
             _cache.Remove(cacheKey); // Remove the cache item when needed
         }
 
-        public async Task<IActionResult> OnPostUpdatePriceAsync(int itemId, decimal newPrice)
+        public async Task<IActionResult> OnPostUpdatePriceAsync(int itemId, decimal newPrice, CancellationToken cancellationToken = default)
         {
-            var offerItem = await _context.OfferItems.Include(x => x.EquipmentModel).ThenInclude(x => x.Equipment).FirstOrDefaultAsync(x => x.Id == itemId);
+            var offerItem = await _context.OfferItems.Include(x => x.EquipmentModel).ThenInclude(x => x.Equipment).FirstOrDefaultAsync(x => x.Id == itemId, cancellationToken);
 
             if (offerItem != null)
             {
                 var offerId = offerItem.OfferId;
-                var offerDetail = await GetOfferByIdAsync(offerId);
+                var offerDetail = await GetOfferByIdAsync(offerId, cancellationToken);
 
                 decimal? min = offerDetail?.OfferItems.Where(x => x.EquipmentModel.EquipmentId == offerItem.EquipmentModel.Equipment.Id).Min(x => x.Price);
 
@@ -1046,32 +1046,32 @@ namespace Pages.Offers
                 if (newPrice <= min)
                 {
                     StatusMessage = "Teklif tutarı en dusuk teklif miktarindan az olamaz";
-                    await LoadRelatedData(offerId);
+                    await LoadRelatedData(offerId, cancellationToken);
                     return Page();
                 }
 
                 if(newPrice > twentyPercentMore)
                 {
                     StatusMessage = "Teklif tutarı en dusuk teklif miktarindan yuzde 20si araliginda olmalidir";
-                    await LoadRelatedData(offerId);
+                    await LoadRelatedData(offerId, cancellationToken);
                     return Page();
                 }
 
                 offerItem.Price = newPrice;
                 _context.Entry(offerItem).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 ClearCache(offerItem.OfferId);
             }
 
             return RedirectToPage("./Edit", new { id = offerItem?.OfferId });
         }
 
-        public async Task<IActionResult> OnGetEquipmentModelPriceAsync(int companyId, int equipmentModelId)
+        public async Task<IActionResult> OnGetEquipmentModelPriceAsync(int companyId, int equipmentModelId, CancellationToken cancellationToken = default)
         {
             var companyEquipmentModel = await _context.CompanyEquipmentModels
                 .Where(cem => cem.CompanyId == companyId && cem.EquipmentModelId == equipmentModelId)
                 .Select(cem => new { cem.Price })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             return new JsonResult(companyEquipmentModel?.Price);
         }
