@@ -1,7 +1,7 @@
 # Tender Management System
 
 ## Overview
-The **Tender Management System** is a robust and scalable solution designed to streamline the management of investors, bidding companies, equipment, and offers. It provides powerful tools for editing agreements, dynamically binding data in Word documents, and exporting essential records. The system includes advanced user, role, and permission management features, ensuring secure authentication and authorization.
+The **Tender Management System** is an integrated platform designed to streamline and automate the entire tendering process. It enables users to create and manage tender items, tenders, equipment, and equipment models. The system calculates tender amounts, updates prices, and facilitates investor and bidding company management. It also allows for the seamless export of Word documentation and agreements, dynamically binding tender and tender item data into comprehensive, up-to-date reports and contracts. This solution enhances efficiency, transparency, and accuracy throughout the tender lifecycle.. The system includes advanced user, role, and permission management features, ensuring secure authentication and authorization.
 
 ## Features
 - **Manage Investors**: Add, update, and monitor investors.
