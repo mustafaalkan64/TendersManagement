@@ -8,7 +8,7 @@ The **Tender Management System** is a robust and scalable solution designed to s
 - **Manage Bidding Companies**: Keep track of bidding companies and their participation.
 - **Manage Equipment & Equipment Models**: Catalog and maintain detailed records of equipment and models.
 - **Manage Tenders & Tender Items**: Create, modify, and review tenders and associated items.
-- **Calculate Tender Amounts**: Calculate tender total amounts and compare with another tenders
+- **Calculate Tender Amounts**: Calculate total amounts for each tenders and compare with another tenders
 - **Save Tender Items Prices**: Save each tender items prices on tenders
 - **Units Management**: Modify units for assigned each tender items 
 - **Edit Agreements**: Update and maintain contractual agreements dynamically.
