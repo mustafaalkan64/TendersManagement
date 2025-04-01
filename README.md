@@ -25,6 +25,7 @@ The system is built using cutting-edge technologies to ensure high performance a
 - **Razor Pages** for UI Development
 - **MsSql** for Database
 - **User, Role, and Permission Management** for Access Control
+- **DocumentFormat.OpenXml** For Edit, Save and Export Word Documentation
 
 ## Installation & Setup
 
