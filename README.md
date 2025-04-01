@@ -31,7 +31,7 @@ The system is built using cutting-edge technologies to ensure high performance a
 
 ### 1. Clone the Repository
 ```sh
-git clone https://github.com/your-repo/offer-management-system.git
+git clone https://github.com/mustafaalkan64/TendersManagement.git
 cd offer-management-system
 ```
 
