@@ -25,24 +25,24 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group mb-3">
-                <label asp-for="EquipmentModel.EquipmentId" class="control-label">Equipment</label>
+                <label asp-for="EquipmentModel.EquipmentId" class="control-label">Ekipman</label>
                 <select asp-for="EquipmentModel.EquipmentId"
                         asp-items="Model.EquipmentList"
                         class="form-select"
                         onchange="loadEquipmentFeatures(this.value)">
-                    <option value="">Please select equipment</option>
+                    <option value="">Lütfen Ekipman Seçiniz</option>
                 </select>
                 <span asp-validation-for="EquipmentModel.EquipmentId" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="EquipmentModel.Brand" class="control-label"></label>
+                <label asp-for="EquipmentModel.Brand" class="control-label">Marka</label>
                 <input asp-for="EquipmentModel.Brand" class="form-control" />
                 <span asp-validation-for="EquipmentModel.Brand" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="EquipmentModel.Model" class="control-label"></label>
+                <label asp-for="EquipmentModel.Model" class="control-label">Model</label>
                 <input asp-for="EquipmentModel.Model" class="form-control" />
                 <span asp-validation-for="EquipmentModel.Model" class="text-danger"></span>
             </div>
@@ -50,7 +50,7 @@
             <div class="card mb-3">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Features</h5>
+                        <h5 class="mb-0">Özellikler</h5>
                         <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Yeni Ekle</button>
                     </div>
                 </div>

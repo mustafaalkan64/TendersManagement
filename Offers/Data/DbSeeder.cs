@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Identity;
 
 public static class DbSeeder
@@ -28,18 +29,18 @@ public static class DbSeeder
     private static async Task SeedAdminUserAsync(UserManager<IdentityUser> userManager)
     {
         // Seed Admin User
-        var adminUser = await userManager.FindByEmailAsync("admin@example.com");
+        var adminUser = await userManager.FindByEmailAsync("admin@garantitarimsaldanismanlik.com");
 
         if (adminUser == null)
         {
             var user = new IdentityUser
             {
-                UserName = "admin@example.com",
-                Email = "admin@example.com",
+                UserName = "admin@garantitarimsaldanismanlik.com",
+                Email = "admin@garantitarimsaldanismanlik.com",
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(user, "Admin123!");
+            var result = await userManager.CreateAsync(user, "Admin#!123.");
 
             if (result.Succeeded)
             {

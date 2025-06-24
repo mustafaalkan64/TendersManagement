@@ -20,6 +20,9 @@ namespace Pages.EquipmentModelPage
         [BindProperty]
         public EquipmentModel EquipmentModel { get; set; }
 
+        [BindProperty]
+        public string Error { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -55,6 +58,7 @@ namespace Pages.EquipmentModelPage
                 if (isUsed)
                 {
                     ModelState.AddModelError("", "This equipment model cannot be deleted because it is used in one or more offers.");
+                    Error = "Bu ekipman modeli, daha önceki proje tekliflerinde kullanýldýðý için silinemez";
                     EquipmentModel = await _context.EquipmentModels
                         .Include(e => e.Equipment)
                         .FirstOrDefaultAsync(m => m.Id == id);

@@ -79,22 +79,26 @@ namespace Offers.Services.Offer
                                 .Select(y => y.FeatureValue)
                                 .ToList();
 
-                            var minValue = filteredFeatures.Any() ? filteredFeatures.Min() : default;
-                            var maxValue = filteredFeatures.Any() ? filteredFeatures.Max() : default;
+                            var minValueValid = int.TryParse(filteredFeatures.Any() ? filteredFeatures.Min() : default, out int outMin);
+                            var maxValueValid = int.TryParse(filteredFeatures.Any() ? filteredFeatures.Max() : default, out int outMax);
 
-                            var minVal = int.Parse(minValue) - min;
-                            var maxVal = int.Parse(maxValue) + max;
-                            if(feature.FeatureKey.Contains("Güç", StringComparison.Ordinal) && offer.ProjectOwner.Hp > maxVal)
-                                maxVal = offer.ProjectOwner.Hp;
-
-                            if (feature.FeatureKey.Contains("Ebat", StringComparison.Ordinal) ||
-                                feature.FeatureKey.Contains("Lastik Ebadı", StringComparison.Ordinal) ||
-                                feature.FeatureKey.Contains("Boyut", StringComparison.Ordinal))
+                            if(minValueValid && maxValueValid)
                             {
-                                result.AppendLine($"{feature.FeatureKey} Belirtiniz.");
+                                var minVal = outMin - min;
+                                var maxVal = outMax + max;
+                                if (feature.FeatureKey.Contains("Güç", StringComparison.Ordinal) && offer.ProjectOwner.Hp > maxVal)
+                                    maxVal = offer.ProjectOwner.Hp;
+
+                                if (feature.FeatureKey.Contains("Ebat", StringComparison.Ordinal) ||
+                                    feature.FeatureKey.Contains("Lastik Ebadı", StringComparison.Ordinal) ||
+                                    feature.FeatureKey.Contains("Boyut", StringComparison.Ordinal))
+                                {
+                                    result.AppendLine($"{feature.FeatureKey} Belirtiniz.");
+                                }
+                                else
+                                    result.AppendLine($"{feature.FeatureKey} {minVal}-{maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
                             }
-                            else 
-                                result.AppendLine($"{feature.FeatureKey} {minVal}-{maxVal} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
+                            
                         }
                     }
                     else

@@ -40,6 +40,9 @@ namespace Pages.Offers
         [BindProperty]
         public Offer Offer { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string SearchString { get; set; }
+
         public SelectList ProjectOwnerList { get; set; }
 
         public List<CompanySummaryViewModel> CompanySummaries { get; set; }
@@ -68,7 +71,17 @@ namespace Pages.Offers
             {
                 throw new ArgumentNullException("Teklif Bulunamadi");
             }
-            OfferItems = Offer.OfferItems.OrderBy(x => x.Company.Name).ThenBy(x => x.Price).ToList();
+
+            var offerItemsQuery = Offer.OfferItems.AsQueryable();
+
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                offerItemsQuery = offerItemsQuery.Where(x => x.EquipmentModel.Model.ToLower().Contains(SearchString.ToLower())
+                                                    || x.Company.Name.ToLower().Contains(SearchString.ToLower())
+                                                    || x.EquipmentModel.Equipment.Name.ToLower().Contains(SearchString.ToLower())
+                                                    || x.EquipmentModel.Brand.ToLower().Contains(SearchString.ToLower()));
+            }
+            OfferItems = offerItemsQuery.OrderBy(x => x.Company.Name).ThenBy(x => x.Price).ToList();
 
             //var equipmentModels = await _context.EquipmentModels
             //.Include(em => em.Equipment)
@@ -143,13 +156,15 @@ namespace Pages.Offers
 
             if (companyEquipmentModels.Any())
             {
-                return await _context.EquipmentModels
+                var equipmentModels = await _context.EquipmentModels
                     .Include(em => em.Equipment)
-                    .Where(em => companyEquipmentModels.Contains(em.Id))
+                    //.Where(em => companyEquipmentModels.Contains(em.Id))
                     .OrderBy(em => em.Equipment.Name)
                     .ThenBy(em => em.Brand)
                     .ThenBy(em => em.Model)
                     .ToListAsync(cancellationToken);
+
+                return equipmentModels.Where(em => companyEquipmentModels.Contains(em.Id)).ToList();
             }
 
             // If no company equipment models exist, return all equipment models
@@ -890,10 +905,12 @@ namespace Pages.Offers
         {
             var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
 
-            var projectOwnerTraktorHp = offer.ProjectOwner.Hp;
+            var projectOwner = await _context.Offers
+                    .Include(o => o.ProjectOwner)
+                    .FirstOrDefaultAsync(o => o.Id == Offer.Id, cancellationToken);
+            var projectOwnerTraktorHp = projectOwner.ProjectOwner.Hp;
 
             OfferItems = offer.OfferItems.ToList();
-
 
             if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
@@ -940,15 +957,22 @@ namespace Pages.Offers
             if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModelId == NewItem.EquipmentModelId))
             {
                 await LoadRelatedData(Offer.Id, cancellationToken);
-                StatusMessage = "Zaten kurum bu ekipmana teklif vermiş";
+                StatusMessage = "Zaten bu kurum, aynı ekipman modele daha önce teklif vermiş";
+                return Page();
+            }
+
+            var equipmentModel = await _context.EquipmentModels.FindAsync(NewItem.EquipmentModelId);
+            var filteredItems = OfferItems.Where(x => x.EquipmentModel.EquipmentId == equipmentModel?.EquipmentId);
+            if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModel.EquipmentId == equipmentModel?.EquipmentId))
+            {
+                await LoadRelatedData(Offer.Id, cancellationToken);
+                StatusMessage = "Zaten bu firma, aynı ekipmana daha önce teklif vermiş";
                 return Page();
             }
 
 
             if (OfferItems.Any())
             {
-                var equipmentModel = await _context.EquipmentModels.FindAsync(NewItem.EquipmentModelId);
-                var filteredItems = OfferItems.Where(x => x.EquipmentModel.EquipmentId == equipmentModel?.EquipmentId);
                 //var filteredItems = OfferItems.Where(x => x.EquipmentModelId == NewItem.EquipmentModelId);
                 var minOffer = filteredItems.Any() ? filteredItems.Min(x => x.Price) : (decimal?)null;
 

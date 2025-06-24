@@ -7,9 +7,26 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
-    <a asp-page="Create" class="btn btn-primary">Yeni Proje Sahibi</a>
-</p>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" id="searchInput" class="form-control" placeholder="Projeler içinde ara.."
+                   value="@Model.SearchString" />
+            <button class="btn btn-outline-secondary" type="button" onclick="search()">
+                <i class="bi bi-search"></i> Ara
+            </button>
+            @if (!string.IsNullOrEmpty(Model.SearchString))
+            {
+                <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                    <i class="bi bi-x"></i> Temizle
+                </button>
+            }
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        <a asp-page="Create" class="btn btn-primary">Yeni Proje Sahibi</a>
+    </div>
+</div>
 
 <div class="table-responsive">
     <table class="table table-striped">
@@ -40,3 +57,24 @@
         </tbody>
     </table>
 </div> 
+
+@section Scripts {
+    <script>
+
+        function search() {
+            const searchValue = document.getElementById('searchInput').value;
+            window.location.href = `?searchString=${encodeURIComponent(searchValue)}`;
+        }
+
+        function clearSearch() {
+            window.location.href = '?';
+        }
+
+        // Add event listener for Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+    </script>
+    }

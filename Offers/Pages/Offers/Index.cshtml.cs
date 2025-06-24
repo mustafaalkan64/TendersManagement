@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Pages.Offers
 {
@@ -18,15 +19,28 @@ namespace Pages.Offers
             _context = context;
         }
 
+        [BindProperty(SupportsGet = true)]
+        public string SearchString { get; set; }
+
         public List<Offer> Offers { get; set; }
 
         public async Task OnGetAsync(CancellationToken cancellationToken)
         {
-            Offers = await _context.Offers
+            var query = _context.Offers
                 .AsNoTracking()
                 .Include(a => a.ProjectOwner)
                 .Include(o => o.OfferItems)
                     .ThenInclude(x => x.Company)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                var searchTerm = SearchString.ToLower();
+                query = query.Where(em =>
+                    em.OfferName.ToLower().Contains(searchTerm) 
+                    || em.ProjectOwner.Name.Contains(searchTerm));
+            }
+            Offers = await query
                 .OrderByDescending(o => o.CreatedDate)
                 .ToListAsync(cancellationToken).ConfigureAwait(false);
 

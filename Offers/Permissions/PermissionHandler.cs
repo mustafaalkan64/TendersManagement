@@ -22,10 +22,15 @@ namespace Offers.Permissions
 
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            var rolePermissions = await _dbContext.RolePermissions
+            var rp = await _dbContext.RolePermissions
+                .Include(c => c.Role)
+                .Include(c => c.Permission).ToListAsync();
+
+
+            var rolePermissions = rp
                 .Where(rp => userRoles.Contains(rp.Role.Name))
                 .Select(rp => rp.Permission.Name)
-                .ToListAsync();
+                .ToList();
 
             if (rolePermissions.Contains(requirement.Permission))
             {

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Threading.Tasks;
 
 namespace Pages.ProjectOwner
@@ -10,10 +11,12 @@ namespace Pages.ProjectOwner
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private IMemoryCache _cache;
 
-        public EditModel(ApplicationDbContext context)
+        public EditModel(ApplicationDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         [BindProperty]
@@ -51,6 +54,7 @@ namespace Pages.ProjectOwner
             try
             {
                 await _context.SaveChangesAsync();
+
                 StatusMessage = "Proje sahibi başarıyla güncellendi.";
             }
             catch (DbUpdateConcurrencyException)

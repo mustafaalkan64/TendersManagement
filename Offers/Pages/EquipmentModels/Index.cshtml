@@ -18,7 +18,7 @@
             @if (!string.IsNullOrEmpty(Model.SearchString))
             {
                 <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
-                    <i class="bi bi-x"></i> Clear
+                    <i class="bi bi-x"></i> Temizle
                 </button>
             }
         </div>
@@ -72,7 +72,7 @@
                     </div>
                 </td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Duzenle</a>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
                     <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
                 </td>
             </tr>
@@ -109,7 +109,7 @@
         }
 
         function removeCompany(equipmentModelId, companyId) {
-            if (!confirm('Silmek istediginize emin misiniz?')) {
+            if (!confirm('Silmek istediðinize emin misiniz?')) {
                 return;
             }
 
@@ -125,7 +125,7 @@
                 if (response.ok) {
                     window.location.reload();
                 } else {
-                    alert('Sirket silerken hata meydana geldi!');
+                    alert('Þirket silerken hata meydana geldi!');
                 }
             });
         }

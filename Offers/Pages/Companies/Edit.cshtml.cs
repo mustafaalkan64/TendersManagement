@@ -48,7 +48,6 @@ namespace Offers.Pages.Companies
                 .ToList();
             HttpContext.Session.Set("SelectedEquipmentModels", SelectedEquipmentModels);
 
-            await LoadEquipmentModelList();
             return Page();
         }
 
@@ -84,8 +83,7 @@ namespace Offers.Pages.Companies
         {
             if (NewEquipmentModelId == 0)
             {
-                ModelState.AddModelError("NewEquipmentModelId", "Please select an equipment model");
-                await LoadEquipmentModelList();
+                ModelState.AddModelError("NewEquipmentModelId", "Lütfen ekipman model seçiniz");
                 return Page();
             }
 
@@ -109,7 +107,6 @@ namespace Offers.Pages.Companies
                 }
             }
 
-            await LoadEquipmentModelList();
             return Page();
         }
 
@@ -130,29 +127,7 @@ namespace Offers.Pages.Companies
                 HttpContext.Session.Set("SelectedEquipmentModels", SelectedEquipmentModels);
             }
 
-            await LoadEquipmentModelList();
             return Page();
-        }
-
-        private async Task LoadEquipmentModelList()
-        {
-            var equipmentModels = await _context.EquipmentModels
-                .AsNoTracking()
-                .Include(em => em.Equipment)
-                .OrderBy(em => em.Equipment.Name)
-                .ThenBy(em => em.Brand)
-                .ThenBy(em => em.Model)
-                .ToListAsync();
-
-            EquipmentModelList = new SelectList(
-                new List<SelectListItem>
-                {
-                new SelectListItem { Value = "0", Text = "Ekipman modeli seciniz" }
-                }.Concat(equipmentModels.Select(em => new SelectListItem
-                {
-                    Value = em.Id.ToString(),
-                    Text = $"{em.Equipment.Name} - {em.Brand} {em.Model}"
-                })), "Value", "Text");
         }
 
         public async Task<IActionResult> OnPostSaveAsync()
@@ -177,7 +152,7 @@ namespace Offers.Pages.Companies
                 {
                     CompanyId = model.CompanyId,
                     EquipmentModelId = model.EquipmentModelId,
-                    Price = 0
+                    Price = model.Price
                 };
                 _context.CompanyEquipmentModels.Add(companyEquipmentModel);
             }

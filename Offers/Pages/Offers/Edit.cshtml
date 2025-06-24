@@ -2,7 +2,7 @@
 @using global::Pages.Offers
 @model EditModel
 @{
-    ViewData["Title"] = "Proje Duzenle";
+    ViewData["Title"] = "Proje Düzenle";
 }
 @{
     var antiforgery = Html.AntiForgeryToken();
@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-md-12">
         <form method="post">
-            <input type="hidden" asp-for="Offer.Id" />
+            <input type="hidden" id="offerId" asp-for="Offer.Id" />
             <input type="hidden" asp-for="Offer.CreatedDate" />
             <input type="hidden" asp-for="Offer.ProjectOwnerId" />
 
@@ -88,6 +88,27 @@
 
                     @if (Model.OfferItems.Any())
                     {
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Teklifler içinde ara.."
+                                           value="@Model.SearchString" />
+                                    <button class="btn btn-outline-secondary" type="button" onclick="search()">
+                                        <i class="bi bi-search"></i> Ara
+                                    </button>
+                                    @if (!string.IsNullOrEmpty(Model.SearchString))
+                                    {
+                                        <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                                            <i class="bi bi-x"></i> Temizle
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a asp-page="Create" class="btn btn-primary">Yeni Proje Sahibi</a>
+                            </div>
+                        </div>
+
                         <table class="table">
                             <thead>
                                 <tr>
@@ -166,43 +187,43 @@
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.TeklifGonderimTarihi" class="control-label">Teklif Gonderim Tarihi</label>
+                <label asp-for="Offer.TeklifGonderimTarihi" class="control-label">Teklif Gönderim Tarihi</label>
                 <input asp-for="Offer.TeklifGonderimTarihi" class="form-control" type="date" />
                 <span asp-validation-for="Offer.TeklifGonderimTarihi" class="text-danger"></span>
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.HazirlanmaSuresi" class="control-label">Hazirlanma Suresi</label>
+                <label asp-for="Offer.HazirlanmaSuresi" class="control-label">Ýþ Planý Hazýrlama Süresi</label>
                 <input asp-for="Offer.HazirlanmaSuresi" class="form-control" type="number" />
                 <span asp-validation-for="Offer.HazirlanmaSuresi" class="text-danger"></span>
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.PersonelSayisi" class="control-label">Calisan Personel Sayisi</label>
+                <label asp-for="Offer.PersonelSayisi" class="control-label">Ýþ Planý Çalýþan Personel Sayýsý</label>
                 <input asp-for="Offer.PersonelSayisi" class="form-control" type="number" />
                 <span asp-validation-for="Offer.PersonelSayisi" class="text-danger"></span>
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.OtpHazirlanmaSuresi" class="control-label">OTP Hazirlanma Suresi</label>
+                <label asp-for="Offer.OtpHazirlanmaSuresi" class="control-label">OTP Hazýrlanma Süresi</label>
                 <input asp-for="Offer.OtpHazirlanmaSuresi" class="form-control" type="number" />
                 <span asp-validation-for="Offer.OtpHazirlanmaSuresi" class="text-danger"></span>
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.OtpPersonelSayisi" class="control-label">OTP Calisan Personel Sayisi</label>
+                <label asp-for="Offer.OtpPersonelSayisi" class="control-label">OTP Çalýþan Personel Sayýsý</label>
                 <input asp-for="Offer.OtpPersonelSayisi" class="form-control" type="number" />
                 <span asp-validation-for="Offer.OtpPersonelSayisi" class="text-danger"></span>
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.IsPlaniHazirligiYuzde" class="control-label">Is plani hazirligi yuzde</label>
+                <label asp-for="Offer.IsPlaniHazirligiYuzde" class="control-label">Ýþ planý hazýrlýðý yüzde</label>
                 <input asp-for="Offer.IsPlaniHazirligiYuzde" class="form-control" type="number" />
                 <span asp-validation-for="Offer.IsPlaniHazirligiYuzde" class="text-danger"></span>
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.OTPYuzde" class="control-label">OTP Yuzde</label>
+                <label asp-for="Offer.OTPYuzde" class="control-label">OTP Yüzde</label>
                 <input asp-for="Offer.OTPYuzde" class="form-control" type="number" />
                 <span asp-validation-for="Offer.OTPYuzde" class="text-danger"></span>
             </div>
@@ -220,13 +241,13 @@
             </div> *@
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.TeklifGecerlilikSuresi" class="control-label">Teklif Gecerlilik Suresi</label>
+                <label asp-for="Offer.TeklifGecerlilikSuresi" class="control-label">Teklif Geçerlilik Süresi</label>
                 <input asp-for="Offer.TeklifGecerlilikSuresi" class="form-control" type="date" />
                 <span asp-validation-for="Offer.TeklifGecerlilikSuresi" class="text-danger"></span>
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.DanismanlikTeklifGonderim" class="control-label">D.Teklif Gonderim</label>
+                <label asp-for="Offer.DanismanlikTeklifGonderim" class="control-label">D.Teklif Gönderim</label>
                 <input asp-for="Offer.DanismanlikTeklifGonderim" class="form-control" type="date" />
                 <span asp-validation-for="Offer.DanismanlikTeklifGonderim" class="text-danger"></span>
             </div>
@@ -244,13 +265,13 @@
             </div>
 
             <div class="form-group col-md-4">
-                <label asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="control-label">D. Teklif Gecerlilik Suresi</label>
+                <label asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="control-label">D. Teklif Geçerlilik Süresi</label>
                 <input asp-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="form-control" type="date" />
                 <span asp-validation-for="Offer.DanismanlikTeklifGecerlilikSuresi" class="text-danger"></span>
             </div>
 
             <div>
-                <a asp-page="/OfferTeknikSartname/Index" asp-route-offerId="@Model.Offer.Id">Teknik Sartname Duzenle</a>
+                <a asp-page="/OfferTeknikSartname/Index" asp-route-offerId="@Model.Offer.Id">Teknik Þartname Düzenle</a>
             </div>
 
             <div class="form-group mt-3">
@@ -288,7 +309,7 @@
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Fiyat Duzenleme</h5>
+                <h5 class="modal-title">Fiyat Düzenleme</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" asp-page-handler="UpdatePrice">
@@ -363,6 +384,26 @@
                 });
             });
         }
+
+
+        function search() {
+            debugger;
+            const offerId = $('#offerId').val();
+            const searchValue = document.getElementById('searchInput').value;
+            window.location.href = `?id=${offerId}&searchString=${encodeURIComponent(searchValue)}`;
+        }
+
+        function clearSearch() {
+            const offerId = $('#offerId').val();
+            window.location.href = '?id=' + offerId;
+        }
+
+        // Add event listener for Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
 
     </script>
 }

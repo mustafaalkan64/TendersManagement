@@ -16,6 +16,9 @@ namespace Pages.ProjectOwner
             _context = context;
         }
 
+        [BindProperty(SupportsGet = true)]
+        public string SearchString { get; set; }
+
         public IList<Models.ProjectOwner> ProjectOwners { get; set; }
 
         [TempData]
@@ -23,7 +26,14 @@ namespace Pages.ProjectOwner
 
         public async Task OnGetAsync()
         {
-            ProjectOwners = await _context.ProjectOwners
+            var query = _context.ProjectOwners.AsQueryable();
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                var searchTerm = SearchString.ToLower();
+                query = query.Where(em =>
+                    em.Name.ToLower().Contains(searchTerm));
+            }
+            ProjectOwners = await query
                 .OrderBy(p => p.Name)
                 .ToListAsync();
         }

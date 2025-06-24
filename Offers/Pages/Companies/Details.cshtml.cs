@@ -41,6 +41,11 @@ namespace Offers.Pages.Companies
                 .Take(10)
                 .ToListAsync();
 
+            foreach (var offer in CompanyOffers)
+            {
+                offer.TotalPrice = offer.OfferItems.Where(c => c.CompanyId == id).Sum(c => c.Price * c.Quantity);
+            }
+
             return Page();
         }
     }
