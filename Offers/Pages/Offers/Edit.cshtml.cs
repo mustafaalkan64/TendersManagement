@@ -115,17 +115,17 @@ namespace Pages.Offers
             EquipmentModelList = new SelectList(
                 new List<SelectListItem>
                 {
-                new SelectListItem { Value = "0", Text = "Ekipman Modeli Seciniz" }
+                new SelectListItem { Value = "0", Text = "Ekipman Modeli Seçiniz" }
                 }.Concat(equipmentModels.Select(em => new SelectListItem
                 {
                     Value = em.Id.ToString(),
-                    Text = $"{em.Equipment.Name} - {em.Brand} {em.Model}"
+                    Text = $"{em.Equipment.Name} - {em.Brand} {em.Model} {em.Capacity}"
                 })), "Value", "Text");
 
             CompanyList = new SelectList(
                 new List<SelectListItem>
                 {
-                new SelectListItem { Value = "0", Text = "Sirket Seciniz" }
+                new SelectListItem { Value = "0", Text = "Şirket Seçiniz" }
                 }.Concat(await _context.Companies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -145,7 +145,7 @@ namespace Pages.Offers
             return new JsonResult(equipmentModels.Select(em => new
             {
                 id = em.Id,
-                text = $"{em.Equipment.Name} - {em.Brand} {em.Model}"
+                text = $"{em.Equipment.Name} - {em.Brand} {em.Model} {em.Capacity}"
             }));
         }
 
@@ -192,7 +192,7 @@ namespace Pages.Offers
             return new JsonResult(equipmentModels.Select(em => new
             {
                 id = em.Id,
-                text = $"{em.Equipment.Name} - {em.Brand} {em.Model}"
+                text = $"{em.Equipment.Name} - {em.Brand} {em.Model} {em.Capacity}"
             }));
         }
 

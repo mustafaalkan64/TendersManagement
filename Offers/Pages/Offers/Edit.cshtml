@@ -68,7 +68,8 @@
                             </select>
                             <span asp-validation-for="NewItem.CompanyId" class="text-danger"></span>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                            <input type="text" id="equipmentModelFilter" class="form-control mb-2" placeholder="Ekipman Modelleri içinde ara.." onkeyup="filterEquipmentModels()" />
                             <select id="equipmentModelSelect" asp-for="NewItem.EquipmentModelId" asp-items="Model.EquipmentModelList" class="form-select">
                             </select>
                             <span asp-validation-for="NewItem.EquipmentModelId" class="text-danger"></span>
@@ -81,8 +82,8 @@
                             <input type="number" asp-for="NewItem.Price" class="form-control" value="100" placeholder="Price" />
                             <span asp-validation-for="NewItem.Price" class="text-danger"></span>
                         </div>
-                        <div class="col-md-2">
-                            <button type="submit" asp-page-handler="AddItem" class="btn btn-primary">Teklif Ekle</button>
+                        <div class="col-md-1">
+                            <button type="submit" asp-page-handler="AddItem" class="btn btn-primary">Ekle</button>
                         </div>
                     </div>
 
@@ -367,6 +368,16 @@
                 }
             });
         });
+
+        function filterEquipmentModels() {
+            debugger;
+            var filter = document.getElementById('equipmentModelFilter').value.toLowerCase();
+            var select = document.getElementById('equipmentModelSelect');
+            for (var i = 0; i < select.options.length; i++) {
+                var txt = select.options[i].text.toLowerCase();
+                select.options[i].style.display = txt.includes(filter) ? '' : 'none';
+            }
+        }
 
         function updateEquipmentModels(companyId) {
             $.get(`?handler=UpdateEquipmentModels&companyId=${companyId}`, function(data) {
