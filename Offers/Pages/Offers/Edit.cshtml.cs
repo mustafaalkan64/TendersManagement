@@ -76,10 +76,12 @@ namespace Pages.Offers
 
             if (!string.IsNullOrEmpty(SearchString))
             {
-                offerItemsQuery = offerItemsQuery.Where(x => x.EquipmentModel.Model.ToLower().Contains(SearchString.ToLower())
-                                                    || x.Company.Name.ToLower().Contains(SearchString.ToLower())
-                                                    || x.EquipmentModel.Equipment.Name.ToLower().Contains(SearchString.ToLower())
-                                                    || x.EquipmentModel.Brand.ToLower().Contains(SearchString.ToLower()));
+                offerItemsQuery = offerItemsQuery.Where(x =>
+                    x.EquipmentModel.Model.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    x.Company.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    x.EquipmentModel.Equipment.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    x.EquipmentModel.Capacity.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    x.EquipmentModel.Brand.Contains(SearchString, StringComparison.OrdinalIgnoreCase));
             }
             OfferItems = offerItemsQuery.OrderBy(x => x.Company.Name).ThenBy(x => x.Price).ToList();
 
