@@ -63,6 +63,7 @@ namespace Offers.Pages.Equipment
                 // Add new features
                 foreach (var feature in Features)
                 {
+                    feature.FeatureValue = feature.FeatureValue ?? "";
                     feature.EquipmentId = Equipment.Id;
                     _context.EquipmentFeatures.Add(feature);
                 }

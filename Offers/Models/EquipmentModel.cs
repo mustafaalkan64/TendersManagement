@@ -19,6 +19,10 @@ namespace Models
         [StringLength(100)]
         public string Brand { get; set; }
 
+        [Required]
+        [StringLength(100)]
+        public string Capacity { get; set; }
+
         [JsonIgnore]
         // Navigation property
         public Equipment Equipment { get; set; }
