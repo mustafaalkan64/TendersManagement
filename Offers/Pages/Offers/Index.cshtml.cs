@@ -35,10 +35,10 @@ namespace Pages.Offers
 
             if (!string.IsNullOrEmpty(SearchString))
             {
-                var searchTerm = SearchString.ToLower();
+                var searchTerm = SearchString;
                 query = query.Where(em =>
-                    em.OfferName.ToLower().Contains(searchTerm) 
-                    || em.ProjectOwner.Name.Contains(searchTerm));
+                    em.OfferName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    || em.ProjectOwner.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
             }
             Offers = await query
                 .OrderByDescending(o => o.CreatedDate)

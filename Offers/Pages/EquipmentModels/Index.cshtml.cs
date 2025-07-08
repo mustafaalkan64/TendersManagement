@@ -46,9 +46,10 @@ namespace Pages.EquipmentModelPage
             {
                 var searchTerm = SearchString.ToLower();
                 query = query.Where(em =>
-                    em.Equipment.Name.ToLower().Contains(searchTerm) ||
-                    em.Brand.ToLower().Contains(searchTerm) ||
-                    em.Model.ToLower().Contains(searchTerm));
+                    em.Equipment.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    em.Brand.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    em.Capacity.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    em.Model.Contains(SearchString, StringComparison.OrdinalIgnoreCase));
             }
 
             EquipmentModels = await query
