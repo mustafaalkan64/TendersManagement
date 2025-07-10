@@ -1,0 +1,78 @@
+@page
+@model CreateModel
+@{
+    ViewData["Title"] = "Danýþmanlýk Firmasý Ekle";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.Name" class="control-label"></label>
+                <input asp-for="Company.Name" class="form-control" />
+                <span asp-validation-for="Company.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.TicariUnvan" class="control-label"></label>
+                <input asp-for="Company.TicariUnvan" class="form-control" />
+                <span asp-validation-for="Company.TicariUnvan" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.VergiNo" class="control-label"></label>
+                <input asp-for="Company.VergiNo" class="form-control" />
+                <span asp-validation-for="Company.VergiNo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.VergiDairesiAdi" class="control-label"></label>
+                <input asp-for="Company.VergiDairesiAdi" class="form-control" />
+                <span asp-validation-for="Company.VergiDairesiAdi" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.TicariSicilNo" class="control-label"></label>
+                <input asp-for="Company.TicariSicilNo" class="form-control" />
+                <span asp-validation-for="Company.TicariSicilNo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.Address" class="control-label"></label>
+                <textarea asp-for="Company.Address" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Company.Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.Telefon" class="control-label"></label>
+                <input asp-for="Company.Telefon" class="form-control" />
+                <span asp-validation-for="Company.Telefon" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.Faks" class="control-label"></label>
+                <input asp-for="Company.Faks" class="form-control" />
+                <span asp-validation-for="Company.Faks" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Company.Eposta" class="control-label"></label>
+                <input asp-for="Company.Eposta" class="form-control" type="email" />
+                <span asp-validation-for="Company.Eposta" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-page="./Index" class="btn btn-secondary">Geri</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -100,6 +100,21 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("CanListCompany", policy =>
         policy.Requirements.Add(new PermissionRequirement("SirketListele")));
 
+    options.AddPolicy("CanEditConsultantCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("DanismanSirketDuzenle")));
+
+    options.AddPolicy("CanDeleteConsultantCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("DanismanSirketSil")));
+
+    options.AddPolicy("CanAddConsultantCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("DanismanSirketEkle")));
+
+    options.AddPolicy("CanSeeDetailsConsultantCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("DanismanSirketDetay")));
+
+    options.AddPolicy("CanListConsultantCompany", policy =>
+        policy.Requirements.Add(new PermissionRequirement("DanismanSirketListele")));
+
     options.AddPolicy("CanEditOwner", policy =>
         policy.Requirements.Add(new PermissionRequirement("YatirimciDuzenle")));
 
