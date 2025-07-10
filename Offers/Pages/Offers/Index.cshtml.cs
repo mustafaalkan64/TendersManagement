@@ -37,8 +37,8 @@ namespace Pages.Offers
             {
                 var searchTerm = SearchString;
                 query = query.Where(em =>
-                    em.OfferName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                    || em.ProjectOwner.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+                    em.OfferName.ToLower().Contains(searchTerm.ToLower())
+                    || em.ProjectOwner.Name.ToLower().Contains(searchTerm.ToLower()));
             }
             Offers = await query
                 .OrderByDescending(o => o.CreatedDate)

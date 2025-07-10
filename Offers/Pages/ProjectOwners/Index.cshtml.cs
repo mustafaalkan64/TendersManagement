@@ -30,7 +30,7 @@ namespace Pages.ProjectOwner
             if (!string.IsNullOrEmpty(SearchString))
             {
                 var searchTerm = SearchString.ToLower();
-                query = query.Where(em => em.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(em => em.Name.ToLower().Contains(SearchString.ToLower()));
             }
             ProjectOwners = await query
                 .OrderBy(p => p.Name)
