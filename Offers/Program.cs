@@ -6,13 +6,29 @@ using Microsoft.EntityFrameworkCore;
 using Offers.Data;
 using Offers.Permissions;
 using Offers.Services.Offer;
+using Serilog;
 using System;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+        .Build())
+    .CreateLogger();
+
+try
+{
+    Log.Information("Starting web application");
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Use Serilog for logging
+builder.Host.UseSerilog();
 
 // Ensure JSON encoding supports Turkish characters properly
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -96,6 +112,9 @@ app.UseRequestLocalization();
 // Global Exception Middleware
 app.UseMiddleware<Offers.Helpers.GlobalExceptionMiddleware>();
 
+// Request Logging Middleware
+app.UseMiddleware<Offers.Helpers.RequestLoggingMiddleware>();
+
 // Force UTF-8 for responses
 app.Use(async (context, next) =>
 {
@@ -144,3 +163,12 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
