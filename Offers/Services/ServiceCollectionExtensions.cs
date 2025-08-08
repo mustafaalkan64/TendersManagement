@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Offers.Permissions;
 using Offers.Services.Company;
 using Offers.Services.Equipment;
