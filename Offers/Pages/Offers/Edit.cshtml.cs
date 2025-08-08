@@ -252,445 +252,84 @@ namespace Pages.Offers
 
             // Create a copy of the template to modify
             byte[] modifiedDocument;
-            if (company?.Name == Cetinkaya)
+
+            // Copy and paste your custom document under templates folder..
+            // After then, add custom tags such like {unvan}, {Phone}, {Address}, {Mail}.. on your custom document to replace.
+            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "PutYourCustomDocumentName.docx");
+            if (!System.IO.File.Exists(templatePath))
             {
-                templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "CetinkayaTeklif.docx");
-                if (!System.IO.File.Exists(templatePath))
-                {
-                    return NotFound("Template not found.");
-                }
-
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
-                    {
-                        await fileStream.CopyToAsync(memoryStream);
-                    }
-
-                    using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
-                    {
-                        OfferDocumentHelper.ReplaceText(wordDoc, "frmadx", company.TicariUnvan);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "{Unvan}", company.TicariUnvan.ToUpper());
-                        OfferDocumentHelper.ReplaceText(wordDoc, "vrg", company.VergiNo);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "vergdaire", company.VergiDairesiAdi);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "Ticarisicil", company.TicariSicilNo);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "fffaaaxxx", company.Address);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "xxxaaayyyy", company.Telefon);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "ffkkss", company.Faks);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "Yatirimci", projectOwner?.Name.ToUpper() ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "aaaa", projectOwner?.Address.ToUpper() ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "yzyzyz", Offer.OfferName.ToUpper() ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        OfferDocumentHelper.ReplaceText(wordDoc, "N13", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-                        OfferDocumentHelper.ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        OfferDocumentHelper.ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-
-                        decimal totalPrices = 0;
-                        var equipmentNames = new StringBuilder();
-                        var equipmentList = new List<string>();
-
-                        foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
-                        {
-                            var result = new StringBuilder();
-                            foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
-                            {
-                                result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper().Replace("-", "") ?? ""}");
-                            }
-                            var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
-                            equipmentList.Add(equipment);
-                            var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
-                            var equipmentModel = offerItem.EquipmentModel.Brand.ToUpper() + "\n" + offerItem.EquipmentModel.Model.ToUpper();
-                            var sayi = offerItem.Quantity;
-                            var price = offerItem.Price;
-                            var totalPrice = sayi * price;
-                            totalPrices += totalPrice;
-
-                            string[] rowValues = { equipment, features, equipmentModel, "Adet", sayi.ToString(), price.ToString("#,##0.00", trCulture) + " TL", totalPrice.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
-
-                            OfferDocumentHelper.AddRowToTable(wordDoc, rowValues, true);
-
-                        }
-                        string[] totalPriceRow = { "", "", "", "", "", "Toplam Fiyat (TL) ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
-                        OfferDocumentHelper.AddRowToTable(wordDoc, totalPriceRow, true);
-
-                        foreach (var equipment in equipmentList.Distinct().ToList())
-                        {
-                            equipmentNames.AppendLine(equipment);
-                        }
-
-                        OfferDocumentHelper.ReplaceText(wordDoc, "AXCCD", Regex.Replace(equipmentNames.ToString(), @"[\r\n]$", ""));
-                    }
-
-                    modifiedDocument = memoryStream.ToArray();
-                }
+                return NotFound("Template not found.");
             }
-            else
+
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "TeklifTemplate.docx");
-                if (!System.IO.File.Exists(templatePath))
+                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
                 {
-                    return NotFound("Template not found.");
+                    await fileStream.CopyToAsync(memoryStream);
                 }
 
-                using (MemoryStream memoryStream = new MemoryStream())
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
                 {
-                    using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{unvan}", company.TicariUnvan);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{Unvan}", company.TicariUnvan.ToUpper());
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{VergiNo}", company.VergiNo);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{VergiDaire}", company.VergiDairesiAdi);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{Ticarisicil}", company.TicariSicilNo);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{Address}", company.Address);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{Phone}", company.Telefon);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{Faks}", company.Faks);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{FirmaEposta}", company.Eposta);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{ProjectOwnerName}", projectOwner?.Name.ToUpper() ?? "");
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{ProjectOwnerAddress}", projectOwner?.Address.ToUpper() ?? "");
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{OfferName}", Offer.OfferName.ToUpper() ?? "");
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{OfferDate}", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{OfferSentDate}", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
+                    OfferDocumentHelper.ReplaceText(wordDoc, "{OfferExpireDate}", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
+
+                    decimal totalPrices = 0;
+                    var equipmentNames = new StringBuilder();
+                    var equipmentList = new List<string>();
+
+                    foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
                     {
-                        await fileStream.CopyToAsync(memoryStream);
-                    }
-
-                    using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
-                    {
-                        OfferDocumentHelper.ReplaceText(wordDoc, "A1", company.TicariUnvan.ToUpper());
-                        OfferDocumentHelper.ReplaceText(wordDoc, "{Unvan}", company.TicariUnvan);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "B2", company.VergiNo);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "C3", company.VergiDairesiAdi);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "D4", company.TicariSicilNo);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "E5", company.Address);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "F6", company.Telefon);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "G7", company.Faks);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "Firmaeposta", company.Eposta);
-                        OfferDocumentHelper.ReplaceText(wordDoc, "I9", projectOwner?.Name ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "K10", projectOwner?.Address ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "L11", Offer.OfferName ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "M12", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        OfferDocumentHelper.ReplaceText(wordDoc, "N13", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-                        OfferDocumentHelper.ReplaceText(wordDoc, "ddmmyyyy", teklifGirisTarihi.Value.ToString("dd.MM.yyyy") ?? "");
-                        OfferDocumentHelper.ReplaceText(wordDoc, "BCDAY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                        OfferDocumentHelper.ReplaceText(wordDoc, "BFDAY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-
-                        decimal totalPrices = 0;
-                        var no = 1;
-                        var equipmentList = new List<string>();
-
-                        var equipmentNames = new StringBuilder();
-                        foreach (var offerItem in offerItems.Where(x => x.CompanyId == companyId).ToList())
+                        var result = new StringBuilder();
+                        foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
                         {
-                            var result = new StringBuilder();
-                            foreach (var feature in offerItem.EquipmentModel?.Features?.ToList())
-                            {
-                                result.AppendLine($"{feature.FeatureKey} {feature.FeatureValue} {feature.Unit?.Name?.ToString().Replace("-", "") ?? ""}");
-                            }
-                            var equipment = offerItem.EquipmentModel.Equipment.Name;
-                            equipmentList.Add(equipment);
-                            var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
-                            var equipmentModel = offerItem.EquipmentModel.Brand + " " + offerItem.EquipmentModel.Model;
-                            var sayi = offerItem.Quantity;
-                            var price = offerItem.Price;
-                            var totalPrice = sayi * price;
-                            totalPrices += totalPrice;
-
-                            string[] rowValues = { no.ToString(), equipment, features, equipmentModel, "Adet", sayi.ToString(), price.ToString("#,##0.00", trCulture) + " TL", totalPrice.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
-
-                            OfferDocumentHelper.AddRowToTable(wordDoc, rowValues, false);
-                            no += 1;
-
+                            result.AppendLine($"{feature.FeatureKey.ToUpper()} {feature.FeatureValue.ToUpper()} {feature.Unit?.Name?.ToUpper().Replace("-", "") ?? ""}");
                         }
-                        string[] totalPriceRow = { "", "", "", "", "", "", "GENEL TOPLAM ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
-                        OfferDocumentHelper.AddRowToTable(wordDoc, totalPriceRow, false);
+                        var equipment = offerItem.EquipmentModel.Equipment.Name.ToUpper();
+                        equipmentList.Add(equipment);
+                        var features = Regex.Replace(result.ToString(), @"[\r\n]$", "");
+                        var equipmentModel = offerItem.EquipmentModel.Brand.ToUpper() + "\n" + offerItem.EquipmentModel.Model.ToUpper();
+                        var sayi = offerItem.Quantity;
+                        var price = offerItem.Price;
+                        var totalPrice = sayi * price;
+                        totalPrices += totalPrice;
 
-                        var equipments = ConvertListToString(equipmentList.Distinct().ToList());
-                        OfferDocumentHelper.ReplaceText(wordDoc, "O14", equipments);
+                        string[] rowValues = { equipment, features, equipmentModel, "Adet", sayi.ToString(), price.ToString("#,##0.00", trCulture) + " TL", totalPrice.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
+
+                        OfferDocumentHelper.AddRowToTable(wordDoc, rowValues, true);
+
                     }
-                    modifiedDocument = memoryStream.ToArray();
+                    string[] totalPriceRow = { "", "", "", "", "", "Toplam Fiyat (TL) ", totalPrices.ToString("#,##0.00", trCulture) + " TL" }; // Example row values
+                    OfferDocumentHelper.AddRowToTable(wordDoc, totalPriceRow, true);
+
+                    foreach (var equipment in equipmentList.Distinct().ToList())
+                    {
+                        equipmentNames.AppendLine(equipment);
+                    }
+
+                    OfferDocumentHelper.ReplaceText(wordDoc, "AXCCD", Regex.Replace(equipmentNames.ToString(), @"[\r\n]$", ""));
                 }
+
+                modifiedDocument = memoryStream.ToArray();
+                
             }
 
             return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Teklif.docx");
         }
 
-        /// <summary>
-        /// Generates and returns the technical specification document for the offer.
-        /// </summary>
-        public async Task<IActionResult> OnPostTeknikSartnameAsync(CancellationToken cancellationToken)
-        {
-            string templatePath = "";
-
-            var offer = await GetOfferByIdAsync(Offer.Id);
-
-            var _equipmentModelIds = new List<int>();
-
-            var offerItems = offer.OfferItems.ToList();
-
-            OfferItems = offerItems;
-
-            var projectOwner = offer.ProjectOwner;
-            CultureInfo trCulture = new CultureInfo("tr-TR");
-
-            // Create a copy of the template to modify
-            byte[] modifiedDocument;
-
-            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "TeknikSartname.docx");
-            if (!System.IO.File.Exists(templatePath))
-            {
-                return NotFound("Template not found.");
-            }
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
-                {
-                    await fileStream.CopyToAsync(memoryStream);
-                }
-
-                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
-                {
-                    var equipmentNames = string.Join(", ", offerItems
-                        .Select(x => x.EquipmentModel.Equipment.Name)
-                        .Distinct());
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AAAA", offer.OfferName);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "BBBB", offer.ProjectAddress);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AXBY", offer.ProjectOwner.Name);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "XXXX", equipmentNames);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "DDMMYYYY", offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-
-                    var offerTeknikSartname = await _context.OfferTeknikSartnames.Where(x => x.OfferId == offer.Id).ToListAsync(cancellationToken);
-                    if(offerTeknikSartname.Any())
-                    {
-
-                        foreach (var teknikSartname in offerTeknikSartname)
-                        {
-                            teknikSartname.Features = Regex.Replace(teknikSartname.Features, @"[\r\n]$", "");
-                            string[] rowValues = { 
-                                teknikSartname.No.ToString(), 
-                                teknikSartname.EquipmentName.ToString(),
-                                teknikSartname.Features,
-                                teknikSartname.Birim,
-                                teknikSartname.Miktar.ToString()
-                            }; // Example row values
-                            OfferDocumentHelper.AddRowToTable(wordDoc, rowValues, false, true);
-                        }
-                    }
-                    else
-                    {
-                        var teknikSartnameList = await _offerService.GetOfferTeknikSartnameByOfferId(offer.Id);
-                        foreach (var teknikSartname in teknikSartnameList)
-                        {
-                            teknikSartname.Features = Regex.Replace(teknikSartname.Features, @"[\r\n]$", "");
-                            string[] rowValues = {
-                                teknikSartname.No.ToString(),
-                                teknikSartname.EquipmentName.ToString(),
-                                teknikSartname.Features,
-                                teknikSartname.Birim,
-                                teknikSartname.Miktar.ToString()
-                            }; // Example row values
-                            OfferDocumentHelper.AddRowToTable(wordDoc, rowValues, false, true);
-                        }
-                    }                   
-                }
-                modifiedDocument = memoryStream.ToArray();
-            }
-
-            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Teknik Şartname.docx");
-        }
-
-        /// <summary>
-        /// Generates and returns the invitation document for the specified company.
-        /// </summary>
-        public async Task<IActionResult> OnPostDavetAsync(int companyId, CancellationToken cancellationToken = default)
-        {
-            string templatePath = "";
-
-            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
-
-            var offerItems = offer?.OfferItems.ToList();
-
-            var company = offerItems?.FirstOrDefault(x => x.CompanyId == companyId)?.Company;
-
-            var projectOwner = offer?.ProjectOwner;
-            CultureInfo trCulture = new CultureInfo("tr-TR");
-
-            // Create a copy of the template to modify
-            byte[] modifiedDocument;
-
-            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "Davet.docx");
-            if (!System.IO.File.Exists(templatePath))
-            {
-                return NotFound("Template not found.");
-            }
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
-                {
-                    await fileStream.CopyToAsync(memoryStream);
-                }
-
-                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
-                {
-                    OfferDocumentHelper.ReplaceText(wordDoc, "A1", offer?.ProjectOwner?.Name?.ToUpper());
-                    OfferDocumentHelper.ReplaceText(wordDoc, "C3", offer.ProjectOwner.Name);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "H10", offer.ProjectOwner.Name);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "B2", company.TicariUnvan);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "D4", company.Address);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "E5", offer.ProjectAddress);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "F6", offer.OfferName);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "G7", offer.ProjectOwner.Address);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "H8", offer.ProjectOwner.Telephone);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AXBY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "DDMMYYY", Offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "XXYY", Offer.TeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "BCDAY", Offer.SonTeklifBildirme?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "HHMM", Offer.SonTeklifBildirme?.ToString("HH.mm"));
-                }
-                modifiedDocument = memoryStream.ToArray();
-            }
-
-            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"{company.Name}-Davet.docx");
-        }
-
-        /// <summary>
-        /// Generates and returns the guarantee invitation document for the specified company.
-        /// </summary>
-        public async Task<IActionResult> OnPostGarantiDavetAsync(int companyId, CancellationToken cancellationToken = default)
-        {
-            string templatePath = "";
-
-            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
-
-            // Create a copy of the template to modify
-            byte[] modifiedDocument;
-
-            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "GarantiDavet.docx");
-            if (!System.IO.File.Exists(templatePath))
-            {
-                return NotFound("Template not found.");
-            }
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
-                {
-                    await fileStream.CopyToAsync(memoryStream);
-                }
-
-                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
-                {
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AXDC", offer.ProjectOwner.Name.ToUpper());
-                    OfferDocumentHelper.ReplaceText(wordDoc, "C3", offer.ProjectOwner.Name);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "A0", offer.ProjectAddress);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "B1", offer.OfferName);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "D4", offer.ProjectOwner.Address);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "E5", offer.ProjectOwner.Telephone);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "XTDA", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "BCDY", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "XYZT", Offer.DanismanlikSonTeklifSunum?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AA", Offer.DanismanlikSonTeklifSunum?.ToString("HH.mm"));
-                }
-                modifiedDocument = memoryStream.ToArray();
-            }
-
-            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-Davet.docx");
-        }
-
-        /// <summary>
-        /// Generates and returns the guarantee offer document for the specified company.
-        /// </summary>
-        public async Task<IActionResult> OnPostGarantiTeklifAsync(int companyId, CancellationToken cancellationToken = default)
-        {
-            string templatePath = "";
-
-            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
-            CultureInfo trCulture = new CultureInfo("tr-TR");
-
-            // Create a copy of the template to modify
-            byte[] modifiedDocument;
-
-            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "GarantiTeklif.docx");
-            if (!System.IO.File.Exists(templatePath))
-            {
-                return NotFound("Template not found.");
-            }
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
-                {
-                    await fileStream.CopyToAsync(memoryStream);
-                }
-
-                var companySummaries = offer?.OfferItems
-                    .GroupBy(oi => oi.Company.Name)
-                    .Select(g => new CompanySummaryViewModel
-                    {
-                        CompanyName = g.Key,
-                        TotalPrice = g.Sum(oi => oi.Price * oi.Quantity)
-                    })
-                    .OrderBy(s => s.TotalPrice)
-                    .ToList();
-
-                var minOfferAmount = companySummaries.Any() ? companySummaries.First().TotalPrice : 0;
-
-                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
-                {
-                    var isPlaniHazirligi = (minOfferAmount * (decimal)Offer.IsPlaniHazirligiYuzde) / 100;
-                    var otp = (minOfferAmount * (decimal)Offer.OTPYuzde) / 100;
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AXBY", GetRandomDate(Offer.DanismanlikTeklifGonderim, Offer.DanismanlikSonTeklifSunum).ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "A1", offer.ProjectOwner.Name);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "B2", offer.ProjectOwner.Address);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "Z1", offer.OfferName);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "C3", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "D4", Offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "E5", Offer.HazirlanmaSuresi.ToString());
-                    OfferDocumentHelper.ReplaceText(wordDoc, "F6", Offer.PersonelSayisi.ToString());
-                    OfferDocumentHelper.ReplaceText(wordDoc, "LX", Offer.OtpHazirlanmaSuresi.ToString());
-                    OfferDocumentHelper.ReplaceText(wordDoc, "MY", Offer.OtpPersonelSayisi.ToString());
-                    OfferDocumentHelper.ReplaceText(wordDoc, "H7", isPlaniHazirligi.ToString("#,##0.00", trCulture));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "I8", otp.ToString("#,##0.00", trCulture));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "K9", (isPlaniHazirligi + otp).ToString("#,##0.00", trCulture));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "ASDX", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
-                    OfferDocumentHelper.ReplaceText(wordDoc, "BDFX", offer.DanismanlikTeklifGecerlilikSuresi?.ToString("dd.MM.yyyy"));
-
-                }
-                modifiedDocument = memoryStream.ToArray();
-            }
-
-            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-Teklif.docx");
-        }
-
-        /// <summary>
-        /// Generates and returns the guarantee technical specification document for the offer.
-        /// </summary>
-        public async Task<IActionResult> OnPostGarantiTeknikSartnameAsync(CancellationToken cancellationToken = default)
-        {
-            string templatePath = "";
-
-            var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
-
-            CultureInfo trCulture = new CultureInfo("tr-TR");
-
-            // Create a copy of the template to modify
-            byte[] modifiedDocument;
-
-            templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", "GarantiTeknikSartname.docx");
-            if (!System.IO.File.Exists(templatePath))
-            {
-                return NotFound("Template not found.");
-            }
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
-                {
-                    await fileStream.CopyToAsync(memoryStream);
-                }
-
-                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
-                {
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AZDC", offer.ProjectOwner.Name);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "AXDY", offer.OfferName);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "BCDY", offer.ProjectAddress);
-                    OfferDocumentHelper.ReplaceText(wordDoc, "XDAY", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
-                }
-                modifiedDocument = memoryStream.ToArray();
-            }
-
-            return File(modifiedDocument, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Garanti-TeknikŞartname.docx");
-        }
-
-
+        
         private DateTime GetRandomDate(DateTime? start, DateTime? end)
         {
             Random rand = new Random();

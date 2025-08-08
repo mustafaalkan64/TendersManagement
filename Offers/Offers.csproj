@@ -9,42 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Templates\Davet.docx" />
-    <None Remove="Templates\GarantiDavet.docx" />
-    <None Remove="Templates\GarantiTeklif.docx" />
-    <None Remove="Templates\GarantiTeknikSartname.docx" />
-    <None Remove="Templates\TeklifTemplate.docx" />
-    <None Remove="Templates\TeknikSartname.docx" />
     <None Remove="Templates\Template.docx" />
     <None Remove="Templates\Template3.docx" />
     <None Remove="Templates\Template4.docx" />
     <None Remove="Templates\Template5.docx" />
     <None Remove="Templates\TemplateTeklif.docx" />
     <None Remove="Templates\TemplateTeklif2.docx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\Davet.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\GarantiDavet.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\GarantiTeklif.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\GarantiTeknikSartname.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\TeklifTemplate.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\CetinkayaTeklif.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\TeknikSartname.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -61,6 +31,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Templates\" />
   </ItemGroup>
 
 </Project>
