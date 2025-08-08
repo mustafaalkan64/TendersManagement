@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Offers.Data;
 using Offers.Permissions;
+using Offers.Services;
 using Offers.Services.Company;
 using Offers.Services.Equipment;
 using Offers.Services.EquipmentModel;
@@ -82,13 +83,7 @@ builder.Services.AddAuthorization(options =>
     AuthorizationPolicies.RegisterPolicies(options);
 });
 
-builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
-
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.AddTransient<IOfferService, OfferService>();
-builder.Services.AddTransient<ICompanyService, CompanyService>();
-builder.Services.AddTransient<IEquipmentService, EquipmentService>();
-builder.Services.AddTransient<IEquipmentModelService, EquipmentModelService>();
+builder.Services.AddProjectServices();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {

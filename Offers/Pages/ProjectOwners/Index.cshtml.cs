@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+using Offers.Services.ProjectOwner;
 using Models;
 
 namespace Pages.ProjectOwner
@@ -9,11 +9,11 @@ namespace Pages.ProjectOwner
     [Authorize(Policy = "CanListOwner")]
     public class IndexModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProjectOwnerService _projectOwnerService;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(IProjectOwnerService projectOwnerService)
         {
-            _context = context;
+            _projectOwnerService = projectOwnerService;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -26,15 +26,7 @@ namespace Pages.ProjectOwner
 
         public async Task OnGetAsync()
         {
-            var query = _context.ProjectOwners.AsQueryable();
-            if (!string.IsNullOrEmpty(SearchString))
-            {
-                var searchTerm = SearchString.ToLower();
-                query = query.Where(em => em.Name.ToLower().Contains(SearchString.ToLower()));
-            }
-            ProjectOwners = await query
-                .OrderBy(p => p.Name)
-                .ToListAsync();
+            ProjectOwners = await _projectOwnerService.GetProjectOwnersAsync(SearchString);
         }
     }
 }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+using Offers.Services.ProjectOwner;
 using Models;
 
 namespace Pages.ProjectOwner
@@ -9,11 +9,11 @@ namespace Pages.ProjectOwner
     [Authorize(Policy = "CanSeeDetailsOwner")]
     public class DetailsModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProjectOwnerService _projectOwnerService;
 
-        public DetailsModel(ApplicationDbContext context)
+        public DetailsModel(IProjectOwnerService projectOwnerService)
         {
-            _context = context;
+            _projectOwnerService = projectOwnerService;
         }
 
         public Models.ProjectOwner ProjectOwner { get; set; }
@@ -25,7 +25,7 @@ namespace Pages.ProjectOwner
                 return NotFound();
             }
 
-            ProjectOwner = await _context.ProjectOwners.FirstOrDefaultAsync(m => m.Id == id);
+            ProjectOwner = await _projectOwnerService.GetProjectOwnerByIdAsync(id.Value);
 
             if (ProjectOwner == null)
             {
@@ -35,4 +35,4 @@ namespace Pages.ProjectOwner
             return Page();
         }
     }
-} 
+}

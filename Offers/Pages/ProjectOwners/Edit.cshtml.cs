@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+using Offers.Services.ProjectOwner;
 using System.Threading.Tasks;
 
 namespace Pages.ProjectOwner
@@ -10,13 +9,11 @@ namespace Pages.ProjectOwner
     [Authorize(Policy = "CanEditOwner")]
     public class EditModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private IMemoryCache _cache;
+        private readonly IProjectOwnerService _projectOwnerService;
 
-        public EditModel(ApplicationDbContext context, IMemoryCache cache)
+        public EditModel(IProjectOwnerService projectOwnerService)
         {
-            _context = context;
-            _cache = cache;
+            _projectOwnerService = projectOwnerService;
         }
 
         [BindProperty]
@@ -32,7 +29,7 @@ namespace Pages.ProjectOwner
                 return NotFound();
             }
 
-            ProjectOwner = await _context.ProjectOwners.FindAsync(id);
+            ProjectOwner = await _projectOwnerService.GetProjectOwnerByIdAsync(id.Value);
 
             if (ProjectOwner == null)
             {
@@ -49,32 +46,9 @@ namespace Pages.ProjectOwner
                 return Page();
             }
 
-            _context.Attach(ProjectOwner).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-
-                StatusMessage = "Proje sahibi başarıyla güncellendi.";
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProjectOwnerExists(ProjectOwner.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            await _projectOwnerService.UpdateProjectOwnerAsync(ProjectOwner);
+            StatusMessage = "Proje sahibi başarıyla güncellendi.";
             return RedirectToPage("./Index");
         }
-
-        private bool ProjectOwnerExists(int id)
-        {
-            return _context.ProjectOwners.Any(e => e.Id == id);
-        }
     }
-} 
+}
