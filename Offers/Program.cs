@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Offers.Data;
 using Offers.Permissions;
+using Offers.Services.Company;
+using Offers.Services.Equipment;
+using Offers.Services.EquipmentModel;
 using Offers.Services.Offer;
 using Serilog;
 using System;
@@ -83,6 +86,9 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IOfferService, OfferService>();
+builder.Services.AddTransient<ICompanyService, CompanyService>();
+builder.Services.AddTransient<IEquipmentService, EquipmentService>();
+builder.Services.AddTransient<IEquipmentModelService, EquipmentModelService>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {

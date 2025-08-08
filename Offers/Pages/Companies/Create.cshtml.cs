@@ -2,16 +2,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Models;
+using Offers.Services.Company;
 namespace Offers.Pages.Companies
 {
     [Authorize(Policy = "CanAddCompany")]
     public class CreateModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICompanyService _companyService;
 
-        public CreateModel(ApplicationDbContext context)
+        public CreateModel(ICompanyService companyService)
         {
-            _context = context;
+            _companyService = companyService;
         }
 
         [BindProperty]
@@ -24,9 +25,7 @@ namespace Offers.Pages.Companies
                 return Page();
             }
 
-            _context.Companies.Add(Company);
-            await _context.SaveChangesAsync();
-
+            await _companyService.CreateCompanyAsync(Company);
             return RedirectToPage("./Index");
         }
     }

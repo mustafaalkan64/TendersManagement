@@ -3,20 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Offers.Services.Company;
+
 namespace Offers.Pages.Companies
 {
     [Authorize(Policy = "CanDeleteCompany")]
     public class DeleteModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICompanyService _companyService;
 
-        public DeleteModel(ApplicationDbContext context)
+        public DeleteModel(ICompanyService companyService)
         {
-            _context = context;
+            _companyService = companyService;
         }
 
         [BindProperty]
-        public Company Company { get; set; }
+        public Company? Company { get; set; } // Marked as nullable to align with potential null assignment
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -25,7 +27,7 @@ namespace Offers.Pages.Companies
                 return NotFound();
             }
 
-            Company = await _context.Companies.FirstOrDefaultAsync(m => m.Id == id);
+            Company = await _companyService.GetCompanyByIdAsync(id.Value);
 
             if (Company == null)
             {
@@ -41,12 +43,11 @@ namespace Offers.Pages.Companies
                 return NotFound();
             }
 
-            Company = await _context.Companies.FindAsync(id);
+            Company = await _companyService.GetCompanyByIdAsync(id.Value);
 
             if (Company != null)
             {
-                _context.Companies.Remove(Company);
-                await _context.SaveChangesAsync();
+                await _companyService.DeleteCompanyAsync(id.Value);
             }
 
             return RedirectToPage("./Index");

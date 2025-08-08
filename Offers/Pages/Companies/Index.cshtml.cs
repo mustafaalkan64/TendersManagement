@@ -1,21 +1,23 @@
 // All common using statements are now in GlobalUsings.cs
+using Offers.Services.Company;
+
 namespace Offers.Pages.Companies
 {
     [Authorize(Policy = "CanListCompany")]
     public class IndexModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICompanyService _companyService;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(ICompanyService companyService)
         {
-            _context = context;
+            _companyService = companyService;
         }
 
         public IList<Company> Companies { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Companies = await _context.Companies.OrderByDescending(x => x.CreatedDate).ToListAsync();
+            Companies = await _companyService.GetCompaniesAsync();
         }
     }
 } 
