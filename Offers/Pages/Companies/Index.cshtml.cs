@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Models;
+// All common using statements are now in GlobalUsings.cs
 namespace Offers.Pages.Companies
 {
     [Authorize(Policy = "CanListCompany")]

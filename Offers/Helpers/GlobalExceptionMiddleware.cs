@@ -1,8 +1,4 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Offers.Helpers
 {
@@ -25,20 +21,28 @@ namespace Offers.Helpers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred.");
+                _logger.LogError(ex, "Unhandled exception occurred: {Message}", ex.Message);
                 await HandleExceptionAsync(httpContext, ex);
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            return context.Response.WriteAsync(new {
+            
+            var response = new
+            {
                 StatusCode = context.Response.StatusCode,
                 Message = "An unexpected error occurred. Please try again later.",
-                Detailed = exception.Message // Remove in production for security
-            }.ToString());
+                #if DEBUG
+                Detailed = exception.Message,
+                StackTrace = exception.StackTrace
+                #endif
+            };
+
+            var jsonResponse = JsonSerializer.Serialize(response);
+            await context.Response.WriteAsync(jsonResponse);
         }
     }
 }

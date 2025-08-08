@@ -1,11 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+// All common using statements are now in GlobalUsings.cs
 
 namespace Pages.EquipmentModelPage
 {
@@ -27,29 +20,19 @@ namespace Pages.EquipmentModelPage
 
         public async Task OnGetAsync(CancellationToken cancellationToken = default)
         {
-            //EquipmentModels = await _context.EquipmentModels
-            //.Include(em => em.Equipment)
-            //.Include(em => em.CompanyEquipmentModels)
-            //    .ThenInclude(cem => cem.Company)
-            //.OrderBy(em => em.Equipment.Name)
-            //.ThenBy(em => em.Brand)
-            //.ThenBy(em => em.Model)
-            //.ToListAsync();
-
             var query = _context.EquipmentModels
-            .Include(em => em.Equipment)
-            .Include(em => em.CompanyEquipmentModels)
-                .ThenInclude(cem => cem.Company)
-            .AsQueryable();
+                .Include(em => em.Equipment)
+                .Include(em => em.CompanyEquipmentModels)
+                    .ThenInclude(cem => cem.Company)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(SearchString))
             {
-                var searchTerm = SearchString.ToLower();
                 query = query.Where(em =>
-                    em.Equipment.Name.ToLower().Contains(SearchString.ToLower()) ||
-                    em.Brand.ToLower().Contains(SearchString.ToLower()) ||
-                    em.Capacity.ToLower().Contains(SearchString.ToLower()) ||
-                    em.Model.ToLower().Contains(SearchString.ToLower()));
+                    em.Equipment.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    em.Brand.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    em.Capacity.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    em.Model.Contains(SearchString, StringComparison.OrdinalIgnoreCase));
             }
 
             EquipmentModels = await query

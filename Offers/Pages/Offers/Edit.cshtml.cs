@@ -1,24 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Models;
-using Microsoft.AspNetCore.Authorization;
-using DocumentFormat.OpenXml.Packaging;
-
-using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.AspNetCore.Hosting;
-using System.Text;
 using DocumentFormat.OpenXml;
-using System.Globalization;
-using System.Threading;
-using Microsoft.Extensions.Caching.Memory;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Offers.Services.Offer;
-using System.Text.RegularExpressions;
 using Pages.Offers.Helpers;
 
 namespace Pages.Offers
