@@ -289,19 +289,9 @@
                     var companyName = Model.CompanyList.FirstOrDefault(c => c.Value == item.Key.ToString())?.Text ?? "Ýndir";
                     <button type="submit" asp-page-handler="Download" asp-route-companyId="@item.Key" class="btn btn-info">@companyName Teklif</button>
                 }
-                @foreach (var item in Model.OfferItems.GroupBy(x => x.CompanyId))
-                {
-                    var companyName = Model.CompanyList.FirstOrDefault(c => c.Value == item.Key.ToString())?.Text ?? "Ýndir";
-                    <button type="submit" asp-page-handler="Davet" asp-route-companyId="@item.Key" class="btn btn-warning">@companyName Davet</button>
-                }
-                <button type="submit" asp-page-handler="TeknikSartname" class="btn btn-success">Teknik Sartname</button>
                 <a asp-page="./Index" class="btn btn-secondary">Listeye Don</a>
             </div>
-            <div class="form-group mt-3">
-                <button type="submit" asp-page-handler="GarantiDavet" class="btn btn-info">Danisman Davet</button>
-                <button type="submit" asp-page-handler="GarantiTeknikSartname" class="btn btn-info">Danisman Teknik Sartname</button>
-                <button type="submit" asp-page-handler="GarantiTeklif" class="btn btn-info">Danisman Teklif</button>
-            </div>
+
         </form>
     </div>
 </div>
