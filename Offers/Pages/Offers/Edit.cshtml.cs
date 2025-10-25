@@ -693,8 +693,9 @@ namespace Pages.Offers
 
         private DateTime GetRandomDate(DateTime? start, DateTime? end)
         {
+            var endDate = end ?? DateTime.Now;
             Random rand = new Random();
-            int range = (end.Value - start.Value).Days;
+            int range = (endDate - start.Value).Days;
             return start.Value.AddDays(rand.Next(range + 1));
         }
 
