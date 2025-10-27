@@ -54,6 +54,20 @@ public class CreateModel : PageModel
                 return Page();
             }
 
+            if(Equals(Equipment.Name.Trim(), ""))
+            {
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+                StatusMessage = "Ekipman adý boþ olamaz";
+                return Page();
+            }
+
+            if(_context.Equipment.Any(x => x.Name.ToLower() == Equipment.Name.Trim().ToLower()))
+            {
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+                StatusMessage = "Bu isimde zaten bir ekipman mevcut, lütfen farklý bir isim giriniz.";
+                return Page();
+            }
+
             _context.Equipment.Add(Equipment);
             await _context.SaveChangesAsync();
 

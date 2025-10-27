@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Models;
@@ -9,14 +10,33 @@ namespace Offers.Services.Company
     public class CompanyService : ICompanyService
     {
         private readonly ApplicationDbContext _context;
-        public CompanyService(ApplicationDbContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CompanyService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
         public async Task<IList<Models.Company>> GetCompaniesAsync()
         {
-            return await _context.Companies.OrderByDescending(x => x.CreatedDate).ToListAsync();
+            var user = _httpContextAccessor.HttpContext?.User;
+            if(user.IsInRole("Admin"))
+            {
+                return await _context.Companies
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync();
+            }
+
+            var roles = user?.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value.ToLower().Trim()) // rolleri lowercase yapýyoruz
+                .ToList() ?? new List<string>();
+
+            return await _context.Companies
+                .Where(x => roles.Contains(x.Name.ToLower())) // company name de lowercase karþýlaþtýrma
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync();
         }
 
         public async Task CreateCompanyAsync(Models.Company company)

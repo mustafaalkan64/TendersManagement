@@ -99,6 +99,11 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 // Configure cookie policy
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    // Cookie'nin ne kadar süre geçerli olacaðýný belirler
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+
+    // RememberMe seçiliyse kalýcý cookie oluþturur
+    options.SlidingExpiration = true;
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/AccessDenied";

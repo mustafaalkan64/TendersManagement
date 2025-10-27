@@ -232,9 +232,6 @@ namespace Pages.Offers
             return RedirectToPage("./Index");
         }
 
-        /// <summary>
-        /// Generates and returns the offer document for the specified company.
-        /// </summary>
         public async Task<IActionResult> OnPostDownloadAsync(int companyId)
         {
             string templatePath = "";
@@ -447,14 +444,14 @@ namespace Pages.Offers
                     OfferDocumentHelper.ReplaceText(wordDoc, "DDMMYYYY", offer.TeklifGonderimTarihi?.ToString("dd.MM.yyyy"));
 
                     var offerTeknikSartname = await _context.OfferTeknikSartnames.Where(x => x.OfferId == offer.Id).ToListAsync(cancellationToken);
-                    if(offerTeknikSartname.Any())
+                    if (offerTeknikSartname.Any())
                     {
 
                         foreach (var teknikSartname in offerTeknikSartname)
                         {
                             teknikSartname.Features = Regex.Replace(teknikSartname.Features, @"[\r\n]$", "");
-                            string[] rowValues = { 
-                                teknikSartname.No.ToString(), 
+                            string[] rowValues = {
+                                teknikSartname.No.ToString(),
                                 teknikSartname.EquipmentName.ToString(),
                                 teknikSartname.Features,
                                 teknikSartname.Birim,
@@ -478,7 +475,7 @@ namespace Pages.Offers
                             }; // Example row values
                             OfferDocumentHelper.AddRowToTable(wordDoc, rowValues, false, true);
                         }
-                    }                   
+                    }
                 }
                 modifiedDocument = memoryStream.ToArray();
             }

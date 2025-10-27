@@ -29,6 +29,7 @@ namespace Offers.Services.EquipmentModel
                     em.Equipment.Name.Contains(searchString) ||
                     em.Brand.Contains(searchString) ||
                     em.Capacity.Contains(searchString) ||
+                    em.CompanyEquipmentModels.Any(cem => cem.Company.Name.Contains(searchString)) ||
                     em.Model.Contains(searchString));
             }
 

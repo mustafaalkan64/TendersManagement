@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,10 +12,12 @@ namespace Offers.Pages.Companies
     public class DeleteModel : PageModel
     {
         private readonly ICompanyService _companyService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DeleteModel(ICompanyService companyService)
+        public DeleteModel(ICompanyService companyService, IHttpContextAccessor httpContextAccessor)
         {
             _companyService = companyService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [BindProperty]
@@ -33,6 +36,18 @@ namespace Offers.Pages.Companies
             {
                 return NotFound();
             }
+
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            var roles = user?.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value.ToLower().Trim()) // rolleri lowercase yapýyoruz
+                .ToList() ?? new List<string>();
+
+            if (!user.IsInRole("Admin") && !roles.Contains(Company.Name.ToLower()))
+            {
+                return NotFound();
+            }
             return Page();
         }
 
@@ -47,6 +62,18 @@ namespace Offers.Pages.Companies
 
             if (Company != null)
             {
+                var user = _httpContextAccessor.HttpContext?.User;
+
+                var roles = user?.Claims
+                    .Where(c => c.Type == ClaimTypes.Role)
+                    .Select(c => c.Value.ToLower().Trim()) // rolleri lowercase yapýyoruz
+                    .ToList() ?? new List<string>();
+
+                if (!user.IsInRole("Admin") && !roles.Contains(Company.Name.ToLower()))
+                {
+                    return NotFound();
+                }
+
                 await _companyService.DeleteCompanyAsync(id.Value);
             }
 

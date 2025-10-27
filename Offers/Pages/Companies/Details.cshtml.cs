@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,10 +11,12 @@ namespace Offers.Pages.Companies
     public class DetailsModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DetailsModel(ApplicationDbContext context)
+        public DetailsModel(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Company Company { get; set; }
@@ -29,6 +33,18 @@ namespace Offers.Pages.Companies
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (Company == null)
+            {
+                return NotFound();
+            }
+
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            var roles = user?.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value.ToLower().Trim()) // rolleri lowercase yapýyoruz
+                .ToList() ?? new List<string>();
+
+            if (!user.IsInRole("Admin") && !roles.Contains(Company.Name.ToLower()))
             {
                 return NotFound();
             }

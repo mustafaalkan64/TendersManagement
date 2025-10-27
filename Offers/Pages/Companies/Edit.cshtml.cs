@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,11 +11,14 @@ namespace Offers.Pages.Companies
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EditModel(ApplicationDbContext context)
+
+        public EditModel(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             SelectedEquipmentModels = new List<CompanyEquipmentModel>();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [BindProperty]
@@ -28,10 +32,17 @@ namespace Offers.Pages.Companies
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
+            var user = _httpContextAccessor.HttpContext?.User;
+
             if (id == null)
             {
                 return NotFound();
             }
+
+            var roles = user?.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value.ToLower().Trim()) // rolleri lowercase yapýyoruz
+                .ToList() ?? new List<string>();
 
             Company = await _context.Companies
                 .Include(x => x.CompanyEquipmentModels)
@@ -39,6 +50,11 @@ namespace Offers.Pages.Companies
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (Company == null)
+            {
+                return NotFound();
+            }
+
+            if(!user.IsInRole("Admin") && !roles.Contains(Company.Name.ToLower()))
             {
                 return NotFound();
             }
