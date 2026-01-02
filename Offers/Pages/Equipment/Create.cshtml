@@ -19,12 +19,12 @@
 
 <form method="post">
     <div class="form-group">
-        <label asp-for="Equipment.Name">Ekipman Ad&#305;</label>
+        <label asp-for="Equipment.Name">Ekipman Adý;</label>
         <input asp-for="Equipment.Name" class="form-control" />
         <span asp-validation-for="Equipment.Name" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Equipment.Description">A&ccedil;&#305;klamas&#305;</label>
+        <label asp-for="Equipment.Description">Açýklamasý</label>
         <textarea asp-for="Equipment.Description" class="form-control"></textarea>
         <span asp-validation-for="Equipment.Description" class="text-danger"></span>
     </div>
@@ -33,8 +33,8 @@
     <div class="card mb-3">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Ozellikler</h5>
-                <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Ozellik Ekle</button>
+                <h5 class="mb-0">Özellikler</h5>
+                <button type="button" class="btn btn-primary btn-sm" onclick="addFeatureRow()">Özellik Ekle</button>
             </div>
         </div>
         <div class="card-body">
@@ -44,7 +44,7 @@
                         <label style="font-weight: bold;">Tip</label>
                     </div>
                     <div class="col-md-3">
-                        <label style="font-weight: bold;">Degeri</label>
+                        <label style="font-weight: bold;">Deðeri</label>
                     </div>
                     <div class="col-md-1">
                         <label style="font-weight: bold;">Birim</label>
@@ -64,7 +64,7 @@
         </div>
     </div>
     <br />
-    <button type="submit" class="btn btn-primary">Olu&#351;tur</button>
+    <button type="submit" class="btn btn-primary">Oluþtur</button>
     <a asp-page="List" class="btn btn-secondary">Ekipman Listesi</a>
 </form>
 

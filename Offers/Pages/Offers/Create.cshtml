@@ -33,6 +33,18 @@
 
             <div class="row">
                 <div class="col-md-6">
+                    <div class="form-group mb-6">
+                        <label asp-for="Offer.ConsultantId">Danýþman</label>
+                        <select asp-for="Offer.ConsultantId" asp-items="Model.ConsultantList" class="form-select">
+                            <option value="">Danýþman Seç</option>
+                        </select>
+                        <span asp-validation-for="Offer.ConsultantId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="Offer.OfferName">Proje Adi</label>
                         <input asp-for="Offer.OfferName" class="form-control" />

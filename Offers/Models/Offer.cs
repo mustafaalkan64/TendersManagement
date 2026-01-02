@@ -15,6 +15,9 @@ namespace Models
         public int ProjectOwnerId { get; set; }
 
         [Required]
+        public int ConsultantId { get; set; }
+
+        [Required]
         [Display(Name = "Hazirlanma Suresi")]
         public int HazirlanmaSuresi { get; set; }
 

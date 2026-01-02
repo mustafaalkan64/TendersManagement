@@ -29,9 +29,21 @@
                     <div class="form-group mb-6">
                         <label asp-for="Offer.ProjectOwnerId">Proje Sahibi</label>
                         <select asp-for="Offer.ProjectOwnerId" asp-items="Model.ProjectOwnerList" class="form-select" disabled="disabled">
-                            <option value="">Proje Sahibi Sec</option>
+                            <option value="">Proje Sahibi Seç</option>
                         </select>
                         <span asp-validation-for="Offer.ProjectOwnerId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-6">
+                        <label asp-for="Offer.ConsultantId">Danýþman</label>
+                        <select asp-for="Offer.ConsultantId" asp-items="Model.ConsultantList" class="form-select">
+                            <option value="">Danýþman Seç</option>
+                        </select>
+                        <span asp-validation-for="Offer.ConsultantId" class="text-danger"></span>
                     </div>
                 </div>
             </div>

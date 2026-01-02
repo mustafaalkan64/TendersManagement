@@ -29,6 +29,8 @@ namespace Pages.Offers
 
         public SelectList ProjectOwnerList { get; set; }
 
+        public SelectList ConsultantList { get; set; }
+
         public List<CompanySummaryViewModel> CompanySummaries { get; set; }
 
         public Decimal MinOfferAmount { get; set; }
@@ -111,6 +113,11 @@ namespace Pages.Offers
 
             ProjectOwnerList = new SelectList(
                await _context.ProjectOwners.OrderBy(p => p.Name).ToListAsync(cancellationToken),
+               "Id",
+               "Name"
+            );
+            ConsultantList = new SelectList(
+               await _context.ConsultantCompanies.OrderBy(p => p.Name).ToListAsync(cancellationToken),
                "Id",
                "Name"
            );

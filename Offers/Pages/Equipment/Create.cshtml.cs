@@ -75,6 +75,8 @@ public class CreateModel : PageModel
             foreach (var feature in Features)
             {
                 feature.EquipmentId = Equipment.Id;
+                feature.FeatureValue = feature.FeatureValue?.ToString()?.Trim() ?? "";
+                feature.FeatureKey = feature.FeatureKey?.ToString()?.Trim() ?? "";
                 _context.EquipmentFeatures.Add(feature);
             }
             await _context.SaveChangesAsync();

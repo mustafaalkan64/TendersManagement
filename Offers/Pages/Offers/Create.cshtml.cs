@@ -24,6 +24,7 @@ namespace Pages.Offers
         public Offer Offer { get; set; }
 
         public SelectList ProjectOwnerList { get; set; }
+        public SelectList ConsultantList { get; set; }
 
         [BindProperty]
         public OfferItem NewItem { get; set; }
@@ -35,7 +36,7 @@ namespace Pages.Offers
         public SelectList EquipmentModelList { get; set; }
         public SelectList CompanyList { get; set; }
 
-        private async Task LoadDropDownLists()
+        private async Task LoadDropDownLists(CancellationToken cancellationToken = default)
         {
             var equipmentModels = await _context.EquipmentModels
             .Include(em => em.Equipment)
@@ -65,15 +66,20 @@ namespace Pages.Offers
                 }).ToListAsync()), "Value", "Text");
 
             ProjectOwnerList = new SelectList(
-               await _context.ProjectOwners.OrderBy(p => p.Name).ToListAsync(),
+               await _context.ProjectOwners.OrderBy(p => p.Name).ToListAsync(cancellationToken),
+               "Id",
+               "Name"
+           );
+            ConsultantList = new SelectList(
+               await _context.ConsultantCompanies.OrderBy(p => p.Name).ToListAsync(cancellationToken),
                "Id",
                "Name"
            );
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
         {
-            await LoadDropDownLists();
+            await LoadDropDownLists(cancellationToken);
 
             return Page();
         }
