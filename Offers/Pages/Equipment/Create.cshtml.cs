@@ -41,7 +41,7 @@ public class CreateModel : PageModel
                 return Page();
             }
 
-            if (Features.Any(x => x.FeatureKey == "") || Features.Any(x => x.FeatureValue == ""))
+            if (Features.Any(x => x.FeatureKey == string.Empty) || Features.Any(x => x.FeatureValue == string.Empty))
             {
                 Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
                 StatusMessage = "Tip ve deger girilmelidir";
@@ -54,7 +54,7 @@ public class CreateModel : PageModel
                 return Page();
             }
 
-            if(Equals(Equipment.Name.Trim(), ""))
+            if(Equals(Equipment.Name.Trim(), string.Empty))
             {
                 Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
                 StatusMessage = "Ekipman adý boþ olamaz";
@@ -75,8 +75,8 @@ public class CreateModel : PageModel
             foreach (var feature in Features)
             {
                 feature.EquipmentId = Equipment.Id;
-                feature.FeatureValue = feature.FeatureValue?.ToString()?.Trim() ?? "";
-                feature.FeatureKey = feature.FeatureKey?.ToString()?.Trim() ?? "";
+                feature.FeatureValue = feature.FeatureValue?.ToString()?.Trim() ?? string.Empty;
+                feature.FeatureKey = feature.FeatureKey?.ToString()?.Trim() ?? string.Empty;
                 _context.EquipmentFeatures.Add(feature);
             }
             await _context.SaveChangesAsync();
