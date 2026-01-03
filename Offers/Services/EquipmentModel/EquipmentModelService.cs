@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Models;
 
 namespace Offers.Services.EquipmentModel
@@ -10,18 +12,38 @@ namespace Offers.Services.EquipmentModel
     public class EquipmentModelService : IEquipmentModelService
     {
         private readonly ApplicationDbContext _context;
-        public EquipmentModelService(ApplicationDbContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public EquipmentModelService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IList<Models.EquipmentModel>> GetEquipmentModelsAsync(string searchString, CancellationToken cancellationToken = default)
         {
-            var query = _context.EquipmentModels
+            var user = _httpContextAccessor.HttpContext?.User;
+            var isAdmin = user != null && user.IsInRole("Admin");
+
+            var userRoles = user?.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value.Trim())
+                .ToList() ?? new List<string>();
+
+            var query = await _context.EquipmentModels
                 .Include(em => em.Equipment)
                 .Include(em => em.CompanyEquipmentModels)
                     .ThenInclude(cem => cem.Company)
-                .AsQueryable();
+                        .ThenInclude(c => c.CompaniesRoles) // Make sure to include this for filtering
+                            .ThenInclude(cr => cr.Role)
+                .ToListAsync(cancellationToken);
+
+            if (!isAdmin && userRoles.Any())
+            {
+                 query = query.Where(em => em.CompanyEquipmentModels.Any(cem => 
+                    cem.Company.CompaniesRoles.Any(cr => userRoles.Contains(cr.Role.Name.Trim()))
+                 )).ToList();
+            }
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -30,14 +52,14 @@ namespace Offers.Services.EquipmentModel
                     em.Brand.Contains(searchString) ||
                     em.Capacity.Contains(searchString) ||
                     em.CompanyEquipmentModels.Any(cem => cem.Company.Name.Contains(searchString)) ||
-                    em.Model.Contains(searchString));
+                    em.Model.Contains(searchString)).ToList();
             }
 
-            return await query
+            return query
                 .OrderBy(em => em.Equipment.Name)
                 .ThenBy(em => em.Brand)
                 .ThenBy(em => em.Model)
-                .ToListAsync(cancellationToken);
+                .ToList();
         }
 
         public async Task<List<Models.Company>> GetCompaniesAsync(CancellationToken cancellationToken = default)
