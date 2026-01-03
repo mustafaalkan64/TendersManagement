@@ -18,7 +18,7 @@ namespace Offers.Services.Company
 
         }
 
-        public async Task<IList<Models.Company>> GetCompaniesAsync()
+        public async Task<IList<Models.Company>> GetCompaniesAsync(CancellationToken cancellationToken)
         {
             var user = _httpContextAccessor.HttpContext?.User;
             if(user.IsInRole("Admin"))
@@ -30,13 +30,13 @@ namespace Offers.Services.Company
 
             var roles = user?.Claims
                 .Where(c => c.Type == ClaimTypes.Role)
-                .Select(c => c.Value.ToLower().Trim()) // rolleri lowercase yapýyoruz
+                .Select(c => c.Value)
                 .ToList() ?? new List<string>();
 
-            return await _context.Companies
-                .Where(x => roles.Contains(x.Name.ToLower())) // company name de lowercase karþýlaþtýrma
-                .OrderByDescending(x => x.CreatedDate)
-                .ToListAsync();
+            var companies = await _context.Companies.ToListAsync(cancellationToken);
+
+            return companies.Where(x => roles.Any(r => r.ToLower().Contains(x.Name.ToLower())))
+                .OrderByDescending(x => x.CreatedDate).ToList();
         }
 
         public async Task CreateCompanyAsync(Models.Company company)

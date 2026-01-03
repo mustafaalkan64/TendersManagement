@@ -1,0 +1,41 @@
+@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Þirket Rolleri";
+}
+
+<h1>Companies Roles</h1>
+
+<p>
+    <a asp-page="Create">Ekle</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CompaniesRoles[0].Company)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CompaniesRoles[0].Role)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.CompaniesRoles) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Company.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Role.Name)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Düzenle</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Sil</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

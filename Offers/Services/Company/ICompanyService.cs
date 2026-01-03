@@ -6,7 +6,7 @@ namespace Offers.Services.Company
 {
     public interface ICompanyService
     {
-        Task<IList<Models.Company>> GetCompaniesAsync();
+        Task<IList<Models.Company>> GetCompaniesAsync(CancellationToken cancellation);
         Task CreateCompanyAsync(Models.Company company);
         Task<Models.Company?> GetCompanyByIdAsync(int id);
         Task DeleteCompanyAsync(int id);

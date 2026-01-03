@@ -1,0 +1,40 @@
+@page
+@model CreateModel
+
+@{
+    ViewData["Title"] = "Assign Roles to Companies";
+}
+
+<h1>Rolleri Þirketlere Atama Yap</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label class="control-label">Þirketler</label>
+                <select asp-for="SelectedCompanyIds" class="form-control" asp-items="Model.CompaniesRequests" multiple style="height: 200px;">
+                </select>
+                <span asp-validation-for="SelectedCompanyIds" class="text-danger"></span>
+                <small class="form-text text-muted">Birden fazla þirket seçmek için Ctrl tuþunu basýlý tutun.</small>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="control-label">Roller</label>
+                <select asp-for="SelectedRoleIds" class="form-control" asp-items="Model.RolesRequests" multiple style="height: 200px;">
+                </select>
+                <span asp-validation-for="SelectedRoleIds" class="text-danger"></span>
+                <small class="form-text text-muted">Birden fazla rol seçmek için Ctrl tuþunu basýlý tutun.</small>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

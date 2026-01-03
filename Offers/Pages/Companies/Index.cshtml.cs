@@ -15,9 +15,9 @@ namespace Offers.Pages.Companies
 
         public IList<Company> Companies { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(CancellationToken cancellationToken)
         {
-            Companies = await _companyService.GetCompaniesAsync();
+            Companies = await _companyService.GetCompaniesAsync(cancellationToken);
         }
     }
 } 
