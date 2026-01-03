@@ -27,8 +27,6 @@ namespace Offers.Services.Company
                 .Select(c => c.Value.Trim())
                 .ToList() ?? new List<string>();
 
-            userRoles = new List<string> { "Çetinkaya" };
-
             var companies = await _context.Companies
                 .Include(c => c.CompaniesRoles) // Ensure mapped
                 .ThenInclude(cr => cr.Role)
