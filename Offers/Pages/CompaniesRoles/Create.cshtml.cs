@@ -66,7 +66,8 @@ namespace Offers.Pages.CompaniesRoles
 
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Create"); // Or Index, or show success message
+            TempData["SuccessMessage"] = "İşlem başarıyla tamamlandı.";
+            return RedirectToPage("./Create");
         }
     }
 }

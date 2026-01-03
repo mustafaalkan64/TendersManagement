@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Models
@@ -7,9 +7,9 @@ namespace Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Firma Adý zorunludur")]
+        [Required(ErrorMessage = "Firma AdÄ± zorunludur")]
         [StringLength(150, MinimumLength = 3)]
-        [Display(Name = "Firma Adý")]
+        [Display(Name = "Firma AdÄ±")]
         public string Name { get; set; }
 
         [Required]
@@ -53,11 +53,13 @@ namespace Models
         [StringLength(100)]
         public string Eposta { get; set; }
 
-        [Display(Name = "Oluþturma Tarihi")]
+        [Display(Name = "OluÅŸturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         [JsonIgnore]
         public List<CompanyEquipmentModel> CompanyEquipmentModels { get; set; } = new List<CompanyEquipmentModel>();
+
+        public virtual ICollection<CompaniesRoles> CompaniesRoles { get; set; } = new List<CompaniesRoles>();
 
     }
 }

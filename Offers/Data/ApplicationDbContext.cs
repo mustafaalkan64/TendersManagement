@@ -55,5 +55,18 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany(e => e.Models)
             .HasForeignKey(em => em.EquipmentId);
 
+        modelBuilder.Entity<CompaniesRoles>()
+            .HasOne(cr => cr.Company)
+            .WithMany(c => c.CompaniesRoles)
+            .HasForeignKey(cr => cr.CompanyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // IdentityRole doesn't have a navigation property back to CompaniesRoles, so we configure it with WithMany() (no param)
+        modelBuilder.Entity<CompaniesRoles>()
+            .HasOne(cr => cr.Role)
+            .WithMany() 
+            .HasForeignKey(cr => cr.RoleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
     }
 } 
