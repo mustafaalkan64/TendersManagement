@@ -36,3 +36,18 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+@if (TempData["SuccessMessage"] != null)
+{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                title: 'Baþarýlý!',
+                text: 'Ýþlem Baþarýlý!',
+                icon: 'success',
+                confirmButtonText: 'Tamam'
+            });
+        });
+    </script>
+}
+

@@ -84,6 +84,7 @@ namespace Offers.Pages.CompaniesRoles
                 }
             }
 
+            TempData["SuccessMessage"] = "İşlem başarıyla tamamlandı.";
             return RedirectToPage("./Index");
         }
 

@@ -21,22 +21,21 @@ namespace Offers.Services.Company
         public async Task<IList<Models.Company>> GetCompaniesAsync(CancellationToken cancellationToken)
         {
             var user = _httpContextAccessor.HttpContext?.User;
-            if(user.IsInRole("Admin"))
-            {
-                return await _context.Companies
-                .OrderByDescending(x => x.CreatedDate)
-                .ToListAsync();
-            }
 
-            var roles = user?.Claims
+            var userRoles = user?.Claims
                 .Where(c => c.Type == ClaimTypes.Role)
                 .Select(c => c.Value)
                 .ToList() ?? new List<string>();
 
-            var companies = await _context.Companies.ToListAsync(cancellationToken);
-
-            return companies.Where(x => roles.Any(r => r.ToLower().Contains(x.Name.ToLower())))
-                .OrderByDescending(x => x.CreatedDate).ToList();
+            var companies = await _context.Companies
+                .Include(c => c.CompaniesRoles) // Ensure mapped
+                .ThenInclude(cr => cr.Role)
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync(cancellationToken);
+            // Filter companies where any of the company's assigned roles match any of the user's roles
+            return companies
+                .Where(c => c.CompaniesRoles.Any(cr => userRoles.Contains(cr.Role.Name)))
+                .ToList();
         }
 
         public async Task CreateCompanyAsync(Models.Company company)
