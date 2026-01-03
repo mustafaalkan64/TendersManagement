@@ -52,10 +52,18 @@ namespace Pages.EquipmentModelPage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
         {
             if (EquipmentModel.EquipmentId == null || string.IsNullOrEmpty(EquipmentModel.Brand) || string.IsNullOrEmpty(EquipmentModel.Model))
             {
+                await LoadEquipmentList();
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+                return Page();
+            }
+
+            if (await _context.EquipmentModels.AnyAsync(em => em.Brand == EquipmentModel.Brand && em.Model == EquipmentModel.Model && em.Id != EquipmentModel.Id))
+            {
+                ModelState.AddModelError(string.Empty, "Bu marka ve model zaten mevcut.");
                 await LoadEquipmentList();
                 Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
                 return Page();
@@ -87,7 +95,7 @@ namespace Pages.EquipmentModelPage
                 }
                 else
                 {
-                    StatusMessage = "Error: Güncelleme sýrasýnda bir hata oluþtu.";
+                    StatusMessage = "Error: GÃ¼ncelleme sÄ±rasÄ±nda bir hata oluÅŸtu.";
                     await LoadEquipmentList();
                     Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
                     return Page();

@@ -61,6 +61,14 @@ namespace Pages.EquipmentModelPage
                 return Page();
             }
 
+            if (await _context.EquipmentModels.AnyAsync(em => em.Brand == EquipmentModel.Brand && em.Model == EquipmentModel.Model))
+            {
+                ModelState.AddModelError(string.Empty, "Bu marka ve model zaten mevcut.");
+                await LoadEquipmentList();
+                Units = await _context.Units.OrderBy(u => u.Name).ToListAsync();
+                return Page();
+            }
+
             _context.EquipmentModels.Add(EquipmentModel);
             await _context.SaveChangesAsync();
 
@@ -73,7 +81,7 @@ namespace Pages.EquipmentModelPage
 
             await _context.SaveChangesAsync();
 
-            StatusMessage = "Equipment model created successfully.";
+            StatusMessage = "Baþarýyla kaydedildi.";
 
             return RedirectToPage("./Index");
         }
