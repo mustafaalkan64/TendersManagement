@@ -48,6 +48,9 @@ namespace Models
         [Display(Name = "Toplam Tutar")]
         public decimal TotalPrice { get; set; }
 
+        [Display(Name = "Euro Kuru")]
+        public decimal? EuroRate { get; set; }
+
         [Display(Name = "Olusturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Offers.Services.Currency;
 using System.Threading;
 
 namespace Pages.Offers
@@ -13,15 +14,17 @@ namespace Pages.Offers
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICurrencyService _currencyService;
 
-        public CreateModel(ApplicationDbContext context)
+        public CreateModel(ApplicationDbContext context, ICurrencyService currencyService)
         {
             _context = context;
+            _currencyService = currencyService;
             OfferItems = new List<OfferItem>();
         }
 
         [BindProperty]
-        public Offer Offer { get; set; }
+        public Offer Offer { get; set; } = new Offer();
 
         public SelectList ProjectOwnerList { get; set; }
         public SelectList ConsultantList { get; set; }
@@ -81,6 +84,10 @@ namespace Pages.Offers
         {
             await LoadDropDownLists(cancellationToken);
 
+            // Fetch current Euro rate
+            var euroRate = await _currencyService.GetEuroRateAsync();
+            Offer.EuroRate = euroRate;
+           
             return Page();
         }
 

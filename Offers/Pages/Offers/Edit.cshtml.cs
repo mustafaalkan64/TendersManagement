@@ -1,6 +1,7 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Offers.Services.Currency;
 using Offers.Services.Offer;
 using Pages.Offers.Helpers;
 
@@ -12,13 +13,15 @@ namespace Pages.Offers
         private readonly ApplicationDbContext _context;
         private readonly IOfferService _offerService;
         private readonly IMemoryCache _cache;
+        private readonly ICurrencyService _currencyService;
         private const string Cetinkaya = "Çetinkaya";
 
-        public EditModel(ApplicationDbContext context, IMemoryCache cache, IOfferService offerService)
+        public EditModel(ApplicationDbContext context, IMemoryCache cache, IOfferService offerService, ICurrencyService currencyService)
         {
             _context = context;
             _cache = cache;
             _offerService = offerService;
+            _currencyService = currencyService;
         }
 
         [BindProperty]
@@ -53,10 +56,15 @@ namespace Pages.Offers
         private async Task LoadRelatedData(int? id = 0, CancellationToken cancellationToken = default)
         {
             Offer = await GetOfferByIdAsync(id, cancellationToken);
-            if (Offer == null)
+
+            if (Offer is null)
             {
                 throw new ArgumentNullException("Teklif Bulunamadi");
             }
+
+            var euroRate = await _currencyService.GetEuroRateAsync(Offer?.TeklifGonderimTarihi ?? DateTime.Today);
+
+            Offer.EuroRate = euroRate;
 
             var offerItemsQuery = Offer.OfferItems.AsQueryable();
 
@@ -165,6 +173,11 @@ namespace Pages.Offers
             await LoadRelatedData(id, cancellationToken);
             NewItem.EquipmentModelId = 0;
             NewItem.CompanyId = 0;
+
+            // Fetch current Euro rate
+            var euroRate = await _currencyService.GetEuroRateAsync();
+            ViewData["EuroRate"] = euroRate;
+
             return Page();
         }
 
