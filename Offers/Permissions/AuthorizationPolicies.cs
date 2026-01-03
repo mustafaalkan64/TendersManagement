@@ -81,6 +81,17 @@ namespace Offers.Permissions
                 policy.Requirements.Add(new PermissionRequirement("OfferDuzenle")));
             options.AddPolicy("CanDeleteOffer", policy =>
                 policy.Requirements.Add(new PermissionRequirement("OfferSil")));
+
+
+            // Offer policies
+            options.AddPolicy("CanListCompaniesRoles", policy =>
+                policy.Requirements.Add(new PermissionRequirement("SirketRolListele")));
+            options.AddPolicy("CanAddCompaniesRoles", policy =>
+                policy.Requirements.Add(new PermissionRequirement("SirketRolEkle")));
+            options.AddPolicy("CanEditCompaniesRoles", policy =>
+                policy.Requirements.Add(new PermissionRequirement("SirketRolDuzenle")));
+            options.AddPolicy("CanDeleteCompaniesRoles", policy =>
+                policy.Requirements.Add(new PermissionRequirement("SirketRolSil")));
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Offers.Pages.CompaniesRoles
 {
+    [Authorize(Policy = "CanDeleteCompaniesRoles")]
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;

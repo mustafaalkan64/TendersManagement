@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Offers.Pages.CompaniesRoles
 {
+    [Authorize(Policy = "CanListCompaniesRoles")]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace Offers.Pages.CompaniesRoles
 {
+
+    [Authorize(Policy = "CanAddCompaniesRoles")]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;

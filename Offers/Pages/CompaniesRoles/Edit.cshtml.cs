@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Offers.Pages.CompaniesRoles
 {
+    [Authorize(Policy = "CanEditCompaniesRoles")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;

@@ -56,7 +56,11 @@ namespace Offers.Data
                     new Permission { Name = "TeknikSartnameDuzenle", DisplayName = "Teknik Şartname Duzenle" },
                     new Permission { Name = "TeknikSartnameSil", DisplayName = "Teknik Şartname Sil" },
                     new Permission { Name = "TeknikSartnameEkle", DisplayName = "Teknik Şartname Ekle" },
-                    new Permission { Name = "TeknikSartnameListele", DisplayName = "Teknik Şartname Listele" }
+                    new Permission { Name = "TeknikSartnameListele", DisplayName = "Teknik Şartname Listele" },
+                    new Permission { Name = "SirketRolListele", DisplayName = "Şirket Rol Listele" },
+                    new Permission { Name = "SirketRolEkle", DisplayName = "Şirket Rol Ekle" },
+                    new Permission { Name = "SirketRolDuzenle", DisplayName = "Şirket Rol Düzenle" },
+                    new Permission { Name = "SirketRolSil", DisplayName = "Şirket Rol Sil" }
                 );
                 context.SaveChanges();
             }

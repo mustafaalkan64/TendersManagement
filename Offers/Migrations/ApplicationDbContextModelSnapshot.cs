@@ -240,7 +240,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("CompaniesRoles");
+                    b.ToTable("CompaniesRoles", (string)null);
                 });
 
             modelBuilder.Entity("Models.Company", b =>
@@ -301,7 +301,7 @@ namespace Offers.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("Models.CompanyEquipmentModel", b =>
@@ -327,7 +327,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("EquipmentModelId");
 
-                    b.ToTable("CompanyEquipmentModels");
+                    b.ToTable("CompanyEquipmentModels", (string)null);
                 });
 
             modelBuilder.Entity("Models.ConsultantCompany", b =>
@@ -385,7 +385,7 @@ namespace Offers.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ConsultantCompanies");
+                    b.ToTable("ConsultantCompanies", (string)null);
                 });
 
             modelBuilder.Entity("Models.Equipment", b =>
@@ -408,7 +408,7 @@ namespace Offers.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Equipment");
+                    b.ToTable("Equipment", (string)null);
                 });
 
             modelBuilder.Entity("Models.EquipmentFeature", b =>
@@ -447,7 +447,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("EquipmentFeatures");
+                    b.ToTable("EquipmentFeatures", (string)null);
                 });
 
             modelBuilder.Entity("Models.EquipmentModel", b =>
@@ -480,7 +480,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("EquipmentId");
 
-                    b.ToTable("EquipmentModels");
+                    b.ToTable("EquipmentModels", (string)null);
                 });
 
             modelBuilder.Entity("Models.EquipmentModelFeature", b =>
@@ -513,7 +513,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("EquipmentModelFeatures");
+                    b.ToTable("EquipmentModelFeatures", (string)null);
                 });
 
             modelBuilder.Entity("Models.Offer", b =>
@@ -598,7 +598,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("ProjectOwnerId");
 
-                    b.ToTable("Offers");
+                    b.ToTable("Offers", (string)null);
                 });
 
             modelBuilder.Entity("Models.OfferItem", b =>
@@ -638,7 +638,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("OfferId");
 
-                    b.ToTable("OfferItems");
+                    b.ToTable("OfferItems", (string)null);
                 });
 
             modelBuilder.Entity("Models.OfferTeknikSartname", b =>
@@ -674,7 +674,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("OfferId");
 
-                    b.ToTable("OfferTeknikSartnames");
+                    b.ToTable("OfferTeknikSartnames", (string)null);
                 });
 
             modelBuilder.Entity("Models.Permission", b =>
@@ -697,7 +697,7 @@ namespace Offers.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permissions", (string)null);
                 });
 
             modelBuilder.Entity("Models.ProjectOwner", b =>
@@ -734,7 +734,7 @@ namespace Offers.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProjectOwners");
+                    b.ToTable("ProjectOwners", (string)null);
                 });
 
             modelBuilder.Entity("Models.RolePermission", b =>
@@ -758,7 +758,7 @@ namespace Offers.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RolePermissions");
+                    b.ToTable("RolePermissions", (string)null);
                 });
 
             modelBuilder.Entity("Models.Unit", b =>
@@ -781,7 +781,7 @@ namespace Offers.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Units");
+                    b.ToTable("Units", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
