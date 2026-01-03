@@ -1,46 +1,66 @@
 @page
 @model LoginModel
 @{
-    ViewData["Title"] = "Login";
+    Layout = null;
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="account" method="post">
-            <h2>Hesabýnla Giriþ Yap</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GiriÅŸ - Teklif YÃ¶netim Sistemi</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="bi bi-building" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h2>Teklif YÃ¶netim Sistemi</h2>
+                <p>HesabÄ±nÄ±za giriÅŸ yapÄ±n</p>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
-                <label asp-for="Input.Password">Þifre</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            
+            <div class="login-body">
+                <form method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="form-control" placeholder="E-posta" autocomplete="username" />
+                        <label asp-for="Input.Email">E-posta</label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" type="password" placeholder="Åžifre" autocomplete="current-password" />
+                        <label asp-for="Input.Password">Åžifre</label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input asp-for="Input.RememberMe" class="form-check-input" />
+                        <label asp-for="Input.RememberMe" class="form-check-label">
+                            Beni hatÄ±rla
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>GiriÅŸ Yap
+                    </button>
+                </form>
             </div>
-            <div class="checkbox mb-3">
-                <label asp-for="Input.RememberMe" class="form-label">
-                    <input class="form-check-input" asp-for="Input.RememberMe" />
-                    Beni Hatýrla
-                </label>
-            </div>
-            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Giriþ Yap</button>
-            <div class="mt-3">
-                <p>
-                    <a asp-page="./Register">Yeni Kullanýcý Oluþtur</a>
-                </p>
-            </div>
-            @* <div class="form-group">
-                <p>
-                    <a asp-page="./ForgotPassword">Forgot your password?</a>
-                </p>
-            </div> *@
-        </form>
+        </div>
     </div>
-</div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-} 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

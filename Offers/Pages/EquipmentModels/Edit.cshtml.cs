@@ -85,7 +85,7 @@ namespace Pages.EquipmentModelPage
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
             catch (DbUpdateConcurrencyException)
             {

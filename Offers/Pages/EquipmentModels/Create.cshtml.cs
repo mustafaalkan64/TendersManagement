@@ -52,7 +52,7 @@ namespace Pages.EquipmentModelPage
             return new JsonResult(features);
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
         {
             if (EquipmentModel.EquipmentId == null || string.IsNullOrEmpty(EquipmentModel.Brand) || string.IsNullOrEmpty(EquipmentModel.Model))
             {
@@ -70,7 +70,7 @@ namespace Pages.EquipmentModelPage
             }
 
             _context.EquipmentModels.Add(EquipmentModel);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             // Add features
             foreach (var feature in Features)
