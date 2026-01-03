@@ -24,8 +24,10 @@ namespace Offers.Services.Company
 
             var userRoles = user?.Claims
                 .Where(c => c.Type == ClaimTypes.Role)
-                .Select(c => c.Value)
+                .Select(c => c.Value.Trim())
                 .ToList() ?? new List<string>();
+
+            userRoles = new List<string> { "Çetinkaya" };
 
             var companies = await _context.Companies
                 .Include(c => c.CompaniesRoles) // Ensure mapped
@@ -34,7 +36,7 @@ namespace Offers.Services.Company
                 .ToListAsync(cancellationToken);
             // Filter companies where any of the company's assigned roles match any of the user's roles
             return companies
-                .Where(c => c.CompaniesRoles.Any(cr => userRoles.Contains(cr.Role.Name)))
+                .Where(c => c.CompaniesRoles.Any(cr => userRoles.Contains(cr.Role.Name.Trim())))
                 .ToList();
         }
 
