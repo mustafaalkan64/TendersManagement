@@ -87,7 +87,7 @@
             <a class="page-link" asp-page="./Index" asp-route-pageIndex="1" asp-route-searchString="@Model.SearchString">İlk</a>
         </li>
         <li class="page-item @(Model.EquipmentModels.HasPreviousPage ? "" : "disabled")">
-            <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.EquipmentModels.PageIndex - 1)" asp-route-searchString="@Model.SearchString">Ã–nceki</a>
+            <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.EquipmentModels.PageIndex - 1)" asp-route-searchString="@Model.SearchString">Önceki</a>
         </li>
         @for (var i = 1; i <= Model.EquipmentModels.TotalPages; i++)
         {

@@ -14,14 +14,16 @@ namespace Pages.Offers
         private readonly IOfferService _offerService;
         private readonly IMemoryCache _cache;
         private readonly ICurrencyService _currencyService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private const string Cetinkaya = "Çetinkaya";
 
-        public EditModel(ApplicationDbContext context, IMemoryCache cache, IOfferService offerService, ICurrencyService currencyService)
+        public EditModel(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, IMemoryCache cache, IOfferService offerService, ICurrencyService currencyService)
         {
             _context = context;
             _cache = cache;
             _offerService = offerService;
             _currencyService = currencyService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [BindProperty]
@@ -68,16 +70,64 @@ namespace Pages.Offers
 
             var offerItemsQuery = Offer.OfferItems.AsQueryable();
 
-            if (!string.IsNullOrEmpty(SearchString))
+            var user = _httpContextAccessor.HttpContext?.User;
+            var isAdmin = user != null && user.IsInRole("Admin");
+
+            var userRoles = user?.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value.Trim())
+                .ToList() ?? new List<string>();
+
+
+            var filteredList = new List<OfferItem>();
+            if (!isAdmin && userRoles.Any())
             {
-                offerItemsQuery = offerItemsQuery.Where(x =>
-                    x.EquipmentModel.Model.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
-                    x.Company.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
-                    x.EquipmentModel.Equipment.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
-                    x.EquipmentModel.Capacity.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
-                    x.EquipmentModel.Brand.Contains(SearchString, StringComparison.OrdinalIgnoreCase));
+
+                var query = offerItemsQuery
+                    .AsNoTracking();
+
+                query = query.Where(em =>
+                   em.Company.CompaniesRoles.Any(cr => userRoles.Contains(cr.Role.Name.Trim()))
+                );
+
+                if (!string.IsNullOrEmpty(SearchString))
+                {
+                    query = query.Where(x =>
+                        x.EquipmentModel.Model.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.Company.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.EquipmentModel.Equipment.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.EquipmentModel.Capacity.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.EquipmentModel.Brand.Contains(SearchString, StringComparison.OrdinalIgnoreCase));
+                }
+
+                filteredList = query.OrderBy(x => x.Company.Name).ThenBy(x => x.Price).ToList();
             }
+
+            else
+            {
+                if (!string.IsNullOrEmpty(SearchString))
+                {
+                    offerItemsQuery = offerItemsQuery.Where(x =>
+                        x.EquipmentModel.Model.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.Company.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.EquipmentModel.Equipment.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.EquipmentModel.Capacity.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                        x.EquipmentModel.Brand.Contains(SearchString, StringComparison.OrdinalIgnoreCase));
+                }
+
+            }
+
             OfferItems = offerItemsQuery.OrderBy(x => x.Company.Name).ThenBy(x => x.Price).ToList();
+
+            CompanySummaries = OfferItems
+            .GroupBy(oi => oi.Company.Name)
+                .Select(g => new CompanySummaryViewModel
+                {
+                    CompanyName = g.Key,
+                    TotalPrice = g.Sum(oi => oi.Price * oi.Quantity)
+                })
+            .OrderBy(s => s.TotalPrice)
+            .ToList();
 
             var equipmentModels = new List<EquipmentModel?>();
 
@@ -86,18 +136,10 @@ namespace Pages.Offers
                 equipmentModels = await GetEquipmentModelsByCompanyId(NewItem.CompanyId, cancellationToken);
             }
 
-            CompanySummaries = OfferItems
-                .GroupBy(oi => oi.Company.Name)
-                .Select(g => new CompanySummaryViewModel
-                {
-                    CompanyName = g.Key,
-                    TotalPrice = g.Sum(oi => oi.Price * oi.Quantity)
-                })
-                .OrderBy(s => s.TotalPrice)
-                .ToList();
-
             MinOfferAmount = CompanySummaries.Any() ? CompanySummaries.First().TotalPrice : 0;
             MinOfferCompany = CompanySummaries.Any() ? CompanySummaries.First().CompanyName : "";
+
+            OfferItems = filteredList.Any() ? filteredList : OfferItems;
 
             EquipmentModelList = new SelectList(
                 new List<SelectListItem>

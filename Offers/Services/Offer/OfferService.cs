@@ -31,6 +31,8 @@ namespace Offers.Services.Offer
                                 .ThenInclude(em => em.Features)
                     .Include(o => o.OfferItems)
                         .ThenInclude(oi => oi.Company)
+                            .ThenInclude(c => c.CompaniesRoles)
+                                .ThenInclude(cr => cr.Role)
                     .Include(o => o.OfferItems)
                         .ThenInclude(oi => oi.EquipmentModel)
                             .ThenInclude(em => em.Features)
