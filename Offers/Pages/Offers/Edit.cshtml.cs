@@ -259,6 +259,19 @@ namespace Pages.Offers
 
         public async Task<IActionResult> OnPostSaveAsync(CancellationToken cancellationToken)
         {
+            var euroRate = Offer.EuroRate;
+
+            var totalPrice = Offer.OfferItems.Sum(x => x.Price * x.Quantity);
+
+            var euroAmount = totalPrice / euroRate;
+
+            if (Offer.OfferItems.Count() < 3 && euroAmount >= 20000)
+            {
+                ViewData["StatusMessage"] = "Teklif tutarı 20.000 euro ve üstü olduğu için en az 3 teklif kalemi içermeli";
+                await LoadRelatedData(Offer.Id, cancellationToken);
+                return Page();
+            }
+
             if (string.IsNullOrEmpty(Offer.OfferName))
             {
                 await LoadRelatedData(Offer.Id, cancellationToken);
@@ -267,7 +280,7 @@ namespace Pages.Offers
 
             if (!(Offer.SonTeklifBildirme > Offer.TeklifGonderimTarihi))
             {
-                StatusMessage = "Son teklif bildirme tarihi teklif gönderim tarihinden sonra olmalıdır";
+                ViewData["StatusMessage"] = "Son teklif bildirme tarihi teklif gönderim tarihinden sonra olmalıdır";
                 await LoadRelatedData(Offer.Id, cancellationToken);
                 return Page();
             }
@@ -762,12 +775,28 @@ namespace Pages.Offers
         {
             var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
 
+            OfferItems = offer.OfferItems.ToList();
+
+            var totalPrice = OfferItems.Sum(offer => offer.Price * offer.Quantity);
+
+            var euroRate = Offer.EuroRate;
+
+            var euroAmount = totalPrice / euroRate;
+
+            if (OfferItems.Any() && euroAmount < 20000)
+            {
+                await LoadRelatedData(Offer.Id, cancellationToken);
+
+                ViewData["StatusMessage"] = "Toplam teklif tutar 20.000 euro altı olduğu için sadece tek bir defa teklif verilebilir";
+                return Page();
+            }
+
+
             var projectOwner = await _context.Offers
                     .Include(o => o.ProjectOwner)
                     .FirstOrDefaultAsync(o => o.Id == Offer.Id, cancellationToken);
             var projectOwnerTraktorHp = projectOwner.ProjectOwner.Hp;
 
-            OfferItems = offer.OfferItems.ToList();
 
             if (NewItem == null || NewItem.EquipmentModelId == 0 || NewItem.CompanyId == 0 || NewItem.Price <= 0 || NewItem.Quantity <= 0)
             {
@@ -788,7 +817,7 @@ namespace Pages.Offers
                     {
                         await LoadRelatedData(Offer.Id, cancellationToken);
 
-                        StatusMessage = "Traktor Hp degeri, makine ekipman hp degeri araliginda veya bu degerden buyuk olmalidir";
+                        ViewData["StatusMessage"] = "Traktor Hp degeri, makine ekipman hp degeri araliginda veya bu degerden buyuk olmalidir";
                         return Page();
                     }
                 }
@@ -797,7 +826,7 @@ namespace Pages.Offers
                     if(projectOwnerTraktorHp < Int32.Parse(equipmentModelUnitFeature.FeatureValue))
                     {
                         await LoadRelatedData(Offer.Id, cancellationToken);
-                        StatusMessage = "Traktor Hp degeri, makine ekipman hp degerinden küçük olmamalidir";
+                        ViewData["StatusMessage"] = "Traktor Hp degeri, makine ekipman hp degerinden küçük olmamalidir";
                         return Page();
                     }
                 }
@@ -814,7 +843,7 @@ namespace Pages.Offers
             if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModelId == NewItem.EquipmentModelId))
             {
                 await LoadRelatedData(Offer.Id, cancellationToken);
-                StatusMessage = "Zaten bu kurum, aynı ekipman modele daha önce teklif vermiş";
+                ViewData["StatusMessage"] = "Zaten bu kurum, aynı ekipman modele daha önce teklif vermiş";
                 return Page();
             }
 
@@ -823,7 +852,7 @@ namespace Pages.Offers
             if (OfferItems.Any(x => x.CompanyId == NewItem.CompanyId && x.EquipmentModel.EquipmentId == equipmentModel?.EquipmentId))
             {
                 await LoadRelatedData(Offer.Id, cancellationToken);
-                StatusMessage = "Zaten bu firma, aynı ekipmana daha önce teklif vermiş";
+                ViewData["StatusMessage"] = "Zaten bu firma, aynı ekipmana daha önce teklif vermiş";
                 return Page();
             }
 
@@ -841,7 +870,7 @@ namespace Pages.Offers
                     {
                         await LoadRelatedData(Offer.Id, cancellationToken);
 
-                        StatusMessage = "Teklif tutarı en düşük teklif tutarından düşük olamaz";
+                        ViewData["StatusMessage"] = "Teklif tutarı en düşük teklif tutarından düşük olamaz";
                         return Page();
                     }
 
@@ -849,7 +878,7 @@ namespace Pages.Offers
                     {
                         await LoadRelatedData(Offer.Id, cancellationToken);
 
-                        StatusMessage = "Teklif tutarı en düşük teklif tutarının %20sinden fazla olamaz";
+                        ViewData["StatusMessage"] = "Teklif tutarı en düşük teklif tutarının %20sinden fazla olamaz";
                         return Page();
                     }
                 }
@@ -926,14 +955,14 @@ namespace Pages.Offers
 
                 if (newPrice <= min)
                 {
-                    StatusMessage = "Teklif tutarı en dusuk teklif miktarindan az olamaz";
+                    ViewData["StatusMessage"] = "Teklif tutarı en dusuk teklif miktarindan az olamaz";
                     await LoadRelatedData(offerId, cancellationToken);
                     return Page();
                 }
 
                 if(newPrice > twentyPercentMore)
                 {
-                    StatusMessage = "Teklif tutarı en dusuk teklif miktarindan yuzde 20si araliginda olmalidir";
+                    ViewData["StatusMessage"] = "Teklif tutarı en dusuk teklif miktarindan yuzde 20si araliginda olmalidir";
                     await LoadRelatedData(offerId, cancellationToken);
                     return Page();
                 }

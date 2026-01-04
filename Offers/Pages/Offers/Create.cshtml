@@ -7,14 +7,6 @@
 
 <h1>@ViewData["Title"]</h1>
 
-@if (!string.IsNullOrEmpty(Model.StatusMessage))
-{
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        @Model.StatusMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
 <div class="row">
     <div class="col-md-12">
         <form method="post">
@@ -226,5 +218,24 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @{
+        var statusMessage = ViewData["StatusMessage"] as string;
+    }
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    title: 'Info',
+                    text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(statusMessage)),
+                    icon: 'info',
+                    confirmButtonText: 'Tamam'
+                });
+            });
+        </script>
+    }
     <partial name="_ValidationScriptsPartial" />
-} 
+}
