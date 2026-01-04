@@ -20,7 +20,7 @@ namespace Offers.Services.EquipmentModel
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IList<Models.EquipmentModel>> GetEquipmentModelsAsync(string searchString, CancellationToken cancellationToken = default)
+        public async Task<PaginatedList<Models.EquipmentModel>> GetEquipmentModelsAsync(string searchString, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
         {
             var user = _httpContextAccessor.HttpContext?.User;
             var isAdmin = user != null && user.IsInRole("Admin");
@@ -30,36 +30,39 @@ namespace Offers.Services.EquipmentModel
                 .Select(c => c.Value.Trim())
                 .ToList() ?? new List<string>();
 
-            var query = await _context.EquipmentModels
+            var query = _context.EquipmentModels
                 .Include(em => em.Equipment)
                 .Include(em => em.CompanyEquipmentModels)
                     .ThenInclude(cem => cem.Company)
-                        .ThenInclude(c => c.CompaniesRoles) // Make sure to include this for filtering
+                        .ThenInclude(c => c.CompaniesRoles)
                             .ThenInclude(cr => cr.Role)
-                .ToListAsync(cancellationToken);
+                .AsNoTracking();
+
+            var filteredList = await query.ToListAsync(cancellationToken);
 
             if (!isAdmin && userRoles.Any())
             {
-                 query = query.Where(em => em.CompanyEquipmentModels.Any(cem => 
+                 filteredList = filteredList.Where(em => em.CompanyEquipmentModels.Any(cem => 
                     cem.Company.CompaniesRoles.Any(cr => userRoles.Contains(cr.Role.Name.Trim()))
                  )).ToList();
             }
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(em =>
-                    em.Equipment.Name.Contains(searchString) ||
-                    em.Brand.Contains(searchString) ||
-                    em.Capacity.Contains(searchString) ||
-                    em.CompanyEquipmentModels.Any(cem => cem.Company.Name.Contains(searchString)) ||
-                    em.Model.Contains(searchString)).ToList();
+                filteredList = filteredList.Where(em =>
+                    em.Equipment.Name.Contains(searchString, System.StringComparison.OrdinalIgnoreCase) ||
+                    em.Brand.Contains(searchString, System.StringComparison.OrdinalIgnoreCase) ||
+                    em.Capacity.Contains(searchString, System.StringComparison.OrdinalIgnoreCase) ||
+                    em.CompanyEquipmentModels.Any(cem => cem.Company.Name.Contains(searchString, System.StringComparison.OrdinalIgnoreCase)) ||
+                    em.Model.Contains(searchString, System.StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            return query
+            var orderedList = filteredList
                 .OrderBy(em => em.Equipment.Name)
                 .ThenBy(em => em.Brand)
-                .ThenBy(em => em.Model)
-                .ToList();
+                .ThenBy(em => em.Model);
+
+            return PaginatedList<Models.EquipmentModel>.Create(orderedList, pageIndex, pageSize);
         }
 
         public async Task<List<Models.Company>> GetCompaniesAsync(CancellationToken cancellationToken = default)

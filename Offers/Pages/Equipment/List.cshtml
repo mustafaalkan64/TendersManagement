@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model EquipmentListModel
 @{
     ViewData["Title"] = "Ekipman Listesi";
@@ -11,7 +11,7 @@
 <div class="row mb-3">
     <div class="col-md-6">
         <div class="input-group">
-            <input type="text" id="searchInput" class="form-control" placeholder="Ekipmanlar i�inde ara.."
+            <input type="text" id="searchInput" class="form-control" placeholder="Ekipmanlar içinde ara.."
                    value="@Model.SearchString" />
             <button class="btn btn-outline-secondary" type="button" onclick="search()">
                 <i class="bi bi-search"></i> Ara
@@ -32,8 +32,8 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Ad&#305;</th>
-            <th>A&ccedil;&#305;klamas&#305;</th>
+            <th>Adı</th>
+            <th>Açıklaması</th>
             <th>Aksiyonlar</th>
         </tr>
     </thead>
@@ -44,13 +44,36 @@
                 <td>@item.Name</td>
                 <td>@item.Description</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">D&uuml;zenle</a>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning">Düzenle</a>
                     <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger">Sil</a>
                 </td>
             </tr>
         }
     </tbody>
-</table> 
+</table>
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.Equipment.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="./List" asp-route-pageIndex="1" asp-route-searchString="@Model.SearchString">İlk</a>
+        </li>
+        <li class="page-item @(Model.Equipment.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-page="./List" asp-route-pageIndex="@(Model.Equipment.PageIndex - 1)" asp-route-searchString="@Model.SearchString">Önceki</a>
+        </li>
+        @for (var i = 1; i <= Model.Equipment.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.Equipment.PageIndex ? "active" : "")">
+                <a class="page-link" asp-page="./List" asp-route-pageIndex="@i" asp-route-searchString="@Model.SearchString">@i</a>
+            </li>
+        }
+        <li class="page-item @(Model.Equipment.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-page="./List" asp-route-pageIndex="@(Model.Equipment.PageIndex + 1)" asp-route-searchString="@Model.SearchString">Sonraki</a>
+        </li>
+        <li class="page-item @(Model.Equipment.PageIndex == Model.Equipment.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="./List" asp-route-pageIndex="@Model.Equipment.TotalPages" asp-route-searchString="@Model.SearchString">Son</a>
+        </li>
+    </ul>
+</nav>
+ 
 
  @section Scripts {
     <script>
@@ -72,3 +95,4 @@
         });
     </script>
 }
+

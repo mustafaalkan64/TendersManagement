@@ -14,11 +14,17 @@ namespace Offers.Services.Equipment
             _context = context;
         }
 
-        public async Task<IList<Models.Equipment>> GetEquipmentListAsync()
+        public async Task<PaginatedList<Models.Equipment>> GetEquipmentListAsync(string searchString, int pageIndex, int pageSize)
         {
-            return await _context.Equipment
-                .OrderBy(e => e.Name)
-                .ToListAsync();
+            var query = _context.Equipment.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(e => e.Name.Contains(searchString) || (e.Description != null && e.Description.Contains(searchString)));
+            }
+
+            query = query.OrderBy(e => e.Name);
+            return await PaginatedList<Models.Equipment>.CreateAsync(query.AsNoTracking(), pageIndex, pageSize);
         }
 
         public async Task<Models.Equipment?> GetEquipmentByIdAsync(int id)

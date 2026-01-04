@@ -1,4 +1,4 @@
-@page
+﻿@page
 @using global::Pages.EquipmentModelPage
 @model IndexModel
 @{
@@ -10,7 +10,7 @@
 <div class="row mb-3">
     <div class="col-md-6">
         <div class="input-group">
-            <input type="text" id="searchInput" class="form-control" placeholder="Ekipman ismi, modeli veya marka icinde ara.."
+            <input type="text" id="searchInput" class="form-control" placeholder="Ekipman ismi, modeli veya marka içinde ara.."
                    value="@Model.SearchString" />
             <button class="btn btn-outline-secondary" type="button" onclick="search()">
                 <i class="bi bi-search"></i> Ara
@@ -34,7 +34,7 @@
             <th>Ekipman</th>
             <th>Marka</th>
             <th>Model</th>
-            <th>�irketler</th>
+            <th>Şirketler</th>
             <th>Kapasite</th>
             <th></th>
         </tr>
@@ -74,13 +74,36 @@
                 </td>
                 <td>@item.Capacity</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">D�zenle</a>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
                     <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
                 </td>
             </tr>
         }
     </tbody>
-</table> 
+</table>
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.EquipmentModels.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="./Index" asp-route-pageIndex="1" asp-route-searchString="@Model.SearchString">İlk</a>
+        </li>
+        <li class="page-item @(Model.EquipmentModels.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.EquipmentModels.PageIndex - 1)" asp-route-searchString="@Model.SearchString">Ã–nceki</a>
+        </li>
+        @for (var i = 1; i <= Model.EquipmentModels.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.EquipmentModels.PageIndex ? "active" : "")">
+                <a class="page-link" asp-page="./Index" asp-route-pageIndex="@i" asp-route-searchString="@Model.SearchString">@i</a>
+            </li>
+        }
+        <li class="page-item @(Model.EquipmentModels.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.EquipmentModels.PageIndex + 1)" asp-route-searchString="@Model.SearchString">Sonraki</a>
+        </li>
+        <li class="page-item @(Model.EquipmentModels.PageIndex == Model.EquipmentModels.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="./Index" asp-route-pageIndex="@Model.EquipmentModels.TotalPages" asp-route-searchString="@Model.SearchString">Son</a>
+        </li>
+    </ul>
+</nav>
+ 
 
 @section Scripts {
     <script>
@@ -89,7 +112,7 @@
             const companyId = select.value;
 
             if (!companyId) {
-                alert('Lutfen bir sirket seciniz');
+                alert('Lütfen bir şirket seciniz');
                 return;
             }
 
@@ -111,7 +134,7 @@
         }
 
         function removeCompany(equipmentModelId, companyId) {
-            if (!confirm('Silmek istedi�inize emin misiniz?')) {
+            if (!confirm('Silmek istediğinize emin misiniz?')) {
                 return;
             }
 
@@ -127,7 +150,7 @@
                 if (response.ok) {
                     window.location.reload();
                 } else {
-                    alert('�irket silerken hata meydana geldi!');
+                    alert('Şirket silerken hata meydana geldi!');
                 }
             });
         }
@@ -149,3 +172,4 @@
         });
     </script>
 }
+

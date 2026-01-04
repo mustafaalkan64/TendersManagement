@@ -26,3 +26,4 @@ global using Microsoft.EntityFrameworkCore;
 
 // Project-specific namespaces
 global using Models;
+global using Offers.Helpers;

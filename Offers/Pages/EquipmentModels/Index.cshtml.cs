@@ -14,15 +14,22 @@ namespace Pages.EquipmentModelPage
             _equipmentModelService = equipmentModelService;
         }
 
-        public IList<EquipmentModel> EquipmentModels { get; set; }
+        public PaginatedList<EquipmentModel> EquipmentModels { get; set; }
         public List<Company> Companies { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageIndex { get; set; } = 1;
+
+        [BindProperty(SupportsGet = true)]
+        public int PageSize { get; set; } = 10;
 
         [BindProperty(SupportsGet = true)]
         public string SearchString { get; set; }
 
         public async Task OnGetAsync(CancellationToken cancellationToken = default)
         {
-            EquipmentModels = await _equipmentModelService.GetEquipmentModelsAsync(SearchString, cancellationToken);
+            if (PageIndex < 1) PageIndex = 1;
+            EquipmentModels = await _equipmentModelService.GetEquipmentModelsAsync(SearchString, PageIndex, PageSize, cancellationToken);
             Companies = await _equipmentModelService.GetCompaniesAsync(cancellationToken);
         }
         public async Task<IActionResult> OnPostAddCompanyAsync([FromBody] CompanyAssignmentModel model, CancellationToken cancellationToken = default)

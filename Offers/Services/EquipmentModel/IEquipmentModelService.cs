@@ -7,7 +7,7 @@ namespace Offers.Services.EquipmentModel
 {
     public interface IEquipmentModelService
     {
-        Task<IList<Models.EquipmentModel>> GetEquipmentModelsAsync(string searchString, CancellationToken cancellationToken = default);
+        Task<PaginatedList<Models.EquipmentModel>> GetEquipmentModelsAsync(string searchString, int pageIndex, int pageSize, CancellationToken cancellationToken = default);
         Task<List<Models.Company>> GetCompaniesAsync(CancellationToken cancellationToken = default);
         Task AddCompanyAssignmentAsync(int companyId, int equipmentModelId, CancellationToken cancellationToken = default);
         Task RemoveCompanyAssignmentAsync(int companyId, int equipmentModelId, CancellationToken cancellationToken = default);
