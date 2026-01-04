@@ -261,11 +261,15 @@ namespace Pages.Offers
         {
             var euroRate = Offer.EuroRate;
 
-            var totalPrice = Offer.OfferItems.Sum(x => x.Price * x.Quantity);
+            var offer = await GetOfferByIdAsync(Offer.Id);
+
+            var offerItems = offer.OfferItems.ToList();
+
+            var totalPrice = offerItems.Sum(x => x.Price * x.Quantity);
 
             var euroAmount = totalPrice / euroRate;
 
-            if (Offer.OfferItems.Count() < 3 && euroAmount >= 20000)
+            if (offerItems.Count() < 3 && euroAmount >= 20000)
             {
                 ViewData["StatusMessage"] = "Teklif tutarı 20.000 euro ve üstü olduğu için en az 3 teklif kalemi içermeli";
                 await LoadRelatedData(Offer.Id, cancellationToken);
