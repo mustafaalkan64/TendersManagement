@@ -20,7 +20,7 @@ public class LogoutModel : PageModel
         }
         else
         {
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Account/Login");
         }
     }
 } 
