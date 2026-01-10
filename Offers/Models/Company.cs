@@ -45,7 +45,7 @@ namespace Models
 
         [Display(Name = "Faks")]
         [StringLength(20)]
-        public string Faks { get; set; }
+        public string? Faks { get; set; }
 
         [Required]
         [Display(Name = "E-posta")]
