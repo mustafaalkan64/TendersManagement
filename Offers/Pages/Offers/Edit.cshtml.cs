@@ -678,6 +678,10 @@ namespace Pages.Offers
             var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
+            var totalOffer = offer.OfferItems.Sum(x => x.Price * x.Quantity);
+            var euroRate = totalOffer / offer.EuroRate;
+            var teklifSartname = euroRate <= 40000 ? "Teknik Proje Hariç" : "Teknik Proje Dahil";
+
             // Create a copy of the template to modify
             byte[] modifiedDocument;
 
@@ -720,6 +724,7 @@ namespace Pages.Offers
                     OfferDocumentHelper.ReplaceText(wordDoc, "F6", Offer.PersonelSayisi.ToString());
                     OfferDocumentHelper.ReplaceText(wordDoc, "LX", Offer.OtpHazirlanmaSuresi.ToString());
                     OfferDocumentHelper.ReplaceText(wordDoc, "MY", Offer.OtpPersonelSayisi.ToString());
+                    OfferDocumentHelper.ReplaceText(wordDoc, "ABCD", teklifSartname);
                     OfferDocumentHelper.ReplaceText(wordDoc, "H7", isPlaniHazirligi.ToString("#,##0.00", trCulture));
                     OfferDocumentHelper.ReplaceText(wordDoc, "I8", otp.ToString("#,##0.00", trCulture));
                     OfferDocumentHelper.ReplaceText(wordDoc, "K9", (isPlaniHazirligi + otp).ToString("#,##0.00", trCulture));
