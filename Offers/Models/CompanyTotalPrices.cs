@@ -4,5 +4,7 @@
     {
         public string CompanyName { get; set; }
         public decimal TotalPrice { get; set; }
+
+        public decimal TotalPriceInEuro { get; set; }
     }
 }

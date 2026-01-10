@@ -51,6 +51,9 @@ namespace Models
         [Display(Name = "Euro Kuru")]
         public decimal? EuroRate { get; set; }
 
+        [Display(Name = "Teklif Þartname Euro")]
+        public decimal? TeklifEuro { get; set; }
+
         [Display(Name = "Olusturma Tarihi")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 

@@ -72,7 +72,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.IdleTimeout = TimeSpan.FromDays(1);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -100,7 +100,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     // Cookie'nin ne kadar süre geçerli olacaðýný belirler
-    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.ExpireTimeSpan = TimeSpan.FromDays(1);
+    options.SlidingExpiration = true;
 
     // RememberMe seçiliyse kalýcý cookie oluþturur
     options.SlidingExpiration = true;
@@ -108,6 +109,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
+
 
 var app = builder.Build();
 

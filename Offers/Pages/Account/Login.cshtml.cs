@@ -42,7 +42,7 @@ public class LoginModel : PageModel
 
         if (ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, true, lockoutOnFailure: false);
             if (result.Succeeded)
             {
                 return LocalRedirect(returnUrl);

@@ -87,6 +87,7 @@ namespace Pages.Offers
             // Fetch current Euro rate
             var euroRate = await _currencyService.GetEuroRateAsync();
             Offer.EuroRate = euroRate;
+            Offer.TeklifEuro = Offer.TeklifEuro ?? 40000;
            
             return Page();
         }

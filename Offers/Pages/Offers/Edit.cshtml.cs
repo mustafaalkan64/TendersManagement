@@ -39,6 +39,8 @@ namespace Pages.Offers
         public List<CompanySummaryViewModel> CompanySummaries { get; set; }
 
         public Decimal MinOfferAmount { get; set; }
+
+        public Decimal MinOfferAmountInEuro { get; set; }
         public string MinOfferCompany { get; set; }
 
         [TempData]
@@ -67,6 +69,7 @@ namespace Pages.Offers
             var euroRate = await _currencyService.GetEuroRateAsync(Offer?.TeklifGonderimTarihi ?? DateTime.Today);
 
             Offer.EuroRate = euroRate;
+            Offer.TeklifEuro = Offer.TeklifEuro ?? 40000;
 
             var offerItemsQuery = Offer.OfferItems.AsQueryable();
 
@@ -124,7 +127,8 @@ namespace Pages.Offers
                 .Select(g => new CompanySummaryViewModel
                 {
                     CompanyName = g.Key,
-                    TotalPrice = g.Sum(oi => oi.Price * oi.Quantity)
+                    TotalPrice = g.Sum(oi => oi.Price * oi.Quantity),
+                    TotalPriceInEuro = g.Sum(oi => oi.Price * oi.Quantity) / Offer.EuroRate.Value
                 })
             .OrderBy(s => s.TotalPrice)
             .ToList();
@@ -138,6 +142,7 @@ namespace Pages.Offers
 
             MinOfferAmount = CompanySummaries.Any() ? CompanySummaries.First().TotalPrice : 0;
             MinOfferCompany = CompanySummaries.Any() ? CompanySummaries.First().CompanyName : "";
+            MinOfferAmountInEuro = CompanySummaries.Any() ? (CompanySummaries.First().TotalPrice / Offer.EuroRate.Value) : 0;
 
             OfferItems = filteredList.Any() ? filteredList : OfferItems;
 
@@ -269,15 +274,17 @@ namespace Pages.Offers
 
             var euroAmount = totalPrice / euroRate;
 
-            if (offerItems.Count() < 3 && euroAmount >= 20000)
-            {
-                ViewData["StatusMessage"] = "Teklif tutarı 20.000 euro ve üstü olduğu için en az 3 teklif kalemi içermeli";
-                await LoadRelatedData(Offer.Id, cancellationToken);
-                return Page();
-            }
+            //if (offerItems.Count() < 3 && euroAmount >= 20000)
+            //{
+            //    ViewData["StatusMessage"] = "Teklif tutarı 20.000 euro ve üstü olduğu için en az 3 teklif kalemi içermeli";
+            //    await LoadRelatedData(Offer.Id, cancellationToken);
+            //    return Page();
+            //}
 
             if (string.IsNullOrEmpty(Offer.OfferName))
             {
+                ViewData["StatusMessage"] = "Teklif ismi boş olamaz";
+
                 await LoadRelatedData(Offer.Id, cancellationToken);
                 return Page();
             }
@@ -734,6 +741,12 @@ namespace Pages.Offers
             string templatePath = "";
 
             var offer = await GetOfferByIdAsync(Offer.Id, cancellationToken);
+            
+            var totalOffer = offer.OfferItems.Sum(x => x.Price * x.Quantity);
+
+            var euroRate = totalOffer / offer.EuroRate;
+
+            var teklifSartname = euroRate <= 40000 ? "Teknik Proje Hariç" : "Teknik Proje Dahil";
 
             CultureInfo trCulture = new CultureInfo("tr-TR");
 
@@ -758,6 +771,7 @@ namespace Pages.Offers
                     OfferDocumentHelper.ReplaceText(wordDoc, "AZDC", offer.ProjectOwner.Name);
                     OfferDocumentHelper.ReplaceText(wordDoc, "AXDY", offer.OfferName);
                     OfferDocumentHelper.ReplaceText(wordDoc, "BCDY", offer.ProjectAddress);
+                    OfferDocumentHelper.ReplaceText(wordDoc, "ABCD", teklifSartname);
                     OfferDocumentHelper.ReplaceText(wordDoc, "XDAY", offer.DanismanlikTeklifGonderim?.ToString("dd.MM.yyyy"));
                 }
                 modifiedDocument = memoryStream.ToArray();
@@ -787,13 +801,13 @@ namespace Pages.Offers
 
             var euroAmount = totalPrice / euroRate;
 
-            if (OfferItems.Any() && euroAmount < 20000)
-            {
-                await LoadRelatedData(Offer.Id, cancellationToken);
+            //if (OfferItems.Count() == 1 && euroAmount < 20000)
+            //{
+            //    await LoadRelatedData(Offer.Id, cancellationToken);
 
-                ViewData["StatusMessage"] = "Toplam teklif tutar 20.000 euro altı olduğu için sadece tek bir defa teklif verilebilir";
-                return Page();
-            }
+            //    ViewData["StatusMessage"] = "Toplam teklif tutar 20.000 euro altı olduğu için sadece tek bir defa teklif verilebilir";
+            //    return Page();
+            //}
 
 
             var projectOwner = await _context.Offers
