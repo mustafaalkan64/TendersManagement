@@ -184,6 +184,11 @@
                                                     <td>@summary.TotalPriceInEuro.ToString("C", new CultureInfo("de-DE"))</td>
                                                 </tr>
                                             }
+                                            <tr>
+												<td><strong>Genel Toplam</strong></td>
+												<td><strong>@Model.CompanySummaries.Sum(s => s.TotalPrice).ToString("C")</strong></td>
+												<td><strong>@Model.CompanySummaries.Sum(s => s.TotalPriceInEuro).ToString("C", new CultureInfo("de-DE"))</strong></td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
